@@ -15,6 +15,17 @@ export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
     [decoded.id]
   );
   req.user = user.rows[0];
+
+  if (req.user?.role === "Seller") {
+    const { rows: profileRows } = await database.query(
+      "SELECT status FROM seller_profiles WHERE user_id = ?",
+      [req.user.id]
+    );
+    if (profileRows[0]?.status === "Suspended") {
+      return next(new ErrorHandler("Your seller account has been suspended.", 403));
+    }
+  }
+
   next();
 });
 

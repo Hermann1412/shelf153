@@ -2,7 +2,9 @@ import { useSelector } from "react-redux";
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const OrdersChart = () => {
-  const { orderStatusCounts } = useSelector((state) => state.admin);
+  const { orderStatusCounts } = useSelector((state) =>
+    state.auth.user?.role === "Seller" ? state.seller : state.admin
+  );
 
   const statusColors = {
     Processing: "#facc15", // yellow

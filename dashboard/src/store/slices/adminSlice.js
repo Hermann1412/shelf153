@@ -42,6 +42,23 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+export const updateSellerStatus = createAsyncThunk(
+  "admin/updateSellerStatus",
+  async ({ userId, status }, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.patch(
+        `/admin/seller/${userId}/status`,
+        { status }
+      );
+      toast.success(data.message);
+      return { userId, status };
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update seller status");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 export const adminSlice = createSlice({
   name: "admin",
   initialState: {
@@ -97,6 +114,10 @@ export const adminSlice = createSlice({
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.users = state.users.filter((u) => u.id !== action.payload);
         state.totalUsers -= 1;
+      })
+      .addCase(updateSellerStatus.fulfilled, (state, action) => {
+        const user = state.users.find((u) => u.id === action.payload.userId);
+        if (user) user.seller_status = action.payload.status;
       });
   },
 });

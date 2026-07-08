@@ -36,13 +36,29 @@ export const createProduct = catchAsyncErrors(async (req, res, next) => {
   res.status(201).json({ success: true, message: "Product created successfully.", product: rows[0] });
 });
 
+const SELLER_JOIN = `
+     JOIN users u ON u.id = p.created_by
+     LEFT JOIN seller_profiles sp ON sp.user_id = p.created_by`;
+const SELLER_NOT_SUSPENDED = "(sp.status IS NULL OR sp.status != 'Suspended')";
+
+const attachSeller = (row) => {
+  const { owner_role, store_name, ...product } = row;
+  return {
+    ...product,
+    seller:
+      owner_role === "Seller"
+        ? { id: product.created_by, name: store_name || "Unnamed Store" }
+        : { id: null, name: "Shelf153" },
+  };
+};
+
 export const fetchAllProducts = catchAsyncErrors(async (req, res) => {
   const { availability, price, category, ratings, search } = req.query;
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const offset = (page - 1) * limit;
 
-  const conditions = [];
+  const conditions = [SELLER_NOT_SUSPENDED];
   const values = [];
 
   if (availability === "in-stock") conditions.push("stock > 5");
@@ -72,46 +88,55 @@ export const fetchAllProducts = catchAsyncErrors(async (req, res) => {
     values.push(`%${search}%`, `%${search}%`);
   }
 
-  const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const whereClause = `WHERE ${conditions.join(" AND ")}`;
 
   const { rows: countRows } = await database.query(
-    `SELECT COUNT(*) AS count FROM products p ${whereClause}`,
+    `SELECT COUNT(*) AS count FROM products p ${SELLER_JOIN} ${whereClause}`,
     values
   );
   const totalProducts = parseInt(countRows[0].count);
 
   const { rows: products } = await database.query(
-    `SELECT p.*, COUNT(r.id) AS review_count
+    `SELECT p.*, u.role AS owner_role, sp.store_name, COUNT(r.id) AS review_count
      FROM products p
+     ${SELLER_JOIN}
      LEFT JOIN reviews r ON p.id = r.product_id
      ${whereClause}
-     GROUP BY p.id
+     GROUP BY p.id, u.role, sp.store_name
      ORDER BY p.created_at DESC
      LIMIT ? OFFSET ?`,
     [...values, limit, offset]
   );
 
   const { rows: newProducts } = await database.query(
-    `SELECT p.*, COUNT(r.id) AS review_count
+    `SELECT p.*, u.role AS owner_role, sp.store_name, COUNT(r.id) AS review_count
      FROM products p
+     ${SELLER_JOIN}
      LEFT JOIN reviews r ON p.id = r.product_id
-     WHERE p.created_at >= NOW() - INTERVAL 30 DAY
-     GROUP BY p.id
+     WHERE p.created_at >= NOW() - INTERVAL 30 DAY AND ${SELLER_NOT_SUSPENDED}
+     GROUP BY p.id, u.role, sp.store_name
      ORDER BY p.created_at DESC
      LIMIT 8`
   );
 
   const { rows: topRatedProducts } = await database.query(
-    `SELECT p.*, COUNT(r.id) AS review_count
+    `SELECT p.*, u.role AS owner_role, sp.store_name, COUNT(r.id) AS review_count
      FROM products p
+     ${SELLER_JOIN}
      LEFT JOIN reviews r ON p.id = r.product_id
-     WHERE p.ratings >= 4.5
-     GROUP BY p.id
+     WHERE p.ratings >= 4.5 AND ${SELLER_NOT_SUSPENDED}
+     GROUP BY p.id, u.role, sp.store_name
      ORDER BY p.ratings DESC, p.created_at DESC
      LIMIT 8`
   );
 
-  res.status(200).json({ success: true, products, totalProducts, newProducts, topRatedProducts });
+  res.status(200).json({
+    success: true,
+    products: products.map(attachSeller),
+    totalProducts,
+    newProducts: newProducts.map(attachSeller),
+    topRatedProducts: topRatedProducts.map(attachSeller),
+  });
 });
 
 export const updateProduct = catchAsyncErrors(async (req, res, next) => {
@@ -124,6 +149,9 @@ export const updateProduct = catchAsyncErrors(async (req, res, next) => {
 
   const { rows } = await database.query("SELECT * FROM products WHERE id = ?", [productId]);
   if (rows.length === 0) return next(new ErrorHandler("Product not found.", 404));
+  if (req.user.role === "Seller" && rows[0].created_by !== req.user.id) {
+    return next(new ErrorHandler("You can only manage your own products.", 403));
+  }
 
   await database.query(
     "UPDATE products SET name = ?, description = ?, price = ?, category = ?, stock = ? WHERE id = ?",
@@ -139,6 +167,9 @@ export const deleteProduct = catchAsyncErrors(async (req, res, next) => {
 
   const { rows } = await database.query("SELECT * FROM products WHERE id = ?", [productId]);
   if (rows.length === 0) return next(new ErrorHandler("Product not found.", 404));
+  if (req.user.role === "Seller" && rows[0].created_by !== req.user.id) {
+    return next(new ErrorHandler("You can only manage your own products.", 403));
+  }
 
   const images = rows[0].images;
   await database.query("DELETE FROM products WHERE id = ?", [productId]);
@@ -156,7 +187,11 @@ export const fetchSingleProduct = catchAsyncErrors(async (req, res, next) => {
   const { productId } = req.params;
 
   const { rows: productRows } = await database.query(
-    "SELECT * FROM products WHERE id = ?",
+    `SELECT p.*, ou.role AS owner_role, sp.store_name
+     FROM products p
+     JOIN users ou ON ou.id = p.created_by
+     LEFT JOIN seller_profiles sp ON sp.user_id = p.created_by
+     WHERE p.id = ? AND ${SELLER_NOT_SUSPENDED}`,
     [productId]
   );
   if (!productRows[0]) return next(new ErrorHandler("Product not found.", 404));
@@ -180,7 +215,7 @@ export const fetchSingleProduct = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Product fetched successfully.",
-    product: { ...productRows[0], reviews },
+    product: { ...attachSeller(productRows[0]), reviews },
   });
 });
 

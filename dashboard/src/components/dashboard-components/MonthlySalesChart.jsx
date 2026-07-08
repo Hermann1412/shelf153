@@ -10,7 +10,9 @@ import {
 } from "recharts";
 
 const MonthlySalesChart = () => {
-  const { monthlySales } = useSelector((state) => state.admin);
+  const { monthlySales } = useSelector((state) =>
+    state.auth.user?.role === "Seller" ? state.seller : state.admin
+  );
 
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm">

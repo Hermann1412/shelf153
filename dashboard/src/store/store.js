@@ -5,6 +5,7 @@ import adminReducer from "./slices/adminSlice";
 import productReducer from "./slices/productsSlice";
 import orderReducer from "./slices/orderSlice";
 import chatReducer from "./slices/chatSlice";
+import sellerReducer from "./slices/sellerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     product: productReducer,
     order: orderReducer,
     chat: chatReducer,
+    seller: sellerReducer,
   },
 });

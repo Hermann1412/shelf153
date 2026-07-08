@@ -8,31 +8,44 @@ import {
   LogOut,
   MoveLeft,
   MessageSquare,
+  Store,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setOpenedComponent, toggleNavbar } from "../store/slices/extraSlice";
 import { logout } from "../store/slices/authSlice";
 
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard },
-  { label: "Products", icon: Package },
-  { label: "Orders", icon: ListOrdered },
-  { label: "Users", icon: Users },
-  { label: "Chat", icon: MessageSquare },
-  { label: "Profile", icon: User },
-];
+const navItemsByRole = {
+  Admin: [
+    { label: "Dashboard", icon: LayoutDashboard },
+    { label: "Products", icon: Package },
+    { label: "Orders", icon: ListOrdered },
+    { label: "Users", icon: Users },
+    { label: "Chat", icon: MessageSquare },
+    { label: "Profile", icon: User },
+  ],
+  Seller: [
+    { label: "Dashboard", icon: LayoutDashboard },
+    { label: "Products", icon: Package },
+    { label: "Orders", icon: ListOrdered },
+    { label: "StoreProfile", icon: Store, display: "Store Profile" },
+    { label: "Profile", icon: User },
+  ],
+  User: [{ label: "StoreProfile", icon: Store, display: "Store Profile" }],
+};
 
 const SideBar = () => {
   const dispatch = useDispatch();
   const { openedComponent, isNavbarOpened } = useSelector(
     (state) => state.extra
   );
+  const { user } = useSelector((state) => state.auth);
   const { conversations } = useSelector((state) => state.chat);
   const totalUnread = conversations.reduce(
     (acc, c) =>
       acc + (c.status === "open" ? Number(c.unread_count || 0) : 0),
     0
   );
+  const navItems = navItemsByRole[user?.role] || [];
 
   const handleLogout = () => {
     dispatch(logout());
@@ -67,7 +80,7 @@ const SideBar = () => {
 
           {/* Nav Items */}
           <nav className="flex-1 p-4 space-y-1">
-            {navItems.map(({ label, icon: Icon }) => (
+            {navItems.map(({ label, icon: Icon, display }) => (
               <button
                 key={label}
                 onClick={() => dispatch(setOpenedComponent(label))}
@@ -78,7 +91,7 @@ const SideBar = () => {
                 }`}
               >
                 <Icon className="w-5 h-5" />
-                <span className="flex-1 text-left">{label}</span>
+                <span className="flex-1 text-left">{display || label}</span>
                 {label === "Chat" && totalUnread > 0 && (
                   <span className="w-5 h-5 bg-blue-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
                     {totalUnread > 9 ? "9+" : totalUnread}

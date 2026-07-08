@@ -48,6 +48,9 @@ const ProductCard = ({ product }) => {
         <h3 className="text-sm font-semibold text-foreground truncate mb-1">
           {product.name}
         </h3>
+        <p className="text-xs text-muted-foreground/80 mb-1 truncate">
+          Sold by {product.seller?.name || "Shelf153"}
+        </p>
         <div className="flex items-center gap-1 mb-2">
           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
           <span className="text-xs text-muted-foreground">

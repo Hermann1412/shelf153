@@ -7,12 +7,15 @@ export async function createOrderItemTable() {
         id CHAR(36) PRIMARY KEY,
         order_id CHAR(36) NOT NULL,
         product_id CHAR(36) NOT NULL,
+        seller_id CHAR(36) NULL,
         quantity INT NOT NULL,
         price DECIMAL(10,2) NOT NULL,
+        item_status VARCHAR(50) DEFAULT 'Processing',
         image TEXT,
         title TEXT,
         FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+        INDEX idx_order_items_seller_id (seller_id)
       )
     `);
   } catch (error) {

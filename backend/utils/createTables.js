@@ -1,4 +1,5 @@
 import { createUserTable } from "../models/userTable.js";
+import { createSellerProfilesTable } from "../models/sellerProfilesTable.js";
 import { createOrderItemTable } from "../models/orderItemsTable.js";
 import { createOrdersTable } from "../models/ordersTable.js";
 import { createPaymentsTable } from "../models/paymentsTable.js";
@@ -10,6 +11,7 @@ import { createChatTables } from "../models/chatTables.js";
 export const createTables = async () => {
   try {
     await createUserTable();
+    await createSellerProfilesTable();
     await createProductsTable();
     await createProductReviewsTable();
     await createOrdersTable();

@@ -14,6 +14,9 @@ import Orders from "./components/Orders";
 import Users from "./components/Users";
 import Profile from "./components/Profile";
 import Chat from "./components/Chat";
+import StoreProfile from "./components/StoreProfile";
+import SellerProducts from "./components/SellerProducts";
+import SellerOrders from "./components/SellerOrders";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -30,6 +33,24 @@ function AppContent() {
   }, [dispatch]);
 
   const renderDashboardContent = () => {
+    // A plain User has no store yet — send them straight to the apply form.
+    if (user?.role === "User") return <StoreProfile />;
+
+    if (user?.role === "Seller") {
+      switch (openedComponent) {
+        case "Products":
+          return <SellerProducts />;
+        case "Orders":
+          return <SellerOrders />;
+        case "StoreProfile":
+          return <StoreProfile />;
+        case "Profile":
+          return <Profile />;
+        default:
+          return <Dashboard />;
+      }
+    }
+
     switch (openedComponent) {
       case "Dashboard":
         return <Dashboard />;
@@ -66,7 +87,8 @@ function AppContent() {
       <Route
         path="/"
         element={
-          isAuthenticated && user?.role === "Admin" ? (
+          isAuthenticated &&
+          ["Admin", "Seller", "User"].includes(user?.role) ? (
             <div className="flex min-h-screen bg-gray-100">
               <SideBar />
               <div className="flex-1 flex flex-col">

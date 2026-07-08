@@ -10,6 +10,7 @@ import productRouter from "./router/productRoutes.js";
 import adminRouter from "./router/adminRoutes.js";
 import orderRouter from "./router/orderRoutes.js";
 import chatRouter from "./router/chatRoutes.js";
+import sellerRouter from "./router/sellerRoutes.js";
 import database from "./database/db.js";
 
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/v1/product", productRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/chat", chatRouter);
+app.use("/api/v1/seller", sellerRouter);
 
 app.post("/api/v1/payment/airtel/callback", async (req, res) => {
   try {

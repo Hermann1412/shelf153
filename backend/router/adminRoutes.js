@@ -1,5 +1,10 @@
 import express from "express";
-import { getAllUsers, deleteUser, dashboardStats } from "../controllers/adminController.js";
+import {
+  getAllUsers,
+  deleteUser,
+  dashboardStats,
+  updateSellerStatus,
+} from "../controllers/adminController.js";
 import {
   authorizedRoles,
   isAuthenticated,
@@ -24,6 +29,12 @@ router.get(
   isAuthenticated,
   authorizedRoles("Admin"),
   dashboardStats
+);
+router.patch(
+  "/seller/:id/status",
+  isAuthenticated,
+  authorizedRoles("Admin"),
+  updateSellerStatus
 );
 
 export default router;

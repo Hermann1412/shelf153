@@ -18,7 +18,7 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
   const productIds = items.map((item) => item.product.id);
   const placeholders = productIds.map(() => "?").join(", ");
   const { rows: products } = await database.query(
-    `SELECT id, price, stock, name FROM products WHERE id IN (${placeholders})`,
+    `SELECT id, price, stock, name, created_by FROM products WHERE id IN (${placeholders})`,
     productIds
   );
 
@@ -46,8 +46,8 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
   for (const item of items) {
     const product = products.find((p) => p.id === item.product.id);
     await database.query(
-      "INSERT INTO order_items (id, order_id, product_id, quantity, price, image, title) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [uuidv4(), orderId, product.id, item.quantity, product.price, item.product.images?.[0]?.url || "", product.name]
+      "INSERT INTO order_items (id, order_id, product_id, seller_id, quantity, price, image, title) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [uuidv4(), orderId, product.id, product.created_by, item.quantity, product.price, item.product.images?.[0]?.url || "", product.name]
     );
   }
 

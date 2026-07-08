@@ -120,31 +120,39 @@ const Orders = () => {
                     </div>
                   </div>
 
-                  {order.items && order.items.length > 0 && (
+                  {order.order_items && order.order_items.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-border flex gap-3 overflow-x-auto">
-                      {order.items.map((item, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-3 shrink-0"
-                        >
-                          <img
-                            src={
-                              item.image ||
-                              "/avatar-holder.avif"
-                            }
-                            alt={item.name}
-                            className="w-12 h-12 rounded-lg object-cover"
-                          />
-                          <div>
-                            <p className="text-sm text-foreground font-medium">
-                              {item.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Qty: {item.quantity} × ${Number(item.price).toFixed(2)}
-                            </p>
+                      {order.order_items.map((item, i) => {
+                        const itemCfg =
+                          statusConfig[item.item_status] || statusConfig.Processing;
+                        const ItemStatusIcon = itemCfg.icon;
+                        return (
+                          <div
+                            key={i}
+                            className="flex items-center gap-3 shrink-0"
+                          >
+                            <img
+                              src={item.image || "/avatar-holder.avif"}
+                              alt={item.title}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                            <div>
+                              <p className="text-sm text-foreground font-medium">
+                                {item.title}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Qty: {item.quantity} × ${Number(item.price).toFixed(2)}
+                              </p>
+                              <span
+                                className={`inline-flex items-center gap-1 mt-1 text-xs ${itemCfg.color}`}
+                              >
+                                <ItemStatusIcon className="w-3 h-3" />
+                                {item.item_status || "Processing"}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

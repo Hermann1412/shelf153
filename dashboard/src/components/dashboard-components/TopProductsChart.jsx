@@ -12,7 +12,9 @@ import {
 const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 const TopProductsChart = () => {
-  const { topSellingProducts } = useSelector((state) => state.admin);
+  const { topSellingProducts } = useSelector((state) =>
+    state.auth.user?.role === "Seller" ? state.seller : state.admin
+  );
 
   const data = topSellingProducts.map((p) => ({
     name: p.name?.length > 15 ? p.name.slice(0, 15) + "…" : p.name,

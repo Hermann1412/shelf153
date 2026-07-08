@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 const Stats = () => {
   const { todayRevenue, yesterdayRevenue, currentMonthSales } = useSelector(
-    (state) => state.admin
+    (state) => (state.auth.user?.role === "Seller" ? state.seller : state.admin)
   );
 
   const cards = [

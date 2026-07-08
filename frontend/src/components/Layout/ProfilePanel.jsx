@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { X, LogOut, Upload, Eye, EyeOff } from "lucide-react";
+import { X, LogOut, Upload, Eye, EyeOff, Store } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { toggleProfilePanel } from "../../store/slices/popupSlice";
@@ -190,12 +190,22 @@ const ProfilePanel = () => {
             </form>
           )}
 
+          <a
+            href={import.meta.env.VITE_DASHBOARD_URL || "http://localhost:5174"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full mt-6 py-3 bg-secondary text-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-secondary/80"
+          >
+            <Store className="w-5 h-5" />
+            {authUser.role === "Seller" ? "Manage My Store" : "Become a Seller"}
+          </a>
+
           <button
             onClick={() => {
               dispatch(logout());
               dispatch(toggleProfilePanel());
             }}
-            className="w-full mt-6 py-3 bg-destructive/10 text-destructive rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-destructive/20"
+            className="w-full mt-3 py-3 bg-destructive/10 text-destructive rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-destructive/20"
           >
             <LogOut className="w-5 h-5" />
             Logout

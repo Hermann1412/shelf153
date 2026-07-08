@@ -3,7 +3,9 @@ import { useSelector } from "react-redux";
 import { Star } from "lucide-react";
 
 const TopSellingProducts = () => {
-  const { topSellingProducts } = useSelector((state) => state.admin);
+  const { topSellingProducts } = useSelector((state) =>
+    state.auth.user?.role === "Seller" ? state.seller : state.admin
+  );
 
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm">

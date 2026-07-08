@@ -8,17 +8,37 @@ export const getAllUsers = catchAsyncErrors(async (req, res) => {
   const offset = (page - 1) * 10;
 
   const { rows: countRows } = await database.query(
-    "SELECT COUNT(*) AS count FROM users WHERE role = ?",
-    ["User"]
+    "SELECT COUNT(*) AS count FROM users WHERE role IN ('User', 'Seller')"
   );
   const totalUsers = parseInt(countRows[0].count) || 0;
 
   const { rows: users } = await database.query(
-    "SELECT * FROM users WHERE role = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
-    ["User", 10, offset]
+    `SELECT u.*, sp.store_name, sp.status AS seller_status
+     FROM users u
+     LEFT JOIN seller_profiles sp ON sp.user_id = u.id
+     WHERE u.role IN ('User', 'Seller')
+     ORDER BY u.created_at DESC
+     LIMIT ? OFFSET ?`,
+    [10, offset]
   );
 
   res.status(200).json({ success: true, totalUsers, currentPage: page, users });
+});
+
+export const updateSellerStatus = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!["Approved", "Suspended"].includes(status)) {
+    return next(new ErrorHandler("Provide a valid status.", 400));
+  }
+
+  const { rows } = await database.query("SELECT * FROM seller_profiles WHERE user_id = ?", [id]);
+  if (rows.length === 0) return next(new ErrorHandler("Seller profile not found.", 404));
+
+  await database.query("UPDATE seller_profiles SET status = ? WHERE user_id = ?", [status, id]);
+  const { rows: updated } = await database.query("SELECT * FROM seller_profiles WHERE user_id = ?", [id]);
+
+  res.status(200).json({ success: true, message: `Seller ${status.toLowerCase()}.`, storeProfile: updated[0] });
 });
 
 export const deleteUser = catchAsyncErrors(async (req, res, next) => {

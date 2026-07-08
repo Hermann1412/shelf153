@@ -19,7 +19,7 @@ const router = express.Router();
 router.post(
   "/admin/create",
   isAuthenticated,
-  authorizedRoles("Admin"),
+  authorizedRoles("Admin", "Seller"),
   createProduct
 );
 router.get("/", fetchAllProducts);
@@ -29,13 +29,13 @@ router.delete("/delete/review/:productId", isAuthenticated, deleteReview);
 router.put(
   "/admin/update/:productId",
   isAuthenticated,
-  authorizedRoles("Admin"),
+  authorizedRoles("Admin", "Seller"),
   updateProduct
 );
 router.delete(
   "/admin/delete/:productId",
   isAuthenticated,
-  authorizedRoles("Admin"),
+  authorizedRoles("Admin", "Seller"),
   deleteProduct
 );
 router.post("/ai-search", isAuthenticated, fetchAIFilteredProducts);

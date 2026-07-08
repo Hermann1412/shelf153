@@ -11,14 +11,17 @@ import { useSelector } from "react-redux";
 import { formatNumber } from "../../lib/helper";
 
 const MiniSummary = () => {
+  const isSeller = useSelector((state) => state.auth.user?.role === "Seller");
   const {
     totalRevenueAllTime,
     totalUsersCount,
+    totalOrdersCount,
     orderStatusCounts,
     lowStockProducts,
     revenueGrowth,
     newUsersThisMonth,
-  } = useSelector((state) => state.admin);
+    newOrdersThisMonth,
+  } = useSelector((state) => (isSeller ? state.seller : state.admin));
 
   const totalOrders = Object.values(orderStatusCounts).reduce(
     (a, b) => a + b,
@@ -35,18 +38,20 @@ const MiniSummary = () => {
     },
     {
       label: "Total Orders",
-      value: formatNumber(totalOrders),
+      value: formatNumber(isSeller ? totalOrdersCount : totalOrders),
       icon: PackageCheck,
       color: "text-blue-600",
       bg: "bg-blue-50",
     },
-    {
-      label: "Total Users",
-      value: formatNumber(totalUsersCount),
-      icon: UserPlus,
-      color: "text-purple-600",
-      bg: "bg-purple-50",
-    },
+    isSeller
+      ? null
+      : {
+          label: "Total Users",
+          value: formatNumber(totalUsersCount),
+          icon: UserPlus,
+          color: "text-purple-600",
+          bg: "bg-purple-50",
+        },
     {
       label: "Revenue Growth",
       value: revenueGrowth || "0%",
@@ -55,8 +60,8 @@ const MiniSummary = () => {
       bg: "bg-emerald-50",
     },
     {
-      label: "New Users (Month)",
-      value: formatNumber(newUsersThisMonth),
+      label: isSeller ? "New Orders (Month)" : "New Users (Month)",
+      value: formatNumber(isSeller ? newOrdersThisMonth : newUsersThisMonth),
       icon: BarChart4,
       color: "text-indigo-600",
       bg: "bg-indigo-50",
@@ -70,7 +75,7 @@ const MiniSummary = () => {
       color: "text-orange-600",
       bg: "bg-orange-50",
     },
-  ];
+  ].filter(Boolean);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

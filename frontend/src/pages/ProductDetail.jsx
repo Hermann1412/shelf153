@@ -107,6 +107,9 @@ const ProductDetail = () => {
               <h1 className="text-3xl font-bold text-foreground mt-2">
                 {productDetails.name}
               </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Sold by {productDetails.seller?.name || "Shelf153"}
+              </p>
             </div>
 
             {/* Rating */}
