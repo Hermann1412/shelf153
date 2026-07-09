@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Mail,
   Phone,
@@ -10,24 +11,26 @@ import {
 } from "lucide-react";
 
 const Footer = () => {
+  const { t } = useTranslation();
+
   const footerLinks = {
     company: [
-      { name: "About Us", path: "/about" },
-      { name: "Careers", path: "#" },
-      { name: "Press", path: "#" },
-      { name: "Blog", path: "#" },
+      { name: t("footer.aboutUs"), path: "/about" },
+      { name: t("footer.careers"), path: "#" },
+      { name: t("footer.press"), path: "#" },
+      { name: t("footer.blog"), path: "#" },
     ],
     customer: [
-      { name: "Contact Us", path: "/contact" },
-      { name: "FAQ", path: "/faq" },
-      { name: "Shipping Info", path: "#" },
-      { name: "Returns", path: "#" },
+      { name: t("footer.contactUs"), path: "/contact" },
+      { name: t("footer.faq"), path: "/faq" },
+      { name: t("footer.shippingInfo"), path: "#" },
+      { name: t("footer.returns"), path: "#" },
     ],
     legal: [
-      { name: "Privacy Policy", path: "#" },
-      { name: "Terms of Service", path: "#" },
-      { name: "Cookie Policy", path: "#" },
-      { name: "Security", path: "#" },
+      { name: t("footer.privacyPolicy"), path: "#" },
+      { name: t("footer.termsOfService"), path: "#" },
+      { name: t("footer.cookiePolicy"), path: "#" },
+      { name: t("footer.security"), path: "#" },
     ],
   };
 
@@ -48,8 +51,7 @@ const Footer = () => {
               Shelf153
             </h2>
             <p className="text-muted-foreground mb-6">
-              Your trusted partner for online shopping. Discover amazing
-              products with exceptional quality and service.
+              {t("footer.description")}
             </p>
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-muted-foreground">
@@ -70,7 +72,7 @@ const Footer = () => {
           {/* Company Links */}
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Company
+              {t("footer.company")}
             </h3>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
@@ -89,7 +91,7 @@ const Footer = () => {
           {/* Customer Service */}
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Customer Service
+              {t("footer.customerService")}
             </h3>
             <ul className="space-y-2">
               {footerLinks.customer.map((link) => (
@@ -108,7 +110,7 @@ const Footer = () => {
           {/* Legal */}
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Legal
+              {t("footer.legal")}
             </h3>
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (

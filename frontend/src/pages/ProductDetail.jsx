@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, Link } from "react-router-dom";
 import {
   Star,
@@ -17,6 +18,7 @@ import { addToCart } from "../store/slices/cartSlice";
 import { toast } from "react-toastify";
 
 const ProductDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const dispatch = useDispatch();
   const { productDetails, loading, productReviews } = useSelector(
@@ -31,11 +33,11 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (productDetails.stock < 1) {
-      toast.error("Product is out of stock");
+      toast.error(t('productDetail.outOfStockError'));
       return;
     }
     dispatch(addToCart({ product: productDetails, quantity }));
-    toast.success("Added to cart!");
+    toast.success(t('productDetail.addedToCart'));
   };
 
   if (loading || !productDetails) {
@@ -58,7 +60,7 @@ const ProductDetail = () => {
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary animate-smooth mb-6"
         >
           <ChevronLeft className="w-4 h-4" />
-          Back to Products
+          {t('productDetail.backToProducts')}
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -72,7 +74,7 @@ const ProductDetail = () => {
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <div className="text-muted-foreground">No image available</div>
+                <div className="text-muted-foreground">{t('productDetail.noImage')}</div>
               )}
             </div>
             {images.length > 1 && (
@@ -108,7 +110,7 @@ const ProductDetail = () => {
                 {productDetails.name}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Sold by {productDetails.seller?.name || "Shelf153"}
+                {t('productDetail.soldBy', { name: productDetails.seller?.name || "Shelf153" })}
               </p>
             </div>
 
@@ -127,7 +129,7 @@ const ProductDetail = () => {
                 ))}
               </div>
               <span className="text-muted-foreground">
-                ({productReviews.length} reviews)
+                {t('productDetail.reviews', { count: productReviews.length })}
               </span>
             </div>
 
@@ -145,14 +147,14 @@ const ProductDetail = () => {
             <div>
               {productDetails.stock > 5 ? (
                 <span className="text-green-400 font-medium">
-                  In Stock ({productDetails.stock} available)
+                  {t('productDetail.inStockAvailable', { count: productDetails.stock })}
                 </span>
               ) : productDetails.stock > 0 ? (
                 <span className="text-yellow-400 font-medium">
-                  Low Stock ({productDetails.stock} left)
+                  {t('productDetail.lowStockLeft', { count: productDetails.stock })}
                 </span>
               ) : (
-                <span className="text-red-400 font-medium">Out of Stock</span>
+                <span className="text-red-400 font-medium">{t('productDetail.outOfStock')}</span>
               )}
             </div>
 
@@ -186,7 +188,7 @@ const ProductDetail = () => {
                 className="flex-1 w-full sm:w-auto py-3 px-8 gradient-primary text-primary-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:glow-on-hover animate-smooth disabled:opacity-50"
               >
                 <ShoppingCart className="w-5 h-5" />
-                Add to Cart
+                {t('productDetail.addToCart')}
               </button>
             </div>
           </div>

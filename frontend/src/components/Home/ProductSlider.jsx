@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import { addToCart } from "../../store/slices/cartSlice";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const ProductSlider = ({ title, products }) => {
+  const { t } = useTranslation();
   const scrollRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -19,7 +21,7 @@ const ProductSlider = ({ title, products }) => {
   const handleAddToCart = (e, product) => {
     e.preventDefault();
     dispatch(addToCart({ product, quantity: 1 }));
-    toast.success("Added to cart");
+    toast.success(t('productCard.addedToCart'));
   };
 
   return (

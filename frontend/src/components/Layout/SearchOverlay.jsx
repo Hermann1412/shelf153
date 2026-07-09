@@ -2,9 +2,11 @@ import { useState } from "react";
 import { X, Search } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { toggleSearchBar } from "../../store/slices/popupSlice";
 
 const SearchOverlay = () => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ const SearchOverlay = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={t("search.placeholder")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="w-full pl-14 pr-14 py-5 bg-background border border-border rounded-xl text-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -44,6 +46,7 @@ const SearchOverlay = () => {
             <button
               type="button"
               onClick={() => dispatch(toggleSearchBar())}
+              aria-label={t("aria.close")}
               className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary rounded-lg"
             >
               <X className="w-5 h-5 text-foreground" />

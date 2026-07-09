@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Search, Sparkles, Star, Filter, X, Loader } from "lucide-react";
 import { categories } from "../data/products";
 import ProductCard from "../components/Products/ProductCard";
@@ -10,6 +11,7 @@ import { fetchAllProducts } from "../store/slices/productSlice";
 import { toggleAIModal } from "../store/slices/popupSlice";
 
 const Products = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const location = useLocation();
   const { products, totalProducts, loading } = useSelector(
@@ -66,9 +68,9 @@ const Products = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Products</h1>
+            <h1 className="text-3xl font-bold text-foreground">{t('products.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              {totalProducts} products found
+              {t('products.productsFound', { count: totalProducts })}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -77,14 +79,14 @@ const Products = () => {
               className="flex items-center gap-2 px-4 py-2 gradient-primary text-primary-foreground rounded-lg font-medium hover:glow-on-hover animate-smooth"
             >
               <Sparkles className="w-4 h-4" />
-              AI Search
+              {t('products.aiSearch')}
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-accent animate-smooth lg:hidden"
             >
               <Filter className="w-4 h-4" />
-              Filters
+              {t('products.filters')}
             </button>
           </div>
         </div>
@@ -98,13 +100,13 @@ const Products = () => {
           >
             <div className="glass-panel space-y-6 sticky top-24">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">Filters</h3>
+                <h3 className="font-semibold text-foreground">{t('products.filters')}</h3>
                 {hasFilters && (
                   <button
                     onClick={clearFilters}
                     className="text-sm text-primary hover:underline"
                   >
-                    Clear all
+                    {t('products.clearAll')}
                   </button>
                 )}
               </div>
@@ -112,7 +114,7 @@ const Products = () => {
               {/* Search */}
               <div>
                 <label className="text-sm text-muted-foreground mb-2 block">
-                  Search
+                  {t('products.search')}
                 </label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -123,7 +125,7 @@ const Products = () => {
                       setSearch(e.target.value);
                       setPage(1);
                     }}
-                    placeholder="Search products..."
+                    placeholder={t('products.searchPlaceholder')}
                     className="w-full pl-10 pr-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
@@ -132,7 +134,7 @@ const Products = () => {
               {/* Category */}
               <div>
                 <label className="text-sm text-muted-foreground mb-2 block">
-                  Category
+                  {t('products.category')}
                 </label>
                 <select
                   value={category}
@@ -142,7 +144,7 @@ const Products = () => {
                   }}
                   className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="">All Categories</option>
+                  <option value="">{t('products.allCategories')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.name}>
                       {cat.name}
@@ -154,7 +156,7 @@ const Products = () => {
               {/* Price Range */}
               <div>
                 <label className="text-sm text-muted-foreground mb-2 block">
-                  Price Range
+                  {t('products.priceRange')}
                 </label>
                 <select
                   value={price}
@@ -164,19 +166,19 @@ const Products = () => {
                   }}
                   className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="">Any Price</option>
-                  <option value="0-25">Under $25</option>
-                  <option value="25-50">$25 - $50</option>
-                  <option value="50-100">$50 - $100</option>
-                  <option value="100-500">$100 - $500</option>
-                  <option value="500-10000">$500+</option>
+                  <option value="">{t('products.anyPrice')}</option>
+                  <option value="0-25">{t('products.under25')}</option>
+                  <option value="25-50">{t('products.range25to50')}</option>
+                  <option value="50-100">{t('products.range50to100')}</option>
+                  <option value="100-500">{t('products.range100to500')}</option>
+                  <option value="500-10000">{t('products.above500')}</option>
                 </select>
               </div>
 
               {/* Availability */}
               <div>
                 <label className="text-sm text-muted-foreground mb-2 block">
-                  Availability
+                  {t('products.availability')}
                 </label>
                 <select
                   value={availability}
@@ -186,17 +188,17 @@ const Products = () => {
                   }}
                   className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="">All</option>
-                  <option value="in-stock">In Stock</option>
-                  <option value="limited">Limited Stock</option>
-                  <option value="out-of-stock">Out of Stock</option>
+                  <option value="">{t('products.all')}</option>
+                  <option value="in-stock">{t('products.inStock')}</option>
+                  <option value="limited">{t('products.limitedStock')}</option>
+                  <option value="out-of-stock">{t('products.outOfStock')}</option>
                 </select>
               </div>
 
               {/* Ratings */}
               <div>
                 <label className="text-sm text-muted-foreground mb-2 block">
-                  Minimum Rating
+                  {t('products.minRating')}
                 </label>
                 <div className="flex gap-2">
                   {[4, 3, 2, 1].map((r) => (
@@ -230,14 +232,14 @@ const Products = () => {
             ) : products.length === 0 ? (
               <div className="text-center py-32">
                 <p className="text-xl text-muted-foreground">
-                  No products found
+                  {t('products.noProductsFound')}
                 </p>
                 {hasFilters && (
                   <button
                     onClick={clearFilters}
                     className="mt-4 text-primary hover:underline"
                   >
-                    Clear filters
+                    {t('products.clearFilters')}
                   </button>
                 )}
               </div>

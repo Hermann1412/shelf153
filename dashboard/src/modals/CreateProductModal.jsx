@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { createNewProduct } from "../store/slices/productsSlice";
 import { toggleCreateProductModal } from "../store/slices/extraSlice";
 import { LoaderCircle } from "lucide-react";
 
 const CreateProductModal = () => {
+  const { t } = useTranslation();
   const { loading } = useSelector((state) => state.product);
   const dispatch = useDispatch();
 
@@ -18,14 +20,14 @@ const CreateProductModal = () => {
   });
 
   const categoryOptions = [
-    "Electronics",
-    "Fashion",
-    "Home & Garden",
-    "Sports",
-    "Books",
-    "Beauty",
-    "Automotive",
-    "Kids & Baby",
+    { value: "Electronics", label: t("categories.electronics") },
+    { value: "Fashion", label: t("categories.fashion") },
+    { value: "Home & Garden", label: t("categories.homeGarden") },
+    { value: "Sports", label: t("categories.sports") },
+    { value: "Books", label: t("categories.books") },
+    { value: "Beauty", label: t("categories.beauty") },
+    { value: "Automotive", label: t("categories.automotive") },
+    { value: "Kids & Baby", label: t("categories.kidsBaby") },
   ];
 
   const handleSubmit = (e) => {
@@ -55,7 +57,7 @@ const CreateProductModal = () => {
             &times;
           </button>
           <h2 className="text-2xl font-bold mb-4 text-center">
-            Create New Product
+            {t("modals.createProduct")}
           </h2>
 
           <form
@@ -64,7 +66,7 @@ const CreateProductModal = () => {
           >
             <input
               type="text"
-              placeholder="Title"
+              placeholder={t("modals.titlePlaceholder")}
               value={formData.name}
               onChange={(e) =>
                 setFormData({
@@ -83,14 +85,14 @@ const CreateProductModal = () => {
               required
             >
               {categoryOptions.map((cat, idx) => (
-                <option key={idx} value={cat}>
-                  {cat}
+                <option key={idx} value={cat.value}>
+                  {cat.label}
                 </option>
               ))}
             </select>
             <input
               type="number"
-              placeholder="Price"
+              placeholder={t("modals.pricePlaceholder")}
               value={formData.price}
               onChange={(e) =>
                 setFormData({
@@ -102,7 +104,7 @@ const CreateProductModal = () => {
             />
             <input
               type="number"
-              placeholder="Stock"
+              placeholder={t("modals.stockPlaceholder")}
               value={formData.stock}
               onChange={(e) =>
                 setFormData({
@@ -127,7 +129,7 @@ const CreateProductModal = () => {
             />
 
             <textarea
-              placeholder="Description"
+              placeholder={t("modals.descriptionPlaceholder")}
               value={formData.description}
               onChange={(e) =>
                 setFormData({
@@ -141,15 +143,15 @@ const CreateProductModal = () => {
 
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded col-span-1 md:col-span-2"
+              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded col-span-1 md:col-span-2"
             >
               {loading ? (
                 <>
                   <LoaderCircle className="w-6 h-6 animate-spin" />
-                  Creating
+                  {t("modals.creating")}
                 </>
               ) : (
-                "Add New Product"
+                t("modals.addNewProduct")
               )}
             </button>
           </form>

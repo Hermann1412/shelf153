@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { X, LogOut, Upload, Eye, EyeOff, Store } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { toggleProfilePanel } from "../../store/slices/popupSlice";
 import {
   logout,
@@ -10,6 +11,7 @@ import {
 } from "../../store/slices/authSlice";
 
 const ProfilePanel = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { isProfilePanelOpen } = useSelector((state) => state.popup);
   const { authUser, isUpdatingProfile, isUpdatingPassword } = useSelector(
@@ -23,6 +25,7 @@ const ProfilePanel = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState({});
 
   useEffect(() => {
     if (authUser) {
@@ -42,6 +45,19 @@ const ProfilePanel = () => {
 
   const handlePasswordUpdate = (e) => {
     e.preventDefault();
+    const next = {};
+    if (!currentPassword) next.currentPassword = t("validation.required");
+    if (!newPassword) next.newPassword = t("validation.required");
+    else if (newPassword.length < 8 || newPassword.length > 16) {
+      next.newPassword = t("validation.passwordLength");
+    }
+    if (!confirmNewPassword) next.confirmNewPassword = t("validation.required");
+    else if (newPassword !== confirmNewPassword) {
+      next.confirmNewPassword = t("validation.passwordMismatch");
+    }
+    setPasswordErrors(next);
+    if (Object.keys(next).length > 0) return;
+
     dispatch(
       updatePassword({ currentPassword, newPassword, confirmNewPassword })
     );
@@ -60,9 +76,10 @@ const ProfilePanel = () => {
       />
       <div className="fixed top-0 right-0 h-full w-96 max-w-full bg-background border-l border-border z-50 flex flex-col overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-semibold text-foreground">Profile</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t("profile.title")}</h2>
           <button
             onClick={() => dispatch(toggleProfilePanel())}
+            aria-label={t("aria.close")}
             className="p-2 hover:bg-secondary rounded-lg"
           >
             <X className="w-5 h-5 text-foreground" />
@@ -91,7 +108,7 @@ const ProfilePanel = () => {
                   : "bg-secondary text-foreground"
               }`}
             >
-              Edit Profile
+              {t("profile.editProfile")}
             </button>
             <button
               onClick={() => setTab("password")}
@@ -101,7 +118,7 @@ const ProfilePanel = () => {
                   : "bg-secondary text-foreground"
               }`}
             >
-              Password
+              {t("profile.password")}
             </button>
           </div>
 
@@ -111,20 +128,20 @@ const ProfilePanel = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Name"
+                placeholder={t("profile.name")}
                 className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
+                placeholder={t("profile.email")}
                 className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-border rounded-lg cursor-pointer hover:bg-secondary/80">
                 <Upload className="w-5 h-5 text-muted-foreground" />
                 <span className="text-muted-foreground text-sm">
-                  {avatar ? avatar.name : "Change Avatar"}
+                  {avatar ? avatar.name : t("profile.changeAvatar")}
                 </span>
                 <input
                   type="file"
@@ -138,54 +155,72 @@ const ProfilePanel = () => {
                 disabled={isUpdatingProfile}
                 className="w-full py-3 gradient-primary text-primary-foreground rounded-lg font-semibold disabled:opacity-50"
               >
-                {isUpdatingProfile ? "Updating..." : "Update Profile"}
+                {isUpdatingProfile ? t("profile.updating") : t("profile.updateProfile")}
               </button>
             </form>
           ) : (
             <form onSubmit={handlePasswordUpdate} className="space-y-4">
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Current Password"
-                  className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <Eye className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </button>
+              <div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder={t("profile.currentPassword")}
+                    className={`w-full px-4 py-3 bg-secondary border rounded-lg text-foreground focus:outline-none focus:ring-2 ${
+                      passwordErrors.currentPassword ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </button>
+                </div>
+                {passwordErrors.currentPassword && (
+                  <p className="text-xs text-destructive mt-1">{passwordErrors.currentPassword}</p>
+                )}
               </div>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="New Password"
-                className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                required
-              />
-              <input
-                type="password"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                placeholder="Confirm New Password"
-                className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                required
-              />
+              <div>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder={t("profile.newPassword")}
+                  className={`w-full px-4 py-3 bg-secondary border rounded-lg text-foreground focus:outline-none focus:ring-2 ${
+                    passwordErrors.newPassword ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
+                  }`}
+                />
+                {passwordErrors.newPassword && (
+                  <p className="text-xs text-destructive mt-1">{passwordErrors.newPassword}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  placeholder={t("profile.confirmNewPassword")}
+                  className={`w-full px-4 py-3 bg-secondary border rounded-lg text-foreground focus:outline-none focus:ring-2 ${
+                    passwordErrors.confirmNewPassword ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
+                  }`}
+                />
+                {passwordErrors.confirmNewPassword && (
+                  <p className="text-xs text-destructive mt-1">{passwordErrors.confirmNewPassword}</p>
+                )}
+              </div>
               <button
                 type="submit"
                 disabled={isUpdatingPassword}
                 className="w-full py-3 gradient-primary text-primary-foreground rounded-lg font-semibold disabled:opacity-50"
               >
-                {isUpdatingPassword ? "Updating..." : "Update Password"}
+                {isUpdatingPassword ? t("profile.updating") : t("profile.updatePassword")}
               </button>
             </form>
           )}
@@ -197,7 +232,7 @@ const ProfilePanel = () => {
             className="w-full mt-6 py-3 bg-secondary text-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-secondary/80"
           >
             <Store className="w-5 h-5" />
-            {authUser.role === "Seller" ? "Manage My Store" : "Become a Seller"}
+            {authUser.role === "Seller" ? t("profile.manageMyStore") : t("profile.becomeSeller")}
           </a>
 
           <button
@@ -208,7 +243,7 @@ const ProfilePanel = () => {
             className="w-full mt-3 py-3 bg-destructive/10 text-destructive rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-destructive/20"
           >
             <LogOut className="w-5 h-5" />
-            Logout
+            {t("profile.logout")}
           </button>
         </div>
       </div>

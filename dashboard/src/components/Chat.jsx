@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import {
   Send,
   Loader2,
@@ -24,14 +25,14 @@ import {
 
 const TYPING_TIMEOUT = 1500;
 
-const formatTime = (ts) => {
+const formatTime = (ts, t) => {
   if (!ts) return "";
   const d = new Date(ts);
   const now = new Date();
   const diffDays = Math.floor((now - d) / 86400000);
   if (diffDays === 0)
     return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  if (diffDays === 1) return "Yesterday";
+  if (diffDays === 1) return t("chat.yesterday");
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
 };
 
@@ -39,7 +40,7 @@ const Avatar = ({ name, size = "md" }) => {
   const sizes = { sm: "w-8 h-8 text-xs", md: "w-10 h-10 text-sm" };
   return (
     <div
-      className={`${sizes[size]} rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center flex-shrink-0`}
+      className={`${sizes[size]} rounded-full bg-green-100 text-green-600 font-bold flex items-center justify-center flex-shrink-0`}
     >
       {name?.[0]?.toUpperCase() || "?"}
     </div>
@@ -59,11 +60,11 @@ const TypingDots = () => (
 );
 
 // ─── Conversation List Item ───────────────────────────────────────────────────
-const ConversationItem = ({ conv, isSelected, onClick }) => (
+const ConversationItem = ({ conv, isSelected, onClick, t }) => (
   <button
     onClick={onClick}
     className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors border-b border-gray-100 ${
-      isSelected ? "bg-blue-50" : "hover:bg-gray-50"
+      isSelected ? "bg-green-50" : "hover:bg-gray-50"
     }`}
   >
     <Avatar name={conv.customer_name} />
@@ -73,28 +74,28 @@ const ConversationItem = ({ conv, isSelected, onClick }) => (
           {conv.customer_name}
         </span>
         <span className="text-[10px] text-gray-400 flex-shrink-0 ml-1">
-          {formatTime(conv.last_message_at || conv.created_at)}
+          {formatTime(conv.last_message_at || conv.created_at, t)}
         </span>
       </div>
       <div className="flex items-center justify-between mt-0.5">
         <p className="text-xs text-gray-500 truncate max-w-[160px]">
-          {conv.last_message || "No messages yet"}
+          {conv.last_message || t("chat.noMessagesYet")}
         </p>
         <div className="flex items-center gap-1 flex-shrink-0 ml-1">
           {conv.status === "closed" && (
             <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">
-              Closed
+              {t("chat.closed")}
             </span>
           )}
           {Number(conv.unread_count) > 0 && conv.status !== "closed" && (
-            <span className="w-5 h-5 bg-blue-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
+            <span className="w-5 h-5 bg-green-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
               {Number(conv.unread_count) > 9 ? "9+" : conv.unread_count}
             </span>
           )}
         </div>
       </div>
       {conv.admin_name && (
-        <p className="text-[10px] text-blue-500 mt-0.5 flex items-center gap-1">
+        <p className="text-[10px] text-green-500 mt-0.5 flex items-center gap-1">
           <CheckCheck className="w-3 h-3" /> {conv.admin_name}
         </p>
       )}
@@ -104,6 +105,7 @@ const ConversationItem = ({ conv, isSelected, onClick }) => (
 
 // ─── Main Chat Component ──────────────────────────────────────────────────────
 const Chat = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const {
     conversations,
@@ -249,17 +251,17 @@ const Chat = () => {
         <div className="px-4 py-4 border-b border-gray-100">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-gray-800 flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-500" />
-              Support Chat
+              <MessageSquare className="w-5 h-5 text-green-500" />
+              {t("chat.supportChat")}
               {totalUnread > 0 && (
-                <span className="bg-blue-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                <span className="bg-green-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                   {totalUnread}
                 </span>
               )}
             </h2>
             <span
               className={`w-2 h-2 rounded-full ${connected ? "bg-green-400" : "bg-gray-300"}`}
-              title={connected ? "Connected" : "Disconnected"}
+              title={connected ? t("chat.connected") : t("chat.disconnected")}
             />
           </div>
 
@@ -268,10 +270,10 @@ const Chat = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search customers..."
+              placeholder={t("chat.searchCustomers")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 rounded-lg border border-gray-200 outline-none focus:border-blue-400 transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 rounded-lg border border-gray-200 outline-none focus:border-green-400 transition-colors"
             />
           </div>
 
@@ -283,7 +285,7 @@ const Chat = () => {
                 onClick={() => dispatch(setFilter(f))}
                 className={`flex-1 py-1.5 text-xs font-medium rounded-lg capitalize transition-colors ${
                   filter === f
-                    ? "bg-blue-500 text-white"
+                    ? "bg-green-500 text-white"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -385,7 +387,7 @@ const Chat = () => {
                         <div
                           className={`text-sm px-4 py-2.5 rounded-2xl leading-relaxed ${
                             isAdmin
-                              ? "bg-blue-500 text-white rounded-tr-none"
+                              ? "bg-green-500 text-white rounded-tr-none"
                               : "bg-white text-gray-800 rounded-tl-none shadow-sm border border-gray-100"
                           }`}
                         >
@@ -426,12 +428,12 @@ const Chat = () => {
                   onKeyDown={handleKeyDown}
                   placeholder="Type a reply..."
                   disabled={!connected}
-                  className="flex-1 resize-none bg-gray-50 text-gray-800 text-sm rounded-xl px-4 py-2.5 outline-none border border-gray-200 focus:border-blue-400 placeholder:text-gray-400 max-h-28 disabled:opacity-50 leading-relaxed transition-colors"
+                  className="flex-1 resize-none bg-gray-50 text-gray-800 text-sm rounded-xl px-4 py-2.5 outline-none border border-gray-200 focus:border-green-400 placeholder:text-gray-400 max-h-28 disabled:opacity-50 leading-relaxed transition-colors"
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || !connected}
-                  className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center flex-shrink-0 disabled:opacity-40 transition-colors"
+                  className="w-10 h-10 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center flex-shrink-0 disabled:opacity-40 transition-colors"
                 >
                   <Send className="w-4 h-4" />
                 </button>

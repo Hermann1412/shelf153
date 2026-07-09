@@ -1,15 +1,17 @@
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const OrdersChart = () => {
+  const { t } = useTranslation();
   const { orderStatusCounts } = useSelector((state) =>
     state.auth.user?.role === "Seller" ? state.seller : state.admin
   );
 
   const statusColors = {
     Processing: "#facc15", // yellow
-    Shipped: "#3b82f6", // blue
-    Delivered: "#22c55e", // green
+    Shipped: "#128C7E", // WhatsApp teal
+    Delivered: "#25D366", // WhatsApp green
     Cancelled: "#ef4444", // red
   };
   const orderStatusData = Object.keys(orderStatusCounts).map((status) => ({
@@ -20,7 +22,7 @@ const OrdersChart = () => {
   return (
     <>
       <div className="bg-white p-4 rounded-xl shadow-md">
-        <h3 className="font-semibold mb-2">Order Status</h3>
+        <h3 className="font-semibold mb-2">{t("stats.orderStatus")}</h3>
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
             <Pie

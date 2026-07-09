@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Star, Trash2 } from "lucide-react";
 import {
@@ -8,6 +9,7 @@ import {
 } from "../../store/slices/productSlice";
 
 const ReviewsContainer = ({ product, productReviews }) => {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const dispatch = useDispatch();
@@ -36,7 +38,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
   return (
     <div className="mt-12">
       <h2 className="text-2xl font-bold text-foreground mb-6">
-        Customer Reviews
+        {t('reviews.title')}
       </h2>
 
       {authUser && (
@@ -44,9 +46,9 @@ const ReviewsContainer = ({ product, productReviews }) => {
           onSubmit={handleSubmitReview}
           className="glass-panel mb-8 space-y-4"
         >
-          <h3 className="font-semibold text-foreground">Write a Review</h3>
+          <h3 className="font-semibold text-foreground">{t('reviews.writeReview')}</h3>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Rating:</span>
+            <span className="text-sm text-muted-foreground">{t('reviews.rating')}</span>
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
@@ -67,7 +69,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Share your experience..."
+            placeholder={t('reviews.placeholder')}
             rows={3}
             className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             required
@@ -77,7 +79,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
             disabled={isPostingReview}
             className="px-6 py-2 gradient-primary text-primary-foreground rounded-lg font-semibold disabled:opacity-50"
           >
-            {isPostingReview ? "Posting..." : "Submit Review"}
+            {isPostingReview ? t('reviews.posting') : t('reviews.submit')}
           </button>
         </form>
       )}
@@ -97,7 +99,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
                   />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      {review.reviewer?.name || "Anonymous"}
+                      {review.reviewer?.name || t('reviews.anonymous')}
                     </h4>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -128,7 +130,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
           ))
         ) : (
           <p className="text-center text-muted-foreground py-8">
-            No reviews yet. Be the first to review!
+            {t('reviews.empty')}
           </p>
         )}
       </div>

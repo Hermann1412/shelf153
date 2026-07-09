@@ -10,20 +10,23 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { toggleSidebar } from "../../store/slices/popupSlice";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { isSidebarOpen } = useSelector((state) => state.popup);
 
   const links = [
-    { to: "/", icon: Home, label: "Home" },
-    { to: "/products", icon: Package, label: "Products" },
-    { to: "/cart", icon: ShoppingCart, label: "Cart" },
-    { to: "/orders", icon: List, label: "Orders" },
-    { to: "/about", icon: Info, label: "About" },
-    { to: "/faq", icon: HelpCircle, label: "FAQ" },
-    { to: "/contact", icon: Phone, label: "Contact" },
+    { to: "/", icon: Home, label: t("nav.home") },
+    { to: "/products", icon: Package, label: t("nav.products") },
+    { to: "/cart", icon: ShoppingCart, label: t("nav.cart") },
+    { to: "/orders", icon: List, label: t("nav.orders") },
+    { to: "/about", icon: Info, label: t("nav.about") },
+    { to: "/faq", icon: HelpCircle, label: t("nav.faq") },
+    { to: "/contact", icon: Phone, label: t("nav.contact") },
   ];
 
   if (!isSidebarOpen) return null;
@@ -41,6 +44,7 @@ const Sidebar = () => {
           </h2>
           <button
             onClick={() => dispatch(toggleSidebar())}
+            aria-label={t("aria.close")}
             className="p-2 hover:bg-secondary rounded-lg"
           >
             <X className="w-5 h-5 text-foreground" />
@@ -59,6 +63,9 @@ const Sidebar = () => {
             </Link>
           ))}
         </nav>
+        <div className="mt-6 pt-6 border-t border-border">
+          <LanguageSwitcher />
+        </div>
       </div>
     </>
   );

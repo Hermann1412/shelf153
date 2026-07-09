@@ -1,6 +1,7 @@
 import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { toggleCart } from "../../store/slices/popupSlice";
 import {
   removeFromCart,
@@ -8,6 +9,7 @@ import {
 } from "../../store/slices/cartSlice";
 
 const CartSidebar = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { isCartOpen } = useSelector((state) => state.popup);
   const { cart } = useSelector((state) => state.cart);
@@ -28,10 +30,11 @@ const CartSidebar = () => {
       <div className="fixed top-0 right-0 h-full w-96 max-w-full bg-background border-l border-border z-50 flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground">
-            Cart ({cart.length})
+            {t("cart.sidebarTitle", { count: cart.length })}
           </h2>
           <button
             onClick={() => dispatch(toggleCart())}
+            aria-label={t("aria.close")}
             className="p-2 hover:bg-secondary rounded-lg"
           >
             <X className="w-5 h-5 text-foreground" />
@@ -41,7 +44,7 @@ const CartSidebar = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {cart.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
-              Your cart is empty
+              {t("cart.empty")}
             </p>
           ) : (
             cart.map((item) => (
@@ -110,7 +113,7 @@ const CartSidebar = () => {
         {cart.length > 0 && (
           <div className="p-4 border-t border-border space-y-3">
             <div className="flex justify-between text-foreground font-semibold">
-              <span>Subtotal</span>
+              <span>{t("cart.subtotal")}</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
             <Link
@@ -118,7 +121,7 @@ const CartSidebar = () => {
               onClick={() => dispatch(toggleCart())}
               className="block w-full text-center py-3 gradient-primary text-primary-foreground rounded-lg font-semibold hover:glow-on-hover animate-smooth"
             >
-              View Cart
+              {t("cart.viewCart")}
             </Link>
           </div>
         )}

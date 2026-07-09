@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Search, Sparkles, Star } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleAIModal } from "../../store/slices/popupSlice";
@@ -6,6 +7,7 @@ import { fetchAIProducts } from "../../store/slices/productSlice";
 import { Link } from "react-router-dom";
 
 const AISearchModal = () => {
+  const { t } = useTranslation();
   const [prompt, setPrompt] = useState("");
   const dispatch = useDispatch();
   const { isAIPopupOpen } = useSelector((state) => state.popup);
@@ -34,11 +36,12 @@ const AISearchModal = () => {
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
               <h2 className="text-lg font-semibold text-foreground">
-                AI Product Search
+                {t('aiSearch.title')}
               </h2>
             </div>
             <button
               onClick={() => dispatch(toggleAIModal())}
+              aria-label={t("aria.close")}
               className="p-2 hover:bg-secondary rounded-lg"
             >
               <X className="w-5 h-5 text-foreground" />
@@ -51,7 +54,7 @@ const AISearchModal = () => {
                 type="text"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Describe what you're looking for..."
+                placeholder={t('aiSearch.placeholder')}
                 className="flex-1 px-4 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <button
@@ -59,7 +62,7 @@ const AISearchModal = () => {
                 disabled={aiSearching}
                 className="px-6 py-3 gradient-primary text-primary-foreground rounded-lg font-semibold disabled:opacity-50"
               >
-                {aiSearching ? "Searching..." : "Search"}
+                {aiSearching ? t('aiSearch.searching') : t('aiSearch.search')}
               </button>
             </form>
           </div>
@@ -101,7 +104,7 @@ const AISearchModal = () => {
             ) : (
               !aiSearching && (
                 <p className="text-center text-muted-foreground py-8">
-                  Ask AI to find the perfect products for you
+                  {t('aiSearch.prompt')}
                 </p>
               )
             )}

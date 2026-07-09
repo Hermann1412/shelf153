@@ -1,26 +1,28 @@
 import { Users, Target, Award, Heart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const About = () => {
+  const { t } = useTranslation();
   const values = [
     {
       icon: Heart,
-      title: 'Customer First',
-      description: 'We put our customers at the heart of everything we do.'
+      title: t('about.customerFirstTitle'),
+      description: t('about.customerFirstDesc')
     },
     {
       icon: Award,
-      title: 'Quality Products',
-      description: 'We ensure all products meet our high standards.'
+      title: t('about.qualityTitle'),
+      description: t('about.qualityDesc')
     },
     {
       icon: Users,
-      title: 'Community',
-      description: 'Building lasting relationships with our customers.'
+      title: t('about.communityTitle'),
+      description: t('about.communityDesc')
     },
     {
       icon: Target,
-      title: 'Innovation',
-      description: 'Constantly improving our platform and services.'
+      title: t('about.innovationTitle'),
+      description: t('about.innovationDesc')
     }
   ];
 
@@ -28,9 +30,9 @@ const About = () => {
     <div className="min-h-screen bg-background pt-20">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-foreground mb-6">About Shelf153</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-6">{t('about.title')}</h1>
           <p className="text-xl text-muted-foreground">
-            Your trusted e-commerce platform for quality products and exceptional service.
+            {t('about.subtitle')}
           </p>
         </div>
 
@@ -47,12 +49,9 @@ const About = () => {
         </div>
 
         <div className="bg-secondary rounded-xl p-8">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Our Story</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-4">{t('about.storyTitle')}</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Founded with a vision to make online shopping simple and enjoyable, Shelf153 has grown
-            to become a trusted platform for thousands of customers worldwide. We believe that 
-            everyone deserves access to quality products at fair prices, backed by exceptional 
-            customer service.
+            {t('about.storyText')}
           </p>
         </div>
       </div>

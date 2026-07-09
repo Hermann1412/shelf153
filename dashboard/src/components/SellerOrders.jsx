@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { LoaderCircle } from "lucide-react";
 import {
   fetchSellerOrders,
@@ -8,15 +9,24 @@ import {
 
 const statusColors = {
   Processing: "bg-yellow-100 text-yellow-700",
-  Shipped: "bg-blue-100 text-blue-700",
+  Shipped: "bg-green-100 text-green-700",
   Delivered: "bg-green-100 text-green-700",
   Cancelled: "bg-red-100 text-red-700",
 };
 
 const SellerOrders = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { orderItems, loading } = useSelector((state) => state.seller);
   const [filter, setFilter] = useState("All");
+
+  const statusLabels = {
+    All: t("orders.all"),
+    Processing: t("orders.processing"),
+    Shipped: t("orders.shipped"),
+    Delivered: t("orders.delivered"),
+    Cancelled: t("orders.cancelled"),
+  };
 
   useEffect(() => {
     dispatch(fetchSellerOrders());
@@ -41,11 +51,11 @@ const SellerOrders = () => {
               onClick={() => setFilter(s)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === s
-                  ? "bg-blue-600 text-white"
+                  ? "bg-green-600 text-white"
                   : "bg-white text-gray-600 hover:bg-gray-50 border"
               }`}
             >
-              {s}
+              {statusLabels[s]}
             </button>
           )
         )}
@@ -53,23 +63,25 @@ const SellerOrders = () => {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <LoaderCircle className="w-8 h-8 animate-spin text-blue-500" />
+          <LoaderCircle className="w-8 h-8 animate-spin text-green-500" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-20 text-gray-500">No orders found</div>
+        <div className="text-center py-20 text-gray-500">
+          {t("orders.noOrdersFound")}
+        </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-600 text-left">
                 <tr>
-                  <th className="px-6 py-3 font-medium">Item</th>
-                  <th className="px-6 py-3 font-medium">Order ID</th>
-                  <th className="px-6 py-3 font-medium">Qty</th>
-                  <th className="px-6 py-3 font-medium">Price</th>
-                  <th className="px-6 py-3 font-medium">Ship to</th>
-                  <th className="px-6 py-3 font-medium">Status</th>
-                  <th className="px-6 py-3 font-medium">Date</th>
+                  <th className="px-6 py-3 font-medium">{t("orders.colItem")}</th>
+                  <th className="px-6 py-3 font-medium">{t("orders.colOrderId")}</th>
+                  <th className="px-6 py-3 font-medium">{t("orders.colQty")}</th>
+                  <th className="px-6 py-3 font-medium">{t("products.colPrice")}</th>
+                  <th className="px-6 py-3 font-medium">{t("orders.colShipTo")}</th>
+                  <th className="px-6 py-3 font-medium">{t("orders.colStatus")}</th>
+                  <th className="px-6 py-3 font-medium">{t("orders.colDate")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -99,7 +111,7 @@ const SellerOrders = () => {
                     <td className="px-6 py-4 text-gray-500">
                       {item.full_name
                         ? `${item.full_name}, ${item.city}, ${item.country}`
-                        : "-"}
+                        : t("orders.noShippingInfo")}
                     </td>
                     <td className="px-6 py-4">
                       <select
@@ -111,10 +123,10 @@ const SellerOrders = () => {
                           statusColors[item.item_status] || ""
                         }`}
                       >
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
+                        <option value="Processing">{t("orders.processing")}</option>
+                        <option value="Shipped">{t("orders.shipped")}</option>
+                        <option value="Delivered">{t("orders.delivered")}</option>
+                        <option value="Cancelled">{t("orders.cancelled")}</option>
                       </select>
                     </td>
                     <td className="px-6 py-4 text-gray-500">

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { login } from "../store/slices/authSlice";
 import { LoaderCircle, Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { isAuthenticated, loading, user } = useSelector(
     (state) => state.auth
@@ -12,13 +14,22 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
 
   if (isAuthenticated && user?.role === "Admin") {
     return <Navigate to="/" replace />;
   }
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const next = {};
+    if (!email.trim()) next.email = t("validation.required");
+    else if (!emailRegex.test(email)) next.email = t("validation.emailInvalid");
+    if (!password) next.password = t("validation.required");
+    setErrors(next);
+    if (Object.keys(next).length > 0) return;
     dispatch(login({ email, password }));
   };
 
@@ -26,38 +37,41 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">
-          Admin Login
+          {t("login.adminLogin")}
         </h1>
         <p className="text-center text-gray-500 mb-6 text-sm">
-          Shelf153 Dashboard
+          {t("login.subtitle")}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              {t("login.email")}
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="admin@example.com"
+              className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+                errors.email ? "border-red-400 focus:ring-red-400" : "border-gray-300 focus:ring-green-500"
+              }`}
+              placeholder={t("login.emailPlaceholder")}
             />
+            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
+              {t("login.password")}
             </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-4 py-2.5 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+                  errors.password ? "border-red-400 focus:ring-red-400" : "border-gray-300 focus:ring-green-500"
+                }`}
                 placeholder="••••••••"
               />
               <button
@@ -72,20 +86,21 @@ const Login = () => {
                 )}
               </button>
             </div>
+            {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
                 <LoaderCircle className="w-5 h-5 animate-spin" />
-                Signing in...
+                {t("login.signingIn")}
               </>
             ) : (
-              "Sign In"
+              t("login.signIn")
             )}
           </button>
         </form>
@@ -93,9 +108,9 @@ const Login = () => {
         <p className="text-center text-sm text-gray-500 mt-4">
           <Link
             to="/password/forgot"
-            className="text-blue-600 hover:underline"
+            className="text-green-600 hover:underline"
           >
-            Forgot Password?
+            {t("login.forgotPassword")}
           </Link>
         </p>
       </div>

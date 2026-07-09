@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Check, MapPin, CreditCard, Loader } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import AirtelMoneyPayment from "../components/AirtelMoneyPayment";
 import { placeOrder, setOrderStep } from "../store/slices/orderSlice";
 import { toast } from "react-toastify";
 
 const Payment = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cart } = useSelector((state) => state.cart);
@@ -24,6 +26,7 @@ const Payment = () => {
     pincode: "",
     phone: "",
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -36,13 +39,20 @@ const Payment = () => {
 
   const handleShippingChange = (e) => {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: undefined });
+    }
   };
 
   const handleShippingSubmit = (e) => {
     e.preventDefault();
-    const empty = Object.values(shipping).some((v) => !v.trim());
-    if (empty) {
-      toast.error("Please fill in all shipping fields");
+    const nextErrors = {};
+    Object.entries(shipping).forEach(([key, value]) => {
+      if (!value.trim()) nextErrors[key] = t("validation.required");
+    });
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      toast.error(t("checkout.fillAllFields"));
       return;
     }
 
@@ -54,10 +64,15 @@ const Payment = () => {
     );
   };
 
+  const fieldClass = (name) =>
+    `w-full px-4 py-2 bg-secondary border rounded-lg text-foreground focus:outline-none focus:ring-2 ${
+      errors[name] ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
+    }`;
+
   const steps = [
-    { num: 1, label: "Shipping", icon: MapPin },
-    { num: 2, label: "Processing", icon: Loader },
-    { num: 3, label: "Payment", icon: CreditCard },
+    { num: 1, label: t("checkout.stepShipping"), icon: MapPin },
+    { num: 2, label: t("checkout.stepProcessing"), icon: Loader },
+    { num: 3, label: t("checkout.stepPayment"), icon: CreditCard },
   ];
 
   return (
@@ -69,10 +84,10 @@ const Payment = () => {
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary animate-smooth mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Cart
+          {t("checkout.backToCart")}
         </Link>
 
-        <h1 className="text-3xl font-bold text-foreground mb-8">Checkout</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-8">{t("checkout.title")}</h1>
 
         {/* Step Indicator */}
         <div className="flex items-center justify-center gap-4 mb-10">
@@ -119,113 +134,127 @@ const Payment = () => {
           <form onSubmit={handleShippingSubmit} className="glass-panel space-y-4">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary" />
-              Shipping Information
+              {t("checkout.shippingInfo")}
             </h2>
 
             <div>
               <label className="text-sm text-muted-foreground mb-1 block">
-                Full Name
+                {t("checkout.fullName")}
               </label>
               <input
                 type="text"
                 name="full_name"
                 value={shipping.full_name}
                 onChange={handleShippingChange}
-                className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                required
+                className={fieldClass("full_name")}
               />
+              {errors.full_name && (
+                <p className="text-xs text-destructive mt-1">{errors.full_name}</p>
+              )}
             </div>
 
             <div>
               <label className="text-sm text-muted-foreground mb-1 block">
-                Address
+                {t("checkout.address")}
               </label>
               <input
                 type="text"
                 name="address"
                 value={shipping.address}
                 onChange={handleShippingChange}
-                className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                required
+                className={fieldClass("address")}
               />
+              {errors.address && (
+                <p className="text-xs text-destructive mt-1">{errors.address}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-muted-foreground mb-1 block">
-                  City
+                  {t("checkout.city")}
                 </label>
                 <input
                   type="text"
                   name="city"
                   value={shipping.city}
                   onChange={handleShippingChange}
-                  className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
+                  className={fieldClass("city")}
                 />
+                {errors.city && (
+                  <p className="text-xs text-destructive mt-1">{errors.city}</p>
+                )}
               </div>
               <div>
                 <label className="text-sm text-muted-foreground mb-1 block">
-                  State
+                  {t("checkout.state")}
                 </label>
                 <input
                   type="text"
                   name="state"
                   value={shipping.state}
                   onChange={handleShippingChange}
-                  className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
+                  className={fieldClass("state")}
                 />
+                {errors.state && (
+                  <p className="text-xs text-destructive mt-1">{errors.state}</p>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-muted-foreground mb-1 block">
-                  Country
+                  {t("checkout.country")}
                 </label>
                 <input
                   type="text"
                   name="country"
                   value={shipping.country}
                   onChange={handleShippingChange}
-                  className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
+                  className={fieldClass("country")}
                 />
+                {errors.country && (
+                  <p className="text-xs text-destructive mt-1">{errors.country}</p>
+                )}
               </div>
               <div>
                 <label className="text-sm text-muted-foreground mb-1 block">
-                  Pincode
+                  {t("checkout.pincode")}
                 </label>
                 <input
                   type="text"
                   name="pincode"
                   value={shipping.pincode}
                   onChange={handleShippingChange}
-                  className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
+                  className={fieldClass("pincode")}
                 />
+                {errors.pincode && (
+                  <p className="text-xs text-destructive mt-1">{errors.pincode}</p>
+                )}
               </div>
             </div>
 
             <div>
               <label className="text-sm text-muted-foreground mb-1 block">
-                Phone
+                {t("checkout.phone")}
               </label>
               <input
                 type="text"
                 name="phone"
                 value={shipping.phone}
                 onChange={handleShippingChange}
-                className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                required
+                className={fieldClass("phone")}
               />
+              {errors.phone && (
+                <p className="text-xs text-destructive mt-1">{errors.phone}</p>
+              )}
             </div>
 
             {/* Order Summary */}
             <div className="border-t border-border pt-4 mt-6">
               <h3 className="text-sm font-semibold text-foreground mb-3">
-                Order Summary ({cart.length} items)
+                {t("checkout.orderSummary", { count: cart.length })}
               </h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {cart.map((item) => (
@@ -252,10 +281,10 @@ const Payment = () => {
               {placingOrder ? (
                 <>
                   <Loader className="w-4 h-4 animate-spin" />
-                  Placing Order...
+                  {t("checkout.placingOrder")}
                 </>
               ) : (
-                "Place Order & Proceed to Payment"
+                t("checkout.placeOrder")
               )}
             </button>
           </form>

@@ -1,8 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { toggleViewProductModal } from "../store/slices/extraSlice";
 
 const ViewProductModal = ({ selectedProduct }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   return (
     <>
@@ -31,29 +33,32 @@ const ViewProductModal = ({ selectedProduct }) => {
             {/* Info */}
             <div>
               <p>
-                <strong>ID:</strong> {selectedProduct.id}
+                <strong>{t("modals.id")}</strong> {selectedProduct.id}
               </p>
               <p>
-                <strong>Description:</strong> {selectedProduct.description}
+                <strong>{t("modals.description")}</strong>{" "}
+                {selectedProduct.description}
               </p>
               <p>
-                <strong>Category:</strong> {selectedProduct.category}
+                <strong>{t("modals.category")}</strong>{" "}
+                {selectedProduct.category}
               </p>
               <p>
-                <strong>Price:</strong> Rs{" "}
+                <strong>{t("modals.price")}</strong> Rs{" "}
                 {selectedProduct.price.toLocaleString()}
               </p>
               <p>
-                <strong>Ratings:</strong> ⭐ {selectedProduct.ratings}
+                <strong>{t("modals.ratings")}</strong> ⭐{" "}
+                {selectedProduct.ratings}
               </p>
               <p>
-                <strong>Stock:</strong>{" "}
+                <strong>{t("modals.stock")}</strong>{" "}
                 {selectedProduct.stock > 0
-                  ? `In Stock (${selectedProduct.stock})`
-                  : "Out of Stock"}
+                  ? t("modals.inStock", { count: selectedProduct.stock })
+                  : t("modals.outOfStock")}
               </p>
               <p>
-                <strong>Created At:</strong>{" "}
+                <strong>{t("modals.createdAt")}</strong>{" "}
                 {new Date(selectedProduct.created_at).toLocaleDateString()}
               </p>
             </div>

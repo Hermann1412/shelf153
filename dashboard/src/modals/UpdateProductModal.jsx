@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleUpdateProductModal } from "../store/slices/extraSlice";
 import { LoaderCircle } from "lucide-react";
 import { updateProduct } from "../store/slices/productsSlice";
 
 const UpdateProductModal = ({ selectedProduct }) => {
+  const { t } = useTranslation();
   const { loading } = useSelector((state) => state.product);
   const dispatch = useDispatch();
 
@@ -17,14 +19,14 @@ const UpdateProductModal = ({ selectedProduct }) => {
   });
 
   const categoryOptions = [
-    "Electronics",
-    "Fashion",
-    "Home & Garden",
-    "Sports",
-    "Books",
-    "Beauty",
-    "Automotive",
-    "Kids & Baby",
+    { value: "Electronics", label: t("categories.electronics") },
+    { value: "Fashion", label: t("categories.fashion") },
+    { value: "Home & Garden", label: t("categories.homeGarden") },
+    { value: "Sports", label: t("categories.sports") },
+    { value: "Books", label: t("categories.books") },
+    { value: "Beauty", label: t("categories.beauty") },
+    { value: "Automotive", label: t("categories.automotive") },
+    { value: "Kids & Baby", label: t("categories.kidsBaby") },
   ];
 
   useEffect(() => {
@@ -63,7 +65,9 @@ const UpdateProductModal = ({ selectedProduct }) => {
         >
           &times;
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-center">Update Product</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          {t("modals.updateProduct")}
+        </h2>
 
         <form
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -71,7 +75,7 @@ const UpdateProductModal = ({ selectedProduct }) => {
         >
           <input
             type="text"
-            placeholder="Title"
+            placeholder={t("modals.titlePlaceholder")}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="border px-4 py-2 rounded"
@@ -85,14 +89,14 @@ const UpdateProductModal = ({ selectedProduct }) => {
             required
           >
             {categoryOptions.map((cat, idx) => (
-              <option key={idx} value={cat}>
-                {cat}
+              <option key={idx} value={cat.value}>
+                {cat.label}
               </option>
             ))}
           </select>
           <input
             type="number"
-            placeholder="Price"
+            placeholder={t("modals.pricePlaceholder")}
             value={formData.price}
             onChange={(e) =>
               setFormData({ ...formData, price: e.target.value })
@@ -101,7 +105,7 @@ const UpdateProductModal = ({ selectedProduct }) => {
           />
           <input
             type="number"
-            placeholder="Stock"
+            placeholder={t("modals.stockPlaceholder")}
             value={formData.stock}
             onChange={(e) =>
               setFormData({ ...formData, stock: e.target.value })
@@ -110,7 +114,7 @@ const UpdateProductModal = ({ selectedProduct }) => {
           />
 
           <textarea
-            placeholder="Description"
+            placeholder={t("modals.descriptionPlaceholder")}
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
@@ -126,10 +130,10 @@ const UpdateProductModal = ({ selectedProduct }) => {
             {loading ? (
               <>
                 <LoaderCircle className="w-6 h-6 animate-spin" />
-                Updating
+                {t("modals.updating")}
               </>
             ) : (
-              "Update Product"
+              t("modals.updateProductBtn")
             )}
           </button>
         </form>

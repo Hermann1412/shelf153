@@ -1,26 +1,28 @@
 import { Truck, Shield, Headphones, CreditCard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const FeatureSection = () => {
+  const { t } = useTranslation();
   const features = [
     {
       icon: Truck,
-      title: 'Free Shipping',
-      description: 'Free shipping on orders over $50 worldwide'
+      title: t('home.features.shippingTitle'),
+      description: t('home.features.shippingDesc')
     },
     {
       icon: Shield,
-      title: 'Secure Payment',
-      description: '100% secure payment with SSL encryption'
+      title: t('home.features.paymentTitle'),
+      description: t('home.features.paymentDesc')
     },
     {
       icon: Headphones,
-      title: '24/7 Support',
-      description: 'Dedicated customer support available anytime'
+      title: t('home.features.supportTitle'),
+      description: t('home.features.supportDesc')
     },
     {
       icon: CreditCard,
-      title: 'Easy Returns',
-      description: '30-day return policy for your peace of mind'
+      title: t('home.features.returnsTitle'),
+      description: t('home.features.returnsDesc')
     }
   ];
 

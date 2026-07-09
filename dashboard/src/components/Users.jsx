@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import avatar from "../assets/avatar.jpg";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { LoaderCircle, Trash2, Ban, RotateCcw } from "lucide-react";
+import ConfirmDialog from "./ConfirmDialog";
 import {
   getAllUsers,
   deleteUser,
@@ -9,10 +11,12 @@ import {
 } from "../store/slices/adminSlice";
 
 const Users = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { users, totalUsers, loading } = useSelector((state) => state.admin);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState("All");
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const totalPages = Math.ceil(totalUsers / 10);
 
   useEffect(() => {
@@ -23,9 +27,18 @@ const Users = () => {
     filter === "All" ? users : users.filter((u) => u.role === filter);
 
   const handleDelete = (userId) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      dispatch(deleteUser(userId));
-    }
+    setPendingDeleteId(userId);
+  };
+
+  const confirmDelete = () => {
+    dispatch(deleteUser(pendingDeleteId));
+    setPendingDeleteId(null);
+  };
+
+  const filterLabels = {
+    All: t("users.all"),
+    User: t("users.user"),
+    Seller: t("users.seller"),
   };
 
   const handleToggleSuspend = (user) => {
@@ -36,7 +49,9 @@ const Users = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-500">{totalUsers} total users</p>
+        <p className="text-gray-500">
+          {t("users.totalUsers", { count: totalUsers })}
+        </p>
         <div className="flex gap-2">
           {["All", "User", "Seller"].map((f) => (
             <button
@@ -44,11 +59,11 @@ const Users = () => {
               onClick={() => setFilter(f)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === f
-                  ? "bg-blue-600 text-white"
+                  ? "bg-green-600 text-white"
                   : "bg-white text-gray-600 hover:bg-gray-50 border"
               }`}
             >
-              {f}
+              {filterLabels[f]}
             </button>
           ))}
         </div>
@@ -56,7 +71,7 @@ const Users = () => {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <LoaderCircle className="w-8 h-8 animate-spin text-blue-500" />
+          <LoaderCircle className="w-8 h-8 animate-spin text-green-500" />
         </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -64,11 +79,11 @@ const Users = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-600 text-left">
                 <tr>
-                  <th className="px-6 py-3 font-medium">User</th>
-                  <th className="px-6 py-3 font-medium">Email</th>
-                  <th className="px-6 py-3 font-medium">Role</th>
-                  <th className="px-6 py-3 font-medium">Joined</th>
-                  <th className="px-6 py-3 font-medium">Actions</th>
+                  <th className="px-6 py-3 font-medium">{t("users.colUser")}</th>
+                  <th className="px-6 py-3 font-medium">{t("users.colEmail")}</th>
+                  <th className="px-6 py-3 font-medium">{t("users.colRole")}</th>
+                  <th className="px-6 py-3 font-medium">{t("users.colJoined")}</th>
+                  <th className="px-6 py-3 font-medium">{t("users.colActions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -105,7 +120,7 @@ const Users = () => {
                         }`}
                       >
                         {user.role === "Seller" && user.seller_status === "Suspended"
-                          ? "Suspended Seller"
+                          ? t("users.suspendedSeller")
                           : user.role}
                       </span>
                     </td>
@@ -124,8 +139,13 @@ const Users = () => {
                             }`}
                             title={
                               user.seller_status === "Suspended"
-                                ? "Reinstate seller"
-                                : "Suspend seller"
+                                ? t("users.reinstateSeller")
+                                : t("users.suspendSeller")
+                            }
+                            aria-label={
+                              user.seller_status === "Suspended"
+                                ? t("users.reinstateSeller")
+                                : t("users.suspendSeller")
                             }
                           >
                             {user.seller_status === "Suspended" ? (
@@ -137,6 +157,7 @@ const Users = () => {
                         )}
                         <button
                           onClick={() => handleDelete(user.id)}
+                          aria-label={t("aria.delete")}
                           className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -152,7 +173,7 @@ const Users = () => {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-6 py-4 border-t">
               <p className="text-sm text-gray-500">
-                Page {page} of {totalPages}
+                {t("products.page", { page, totalPages })}
               </p>
               <div className="flex gap-2">
                 <button
@@ -160,20 +181,28 @@ const Users = () => {
                   disabled={page === 1}
                   className="px-3 py-1 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
-                  Previous
+                  {t("products.previous")}
                 </button>
                 <button
                   onClick={() => setPage(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
                   className="px-3 py-1 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
-                  Next
+                  {t("products.next")}
                 </button>
               </div>
             </div>
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!pendingDeleteId}
+        title={t("common.delete")}
+        message={t("users.confirmDelete")}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </div>
   );
 };

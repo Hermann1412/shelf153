@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Star, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -6,12 +7,13 @@ import { addToCart } from "../../store/slices/cartSlice";
 import { toast } from "react-toastify";
 
 const ProductCard = ({ product }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     dispatch(addToCart({ product, quantity: 1 }));
-    toast.success("Added to cart");
+    toast.success(t('productCard.addedToCart'));
   };
 
   return (
@@ -27,12 +29,12 @@ const ProductCard = ({ product }) => {
         />
         {product.stock === 0 && (
           <span className="absolute top-2 left-2 px-2 py-1 bg-destructive text-destructive-foreground text-xs rounded-md font-medium">
-            Out of Stock
+            {t('productCard.outOfStock')}
           </span>
         )}
         {product.stock > 0 && product.stock <= 5 && (
           <span className="absolute top-2 left-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded-md font-medium">
-            Only {product.stock} left
+            {t('productCard.onlyLeft', { count: product.stock })}
           </span>
         )}
         <button
@@ -49,7 +51,7 @@ const ProductCard = ({ product }) => {
           {product.name}
         </h3>
         <p className="text-xs text-muted-foreground/80 mb-1 truncate">
-          Sold by {product.seller?.name || "Shelf153"}
+          {t('productCard.soldBy', { name: product.seller?.name || "Shelf153" })}
         </p>
         <div className="flex items-center gap-1 mb-2">
           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />

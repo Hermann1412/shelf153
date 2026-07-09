@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { LoaderCircle, Plus, Eye, Pencil, Trash2 } from "lucide-react";
 import CreateProductModal from "../modals/CreateProductModal";
 import { useDispatch, useSelector } from "react-redux";
 import UpdateProductModal from "../modals/UpdateProductModal";
 import ViewProductModal from "../modals/ViewProductModal";
+import ConfirmDialog from "./ConfirmDialog";
 import {
   fetchAllProducts,
   deleteProduct,
@@ -15,6 +17,7 @@ import {
 } from "../store/slices/extraSlice";
 
 const Products = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { products, totalProducts, loading } = useSelector(
     (state) => state.product
@@ -26,6 +29,7 @@ const Products = () => {
   } = useSelector((state) => state.extra);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [page, setPage] = useState(1);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const totalPages = Math.ceil(totalProducts / 10);
 
   useEffect(() => {
@@ -43,27 +47,32 @@ const Products = () => {
   };
 
   const handleDelete = (productId) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      dispatch(deleteProduct(productId));
-    }
+    setPendingDeleteId(productId);
+  };
+
+  const confirmDelete = () => {
+    dispatch(deleteProduct(pendingDeleteId));
+    setPendingDeleteId(null);
   };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-500">{totalProducts} total products</p>
+        <p className="text-gray-500">
+          {t("products.totalProducts", { count: totalProducts })}
+        </p>
         <button
           onClick={() => dispatch(toggleCreateProductModal())}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add Product
+          {t("products.addProduct")}
         </button>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <LoaderCircle className="w-8 h-8 animate-spin text-blue-500" />
+          <LoaderCircle className="w-8 h-8 animate-spin text-green-500" />
         </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -71,12 +80,12 @@ const Products = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-600 text-left">
                 <tr>
-                  <th className="px-6 py-3 font-medium">Image</th>
-                  <th className="px-6 py-3 font-medium">Name</th>
-                  <th className="px-6 py-3 font-medium">Category</th>
-                  <th className="px-6 py-3 font-medium">Price</th>
-                  <th className="px-6 py-3 font-medium">Stock</th>
-                  <th className="px-6 py-3 font-medium">Actions</th>
+                  <th className="px-6 py-3 font-medium">{t("products.colImage")}</th>
+                  <th className="px-6 py-3 font-medium">{t("products.colName")}</th>
+                  <th className="px-6 py-3 font-medium">{t("products.colCategory")}</th>
+                  <th className="px-6 py-3 font-medium">{t("products.colPrice")}</th>
+                  <th className="px-6 py-3 font-medium">{t("products.colStock")}</th>
+                  <th className="px-6 py-3 font-medium">{t("products.colActions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -115,18 +124,21 @@ const Products = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleView(product)}
-                          className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                          aria-label={t("aria.view")}
+                          className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleUpdate(product)}
+                          aria-label={t("aria.edit")}
                           className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(product.id)}
+                          aria-label={t("aria.delete")}
                           className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -143,7 +155,7 @@ const Products = () => {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-6 py-4 border-t">
               <p className="text-sm text-gray-500">
-                Page {page} of {totalPages}
+                {t("products.page", { page, totalPages })}
               </p>
               <div className="flex gap-2">
                 <button
@@ -151,14 +163,14 @@ const Products = () => {
                   disabled={page === 1}
                   className="px-3 py-1 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
-                  Previous
+                  {t("products.previous")}
                 </button>
                 <button
                   onClick={() => setPage(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
                   className="px-3 py-1 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
-                  Next
+                  {t("products.next")}
                 </button>
               </div>
             </div>
@@ -173,6 +185,14 @@ const Products = () => {
       {isUpdateProductModalOpened && selectedProduct && (
         <UpdateProductModal selectedProduct={selectedProduct} />
       )}
+
+      <ConfirmDialog
+        open={!!pendingDeleteId}
+        title={t("common.delete")}
+        message={t("products.confirmDelete")}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </div>
   );
 };

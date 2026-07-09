@@ -1,8 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { Star } from "lucide-react";
 
 const TopSellingProducts = () => {
+  const { t } = useTranslation();
   const { topSellingProducts } = useSelector((state) =>
     state.auth.user?.role === "Seller" ? state.seller : state.admin
   );
@@ -10,10 +12,10 @@ const TopSellingProducts = () => {
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm">
       <h3 className="font-semibold mb-4 text-gray-800">
-        Top 5 Best Sellers
+        {t("stats.top5BestSellers")}
       </h3>
       {topSellingProducts.length === 0 ? (
-        <p className="text-gray-400 text-center py-10">No data yet</p>
+        <p className="text-gray-400 text-center py-10">{t("stats.noDataYet")}</p>
       ) : (
         <div className="space-y-3">
           {topSellingProducts.map((product, i) => (
@@ -41,8 +43,8 @@ const TopSellingProducts = () => {
                   </span>
                 </div>
               </div>
-              <span className="text-sm font-bold text-blue-600">
-                {product.total_sold} sold
+              <span className="text-sm font-bold text-green-600">
+                {product.total_sold} {t("stats.sold")}
               </span>
             </div>
           ))}

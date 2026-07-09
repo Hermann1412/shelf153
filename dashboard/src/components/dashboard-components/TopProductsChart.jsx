@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import {
   BarChart,
   Bar,
@@ -9,9 +10,10 @@ import {
   Cell,
 } from "recharts";
 
-const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6"];
+const COLORS = ["#25D366", "#128C7E", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 const TopProductsChart = () => {
+  const { t } = useTranslation();
   const { topSellingProducts } = useSelector((state) =>
     state.auth.user?.role === "Seller" ? state.seller : state.admin
   );
@@ -24,10 +26,10 @@ const TopProductsChart = () => {
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm">
       <h3 className="font-semibold mb-4 text-gray-800">
-        Top Selling Products
+        {t("stats.topSellingProducts")}
       </h3>
       {data.length === 0 ? (
-        <p className="text-gray-400 text-center py-10">No data yet</p>
+        <p className="text-gray-400 text-center py-10">{t("stats.noDataYet")}</p>
       ) : (
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={data}>

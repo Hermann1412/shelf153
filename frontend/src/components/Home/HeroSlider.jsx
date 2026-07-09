@@ -1,37 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const HeroSlider = () => {
+  const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
     {
       id: 1,
-      title: "Premium Electronics",
-      subtitle: "Discover the latest tech innovations",
-      description:
-        "Up to 50% off on premium headphones, smartwatches, and more",
+      title: t("home.hero.slide1Title"),
+      subtitle: t("home.hero.slide1Subtitle"),
+      description: t("home.hero.slide1Description"),
       image: "./electronics.jpg",
-      cta: "Shop Electronics",
+      cta: t("home.hero.slide1Cta"),
       url: "/products?category=Electronics",
     },
     {
       id: 2,
-      title: "Fashion Forward",
-      subtitle: "Style meets comfort",
-      description: "New arrivals in designer clothing and accessories",
+      title: t("home.hero.slide2Title"),
+      subtitle: t("home.hero.slide2Subtitle"),
+      description: t("home.hero.slide2Description"),
       image: "./fashion.jpg",
-      cta: "Explore Fashion",
+      cta: t("home.hero.slide2Cta"),
       url: "/products?category=Fashion",
     },
     {
       id: 3,
-      title: "Home & Garden",
-      subtitle: "Transform your space",
-      description: "Beautiful furniture and decor for every home",
+      title: t("home.hero.slide3Title"),
+      subtitle: t("home.hero.slide3Subtitle"),
+      description: t("home.hero.slide3Description"),
       image: "./furniture.jpg",
-      cta: "Shop Home",
+      cta: t("home.hero.slide3Cta"),
       url: `/products?category=Home & Garden`,
     },
   ];

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { toggleAuthPopup } from "../../store/slices/popupSlice";
 import {
   login,
@@ -11,6 +12,7 @@ import {
 } from "../../store/slices/authSlice";
 
 const LoginModal = () => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState("login");
   const [formData, setFormData] = useState({
     name: "",
@@ -20,6 +22,7 @@ const LoginModal = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
   const { isAuthPopupOpen } = useSelector((state) => state.popup);
   const { isLoggingIn, isSigningUp, isRequestingForToken, authUser } =
@@ -38,13 +41,45 @@ const LoginModal = () => {
   }, [location.pathname]);
 
   useEffect(() => {
+    setErrors({});
+  }, [mode]);
+
+  useEffect(() => {
     if (authUser && isAuthPopupOpen) {
       dispatch(toggleAuthPopup());
     }
   }, [authUser]);
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validate = () => {
+    const next = {};
+    if (mode !== "reset") {
+      if (!formData.email.trim()) next.email = t("validation.required");
+      else if (!emailRegex.test(formData.email)) next.email = t("validation.emailInvalid");
+    }
+    if (mode === "register" && !formData.name.trim()) {
+      next.name = t("validation.required");
+    }
+    if (mode !== "forgot") {
+      if (!formData.password) next.password = t("validation.required");
+      else if (formData.password.length < 8 || formData.password.length > 16) {
+        next.password = t("validation.passwordLength");
+      }
+    }
+    if (mode === "reset") {
+      if (!formData.confirmPassword) next.confirmPassword = t("validation.required");
+      else if (formData.password !== formData.confirmPassword) {
+        next.confirmPassword = t("validation.passwordMismatch");
+      }
+    }
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate()) return;
     if (mode === "login") {
       dispatch(login({ email: formData.email, password: formData.password }));
     } else if (mode === "register") {
@@ -88,12 +123,12 @@ const LoginModal = () => {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-foreground">
               {mode === "login"
-                ? "Welcome Back"
+                ? t("auth.welcomeBack")
                 : mode === "register"
-                ? "Create Account"
+                ? t("auth.createAccount")
                 : mode === "forgot"
-                ? "Forgot Password"
-                : "Reset Password"}
+                ? t("auth.forgotPassword")
+                : t("auth.resetPassword")}
             </h2>
             <button
               onClick={() =>
@@ -101,6 +136,7 @@ const LoginModal = () => {
                   ? (window.location.href = "/")
                   : dispatch(toggleAuthPopup())
               }
+              aria-label={t("aria.close")}
               className="p-2 hover:bg-secondary rounded-lg"
             >
               <X className="w-5 h-5 text-foreground" />
@@ -109,91 +145,115 @@ const LoginModal = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "register" && (
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
+              <div>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder={t("auth.fullName")}
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    className={`w-full pl-10 pr-4 py-3 bg-secondary border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 ${
+                      errors.name ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
+                    }`}
+                  />
+                </div>
+                {errors.name && (
+                  <p className="text-xs text-destructive mt-1 ml-1">{errors.name}</p>
+                )}
               </div>
             )}
 
             {mode !== "reset" && (
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
+              <div>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="email"
+                    placeholder={t("auth.email")}
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    className={`w-full pl-10 pr-4 py-3 bg-secondary border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 ${
+                      errors.email ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
+                    }`}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-xs text-destructive mt-1 ml-1">{errors.email}</p>
+                )}
               </div>
             )}
 
             {mode !== "forgot" && (
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className="w-full pl-10 pr-10 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
+              <div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder={t("auth.password")}
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    className={`w-full pl-10 pr-10 py-3 bg-secondary border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 ${
+                      errors.password ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-xs text-destructive mt-1 ml-1">{errors.password}</p>
+                )}
               </div>
             )}
 
             {mode === "reset" && (
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm Password"
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                  className="w-full pl-10 pr-10 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
+              <div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder={t("auth.confirmPassword")}
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
+                    className={`w-full pl-10 pr-10 py-3 bg-secondary border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 ${
+                      errors.confirmPassword ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-xs text-destructive mt-1 ml-1">{errors.confirmPassword}</p>
+                )}
               </div>
             )}
 
@@ -203,14 +263,14 @@ const LoginModal = () => {
               className="w-full py-3 gradient-primary text-primary-foreground rounded-lg font-semibold hover:glow-on-hover animate-smooth disabled:opacity-50"
             >
               {isLoggingIn || isSigningUp || isRequestingForToken
-                ? "Please wait..."
+                ? t("auth.pleaseWait")
                 : mode === "login"
-                ? "Sign In"
+                ? t("auth.signIn")
                 : mode === "register"
-                ? "Sign Up"
+                ? t("auth.signUp")
                 : mode === "forgot"
-                ? "Send Reset Link"
-                : "Reset Password"}
+                ? t("auth.sendResetLink")
+                : t("auth.resetPassword")}
             </button>
           </form>
 
@@ -222,27 +282,27 @@ const LoginModal = () => {
                     onClick={() => setMode("forgot")}
                     className="text-primary hover:underline block mx-auto"
                   >
-                    Forgot Password?
+                    {t("auth.forgotPasswordLink")}
                   </button>
                   <p>
-                    Don't have an account?{" "}
+                    {t("auth.noAccount")}{" "}
                     <button
                       onClick={() => setMode("register")}
                       className="text-primary hover:underline"
                     >
-                      Sign Up
+                      {t("auth.signUp")}
                     </button>
                   </p>
                 </>
               )}
               {mode === "register" && (
                 <p>
-                  Already have an account?{" "}
+                  {t("auth.haveAccount")}{" "}
                   <button
                     onClick={() => setMode("login")}
                     className="text-primary hover:underline"
                   >
-                    Sign In
+                    {t("auth.signIn")}
                   </button>
                 </p>
               )}
@@ -251,7 +311,7 @@ const LoginModal = () => {
                   onClick={() => setMode("login")}
                   className="text-primary hover:underline"
                 >
-                  Back to Login
+                  {t("auth.backToLogin")}
                 </button>
               )}
             </div>

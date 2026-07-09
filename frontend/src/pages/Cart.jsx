@@ -1,9 +1,11 @@
 import { Plus, Minus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { removeFromCart, updateQuantity, clearCart } from "../store/slices/cartSlice";
 
 const Cart = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { cart } = useSelector((state) => state.cart);
 
@@ -20,16 +22,16 @@ const Cart = () => {
       <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center">
         <ShoppingBag className="w-16 h-16 text-muted-foreground mb-4" />
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          Your cart is empty
+          {t("cart.empty")}
         </h2>
         <p className="text-muted-foreground mb-6">
-          Add some products to get started
+          {t("cart.emptyMessage")}
         </p>
         <Link
           to="/products"
           className="px-6 py-3 gradient-primary text-primary-foreground rounded-lg font-semibold hover:glow-on-hover animate-smooth"
         >
-          Browse Products
+          {t("cart.browseProducts")}
         </Link>
       </div>
     );
@@ -40,13 +42,13 @@ const Cart = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-foreground">
-            Shopping Cart ({cart.length})
+            {t("cart.title", { count: cart.length })}
           </h1>
           <button
             onClick={() => dispatch(clearCart())}
             className="text-sm text-red-400 hover:text-red-300 animate-smooth"
           >
-            Clear Cart
+            {t("cart.clearCart")}
           </button>
         </div>
 
@@ -137,36 +139,36 @@ const Cart = () => {
           {/* Order Summary */}
           <div className="glass-panel h-fit sticky top-24">
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Order Summary
+              {t("cart.orderSummary")}
             </h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-muted-foreground">
-                <span>Subtotal</span>
+                <span>{t("cart.subtotal")}</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>Shipping</span>
+                <span>{t("cart.shipping")}</span>
                 <span>
                   {shipping === 0 ? (
-                    <span className="text-green-400">Free</span>
+                    <span className="text-green-400">{t("cart.free")}</span>
                   ) : (
                     `$${shipping.toFixed(2)}`
                   )}
                 </span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>Tax (8%)</span>
+                <span>{t("cart.tax")}</span>
                 <span>${tax.toFixed(2)}</span>
               </div>
               <div className="border-t border-border pt-3 flex justify-between text-foreground font-bold text-base">
-                <span>Total</span>
+                <span>{t("cart.total")}</span>
                 <span>${total.toFixed(2)}</span>
               </div>
             </div>
 
             {subtotal < 100 && (
               <p className="text-xs text-muted-foreground mt-3">
-                Add ${(100 - subtotal).toFixed(2)} more for free shipping
+                {t("cart.freeShippingRemaining", { amount: (100 - subtotal).toFixed(2) })}
               </p>
             )}
 
@@ -174,7 +176,7 @@ const Cart = () => {
               to="/payment"
               className="mt-6 w-full py-3 gradient-primary text-primary-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:glow-on-hover animate-smooth"
             >
-              Proceed to Checkout
+              {t("cart.proceedToCheckout")}
               <ArrowRight className="w-4 h-4" />
             </Link>
 
@@ -182,7 +184,7 @@ const Cart = () => {
               to="/products"
               className="mt-3 w-full py-3 bg-secondary text-foreground rounded-lg font-medium flex items-center justify-center hover:bg-accent animate-smooth"
             >
-              Continue Shopping
+              {t("cart.continueShopping")}
             </Link>
           </div>
         </div>

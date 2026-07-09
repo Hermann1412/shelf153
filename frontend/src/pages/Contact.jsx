@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 
 const Contact = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,7 +14,7 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Message sent successfully!");
+    toast.success(t('contact.successMessage'));
     setFormData({ name: "", email: "", subject: "", message: "" });
   };
 
@@ -20,10 +23,10 @@ const Contact = () => {
       <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Contact Us
+            {t('contact.title')}
           </h1>
           <p className="text-xl text-muted-foreground">
-            Get in touch with our team
+            {t('contact.subtitle')}
           </p>
         </div>
 
@@ -35,7 +38,7 @@ const Contact = () => {
                 <Mail className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground mb-1">Email</h3>
+                <h3 className="font-semibold text-foreground mb-1">{t('contact.email')}</h3>
                 <p className="text-muted-foreground">hello@shopmate.com</p>
               </div>
             </div>
@@ -45,7 +48,7 @@ const Contact = () => {
                 <Phone className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground mb-1">Phone</h3>
+                <h3 className="font-semibold text-foreground mb-1">{t('contact.phone')}</h3>
                 <p className="text-muted-foreground">+1 (555) 123-4567</p>
               </div>
             </div>
@@ -55,7 +58,7 @@ const Contact = () => {
                 <MapPin className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground mb-1">Address</h3>
+                <h3 className="font-semibold text-foreground mb-1">{t('contact.address')}</h3>
                 <p className="text-muted-foreground">
                   123 Shop Street, City, ST 12345
                 </p>
@@ -69,7 +72,7 @@ const Contact = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
                   type="text"
-                  placeholder="Your Name"
+                  placeholder={t('contact.namePlaceholder')}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -79,7 +82,7 @@ const Contact = () => {
                 />
                 <input
                   type="email"
-                  placeholder="Your Email"
+                  placeholder={t('contact.emailPlaceholder')}
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -91,7 +94,7 @@ const Contact = () => {
 
               <input
                 type="text"
-                placeholder="Subject"
+                placeholder={t('contact.subjectPlaceholder')}
                 value={formData.subject}
                 onChange={(e) =>
                   setFormData({ ...formData, subject: e.target.value })
@@ -102,7 +105,7 @@ const Contact = () => {
 
               <textarea
                 rows="6"
-                placeholder="Your Message"
+                placeholder={t('contact.messagePlaceholder')}
                 value={formData.message}
                 onChange={(e) =>
                   setFormData({ ...formData, message: e.target.value })
@@ -116,7 +119,7 @@ const Contact = () => {
                 className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center space-x-2"
               >
                 <Send className="w-5 h-5" />
-                <span>Send Message</span>
+                <span>{t('contact.sendMessage')}</span>
               </button>
             </form>
           </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { MessageCircle, X, Send, Loader2, HeadphonesIcon } from "lucide-react";
 import { socket } from "../../lib/socket";
 import {
@@ -30,6 +31,7 @@ const TypingDots = () => (
 );
 
 const ChatWidget = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { authUser } = useSelector((s) => s.auth);
   const { isOpen, conversation, messages, isLoadingMessages, typingInfo, unreadCount, isClosed } =
@@ -156,7 +158,7 @@ const ChatWidget = () => {
     return (
       <button
         onClick={handleOpen}
-        title={authUser ? "Chat with us" : "Login to chat"}
+        title={authUser ? t('chat.chatWithUs') : t('chat.loginToChat')}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full gradient-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-110 transition-transform animate-smooth"
       >
         <MessageCircle className="w-6 h-6" />
@@ -179,16 +181,16 @@ const ChatWidget = () => {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-primary-foreground leading-tight">
-            Customer Support
+            {t('chat.customerSupport')}
           </p>
           <p className="text-xs text-primary-foreground/80 truncate">
             {connecting
-              ? "Connecting..."
+              ? t('chat.connecting')
               : connected
               ? conversation?.admin_name
-                ? `Chatting with ${conversation.admin_name}`
-                : "Waiting for an agent..."
-              : "Offline"}
+                ? t('chat.chattingWith', { name: conversation.admin_name })
+                : t('chat.waitingForAgent')
+              : t('chat.offline')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -213,7 +215,7 @@ const ChatWidget = () => {
           <div className="flex flex-col items-center justify-center h-full gap-2 text-center">
             <MessageCircle className="w-10 h-10 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              Please log in to chat with us.
+              {t('chat.loginRequired')}
             </p>
           </div>
         )}
@@ -222,7 +224,7 @@ const ChatWidget = () => {
         {isClosed && (
           <div className="flex flex-col items-center justify-center h-full gap-2 text-center">
             <p className="text-sm text-muted-foreground">
-              This conversation has been closed by the support team.
+              {t('chat.closedByTeam')}
             </p>
           </div>
         )}
@@ -241,7 +243,7 @@ const ChatWidget = () => {
               <HeadphonesIcon className="w-4 h-4 text-primary" />
             </div>
             <div className="bg-secondary text-foreground text-sm rounded-2xl rounded-tl-none px-4 py-2 max-w-[75%]">
-              <p>Hi there! 👋 How can we help you today?</p>
+              <p>{t('chat.welcomeMessage')}</p>
             </div>
           </div>
         )}
@@ -300,7 +302,7 @@ const ChatWidget = () => {
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder={connected ? "Type a message..." : "Connecting..."}
+            placeholder={connected ? t('chat.typeMessage') : t('chat.connecting')}
             disabled={!connected || !conversation}
             className="flex-1 resize-none bg-secondary text-foreground text-sm rounded-xl px-4 py-2.5 outline-none placeholder:text-muted-foreground max-h-24 disabled:opacity-50 leading-relaxed"
           />

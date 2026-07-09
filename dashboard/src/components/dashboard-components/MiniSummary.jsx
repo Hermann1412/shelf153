@@ -8,9 +8,11 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { formatNumber } from "../../lib/helper";
 
 const MiniSummary = () => {
+  const { t } = useTranslation();
   const isSeller = useSelector((state) => state.auth.user?.role === "Seller");
   const {
     totalRevenueAllTime,
@@ -30,44 +32,44 @@ const MiniSummary = () => {
 
   const cards = [
     {
-      label: "Total Revenue",
+      label: t("stats.totalRevenue"),
       value: `$${formatNumber(totalRevenueAllTime)}`,
       icon: Wallet,
       color: "text-green-600",
       bg: "bg-green-50",
     },
     {
-      label: "Total Orders",
+      label: t("stats.totalOrders"),
       value: formatNumber(isSeller ? totalOrdersCount : totalOrders),
       icon: PackageCheck,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
+      color: "text-teal-600",
+      bg: "bg-teal-50",
     },
     isSeller
       ? null
       : {
-          label: "Total Users",
+          label: t("stats.totalUsers"),
           value: formatNumber(totalUsersCount),
           icon: UserPlus,
           color: "text-purple-600",
           bg: "bg-purple-50",
         },
     {
-      label: "Revenue Growth",
+      label: t("stats.revenueGrowth"),
       value: revenueGrowth || "0%",
       icon: TrendingUp,
       color: "text-emerald-600",
       bg: "bg-emerald-50",
     },
     {
-      label: isSeller ? "New Orders (Month)" : "New Users (Month)",
+      label: isSeller ? t("stats.newOrdersMonth") : t("stats.newUsersMonth"),
       value: formatNumber(isSeller ? newOrdersThisMonth : newUsersThisMonth),
       icon: BarChart4,
       color: "text-indigo-600",
       bg: "bg-indigo-50",
     },
     {
-      label: "Low Stock Items",
+      label: t("stats.lowStockItems"),
       value: Array.isArray(lowStockProducts)
         ? lowStockProducts.length
         : lowStockProducts,

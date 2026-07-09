@@ -1,16 +1,18 @@
 import React from "react";
 import { formatNumber } from "../../lib/helper";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const Stats = () => {
+  const { t } = useTranslation();
   const { todayRevenue, yesterdayRevenue, currentMonthSales } = useSelector(
     (state) => (state.auth.user?.role === "Seller" ? state.seller : state.admin)
   );
 
   const cards = [
-    { label: "Today's Revenue", value: todayRevenue },
-    { label: "Yesterday's Revenue", value: yesterdayRevenue },
-    { label: "This Month's Sales", value: currentMonthSales },
+    { label: t("stats.todayRevenue"), value: todayRevenue },
+    { label: t("stats.yesterdayRevenue"), value: yesterdayRevenue },
+    { label: t("stats.thisMonthSales"), value: currentMonthSales },
   ];
 
   return (
