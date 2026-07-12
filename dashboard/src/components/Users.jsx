@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import avatar from "../assets/avatar.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { LoaderCircle, Trash2, Ban, RotateCcw } from "lucide-react";
+import { LoaderCircle, Trash2, Ban, RotateCcw, Search } from "lucide-react";
 import ConfirmDialog from "./ConfirmDialog";
 import {
   getAllUsers,
@@ -17,14 +17,21 @@ const Users = () => {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState("All");
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [search, setSearch] = useState("");
   const totalPages = Math.ceil(totalUsers / 10);
 
   useEffect(() => {
     dispatch(getAllUsers(page));
   }, [dispatch, page]);
 
-  const filtered =
-    filter === "All" ? users : users.filter((u) => u.role === filter);
+  const filtered = users
+    .filter((u) => filter === "All" || u.role === filter)
+    .filter(
+      (u) =>
+        !search.trim() ||
+        u.name?.toLowerCase().includes(search.trim().toLowerCase()) ||
+        u.email?.toLowerCase().includes(search.trim().toLowerCase())
+    );
 
   const handleDelete = (userId) => {
     setPendingDeleteId(userId);
@@ -48,24 +55,36 @@ const Users = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-500">
+      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
+        <p className="text-gray-500 shrink-0">
           {t("users.totalUsers", { count: totalUsers })}
         </p>
-        <div className="flex gap-2">
-          {["All", "User", "Seller"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === f
-                  ? "bg-green-600 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50 border"
-              }`}
-            >
-              {filterLabels[f]}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("common.searchUserPlaceholder")}
+              className="pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div className="flex gap-2">
+            {["All", "User", "Seller"].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  filter === f
+                    ? "bg-green-600 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50 border"
+                }`}
+              >
+                {filterLabels[f]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -79,17 +98,17 @@ const Users = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-600 text-left">
                 <tr>
-                  <th className="px-6 py-3 font-medium">{t("users.colUser")}</th>
-                  <th className="px-6 py-3 font-medium">{t("users.colEmail")}</th>
-                  <th className="px-6 py-3 font-medium">{t("users.colRole")}</th>
-                  <th className="px-6 py-3 font-medium">{t("users.colJoined")}</th>
-                  <th className="px-6 py-3 font-medium">{t("users.colActions")}</th>
+                  <th className="px-4 py-3 font-medium">{t("users.colUser")}</th>
+                  <th className="px-4 py-3 font-medium">{t("users.colEmail")}</th>
+                  <th className="px-4 py-3 font-medium">{t("users.colRole")}</th>
+                  <th className="px-4 py-3 font-medium">{t("users.colJoined")}</th>
+                  <th className="px-4 py-3 font-medium">{t("users.colActions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <img
                           src={user.avatar?.url || avatar}
@@ -108,8 +127,8 @@ const Users = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">{user.email}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3 text-gray-500">{user.email}</td>
+                    <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           user.role === "Seller"
@@ -124,10 +143,10 @@ const Users = () => {
                           : user.role}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-4 py-3 text-gray-500">
                       {new Date(user.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         {user.role === "Seller" && (
                           <button

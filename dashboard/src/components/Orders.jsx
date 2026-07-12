@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { LoaderCircle, Trash2 } from "lucide-react";
+import { LoaderCircle, Trash2, Search } from "lucide-react";
 import ConfirmDialog from "./ConfirmDialog";
 import {
   fetchAllOrders,
@@ -22,6 +22,7 @@ const Orders = () => {
   const { orders, loading } = useSelector((state) => state.order);
   const [filter, setFilter] = useState("All");
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [search, setSearch] = useState("");
 
   const statusLabels = {
     All: t("orders.all"),
@@ -35,10 +36,9 @@ const Orders = () => {
     dispatch(fetchAllOrders());
   }, [dispatch]);
 
-  const filtered =
-    filter === "All"
-      ? orders
-      : orders.filter((o) => o.order_status === filter);
+  const filtered = orders
+    .filter((o) => filter === "All" || o.order_status === filter)
+    .filter((o) => !search.trim() || o.id?.toLowerCase().includes(search.trim().toLowerCase()));
 
   const handleStatusChange = (orderId, status) => {
     dispatch(updateOrderStatus({ orderId, status }));
@@ -55,23 +55,35 @@ const Orders = () => {
 
   return (
     <div>
-      {/* Filter Tabs */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {["All", "Processing", "Shipped", "Delivered", "Cancelled"].map(
-          (s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === s
-                  ? "bg-green-600 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50 border"
-              }`}
-            >
-              {statusLabels[s]}
-            </button>
-          )
-        )}
+      {/* Filter Tabs + Search */}
+      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
+          {["All", "Processing", "Shipped", "Delivered", "Cancelled"].map(
+            (s) => (
+              <button
+                key={s}
+                onClick={() => setFilter(s)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  filter === s
+                    ? "bg-green-600 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50 border"
+                }`}
+              >
+                {statusLabels[s]}
+              </button>
+            )
+          )}
+        </div>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("common.searchOrderPlaceholder")}
+            className="pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -88,27 +100,27 @@ const Orders = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-600 text-left">
                 <tr>
-                  <th className="px-6 py-3 font-medium">{t("orders.colOrderId")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colItems")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colTotal")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colStatus")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colDate")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colActions")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colOrderId")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colItems")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colTotal")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colStatus")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colDate")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colActions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">
+                    <td className="px-4 py-3 font-mono text-xs text-gray-500">
                       {order.id?.slice(0, 8)}...
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600">
                       {t("orders.itemsCount", { count: order.order_items?.length || 0 })}
                     </td>
-                    <td className="px-6 py-4 font-semibold text-gray-800">
+                    <td className="px-4 py-3 font-semibold text-gray-800">
                       ${Number(order.total_price).toFixed(2)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <select
                         value={order.order_status}
                         onChange={(e) =>
@@ -124,10 +136,10 @@ const Orders = () => {
                         <option value="Cancelled">{t("orders.cancelled")}</option>
                       </select>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-4 py-3 text-gray-500">
                       {new Date(order.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <button
                         onClick={() => handleDelete(order.id)}
                         className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"

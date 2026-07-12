@@ -71,7 +71,8 @@
       "slide3Title": "Maison & Jardin",
       "slide3Subtitle": "Transformez votre espace",
       "slide3Description": "De beaux meubles et décorations pour chaque maison",
-      "slide3Cta": "Acheter maison"
+      "slide3Cta": "Acheter maison",
+      "goToSlide": "Aller à la diapositive"
     },
     "newsletter": {
       "title": "Restez informé",
@@ -81,11 +82,20 @@
       "privacy": "Nous respectons votre vie privée. Désabonnez-vous à tout moment."
     },
     "newArrivals": "Nouveautés",
-    "topRated": "Produits les mieux notés"
+    "topRated": "Produits les mieux notés",
+    "dealsTitle": "Offres du jour",
+    "dealsBadge": "Offre",
+    "browseAllTitle": "Vous cherchez quelque chose en particulier ?",
+    "browseAllSubtitle": "Voyez tout ce que nous vendons au même endroit.",
+    "browseAllProducts": "Voir tous les produits"
   },
   "products": {
     "title": "Produits",
     "productsFound": "{{count}} produits trouvés",
+    "sortNewest": "Plus récents",
+    "sortPriceAsc": "Prix : croissant",
+    "sortPriceDesc": "Prix : décroissant",
+    "sortTopRated": "Les mieux notés",
     "aiSearch": "Recherche IA",
     "filters": "Filtres",
     "clearAll": "Tout effacer",
@@ -113,7 +123,9 @@
     "outOfStock": "Rupture de stock",
     "onlyLeft": "Plus que {{count}} en stock",
     "soldBy": "Vendu par {{name}}",
-    "addedToCart": "Ajouté au panier"
+    "addedToCart": "Ajouté au panier",
+    "wishlist": "Ajouter aux favoris",
+    "freeShipping": "Livraison gratuite"
   },
   "productDetail": {
     "backToProducts": "Retour aux produits",

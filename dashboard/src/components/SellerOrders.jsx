@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Search } from "lucide-react";
 import {
   fetchSellerOrders,
   updateOrderItemStatus,
@@ -19,6 +19,7 @@ const SellerOrders = () => {
   const dispatch = useDispatch();
   const { orderItems, loading } = useSelector((state) => state.seller);
   const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
 
   const statusLabels = {
     All: t("orders.all"),
@@ -32,10 +33,9 @@ const SellerOrders = () => {
     dispatch(fetchSellerOrders());
   }, [dispatch]);
 
-  const filtered =
-    filter === "All"
-      ? orderItems
-      : orderItems.filter((i) => i.item_status === filter);
+  const filtered = orderItems
+    .filter((i) => filter === "All" || i.item_status === filter)
+    .filter((i) => !search.trim() || i.title?.toLowerCase().includes(search.trim().toLowerCase()));
 
   const handleStatusChange = (itemId, status) => {
     dispatch(updateOrderItemStatus({ itemId, status }));
@@ -43,22 +43,34 @@ const SellerOrders = () => {
 
   return (
     <div>
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {["All", "Processing", "Shipped", "Delivered", "Cancelled"].map(
-          (s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === s
-                  ? "bg-green-600 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50 border"
-              }`}
-            >
-              {statusLabels[s]}
-            </button>
-          )
-        )}
+      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
+          {["All", "Processing", "Shipped", "Delivered", "Cancelled"].map(
+            (s) => (
+              <button
+                key={s}
+                onClick={() => setFilter(s)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  filter === s
+                    ? "bg-green-600 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50 border"
+                }`}
+              >
+                {statusLabels[s]}
+              </button>
+            )
+          )}
+        </div>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("common.searchPlaceholder")}
+            className="pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -75,19 +87,19 @@ const SellerOrders = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-600 text-left">
                 <tr>
-                  <th className="px-6 py-3 font-medium">{t("orders.colItem")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colOrderId")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colQty")}</th>
-                  <th className="px-6 py-3 font-medium">{t("products.colPrice")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colShipTo")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colStatus")}</th>
-                  <th className="px-6 py-3 font-medium">{t("orders.colDate")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colItem")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colOrderId")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colQty")}</th>
+                  <th className="px-4 py-3 font-medium">{t("products.colPrice")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colShipTo")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colStatus")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colDate")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <img
                           src={item.image || "/placeholder.png"}
@@ -99,21 +111,21 @@ const SellerOrders = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">
+                    <td className="px-4 py-3 font-mono text-xs text-gray-500">
                       {item.order_id?.slice(0, 8)}...
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600">
                       {item.quantity}
                     </td>
-                    <td className="px-6 py-4 font-semibold text-gray-800">
+                    <td className="px-4 py-3 font-semibold text-gray-800">
                       ${Number(item.price).toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-4 py-3 text-gray-500">
                       {item.full_name
                         ? `${item.full_name}, ${item.city}, ${item.country}`
                         : t("orders.noShippingInfo")}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <select
                         value={item.item_status}
                         onChange={(e) =>
@@ -129,7 +141,7 @@ const SellerOrders = () => {
                         <option value="Cancelled">{t("orders.cancelled")}</option>
                       </select>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-4 py-3 text-gray-500">
                       {new Date(item.order_created_at).toLocaleDateString()}
                     </td>
                   </tr>

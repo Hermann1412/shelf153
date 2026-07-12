@@ -4,32 +4,31 @@ import { categories } from "../../data/products";
 const CategoryGrid = () => {
   const { t } = useTranslation();
   return (
-    <section className="py-16">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold text-foreground mb-4">
+    <section className="py-10">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-foreground mb-1">
           {t('home.categoryTitle')}
         </h2>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-sm text-muted-foreground">
           {t('home.categorySubtitle')}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         {categories.map((category) => (
           <Link
             key={category.id}
             to={`/products?category=${category.name}`}
-            className="group glass-card p-6 text-center hover:glow-on-hover animate-smooth"
+            className="group mp-card mp-card-hover p-4 text-center"
           >
-            <div className="relative overflow-hidden rounded-lg mb-4">
+            <div className="relative overflow-hidden rounded-lg mb-3">
               <img
                 src={category.image}
                 alt={category.name}
-                className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-300"
+                className="w-full h-20 object-cover group-hover:scale-110 transition-transform duration-300"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+            <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
               {category.name}
             </h3>
           </Link>

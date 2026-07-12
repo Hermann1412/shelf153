@@ -71,7 +71,8 @@
       "slide3Title": "Nzubu ne Jaridin",
       "slide3Subtitle": "Alaula Muaba Webe",
       "slide3Description": "Ma meubles mimpe ne décoration bua nzubu yonso",
-      "slide3Cta": "Sumba bia Nzubu"
+      "slide3Cta": "Sumba bia Nzubu",
+      "goToSlide": "Ya ku slide"
     },
     "newsletter": {
       "title": "Shala Mu Miyuki",
@@ -81,11 +82,20 @@
       "privacy": "Tudi tunemeka mubombelu webe. Ujimija Abonnement webe dîba dionso."
     },
     "newArrivals": "Bintu Bipya",
-    "topRated": "Bintu Bimpe Bikole"
+    "topRated": "Bintu Bimpe Bikole",
+    "dealsTitle": "Ba Ofele ba Lelu",
+    "dealsBadge": "Ofele",
+    "browseAllTitle": "Udi ukeba tshintu tshimue tshia pa buawu?",
+    "browseAllSubtitle": "Mona bintu byonso bituadi tuenza pa muaba umue.",
+    "browseAllProducts": "Mona Bintu Byonso"
   },
   "products": {
     "title": "Bintu",
     "productsFound": "Bintu {{count}} bidi bijana",
+    "sortNewest": "Bipya Kukudimuka",
+    "sortPriceAsc": "Mushinga: Mikese ku Minene",
+    "sortPriceDesc": "Mushinga: Minene ku Mikese",
+    "sortTopRated": "Bimpe Bikole",
     "aiSearch": "Dikeba dia AI",
     "filters": "Filtres",
     "clearAll": "Ipatula Byonso",
@@ -113,7 +123,9 @@
     "outOfStock": "Kena Mu Stock",
     "onlyLeft": "{{count}} nkayi kashala",
     "soldBy": "Bipandisha kudi {{name}}",
-    "addedToCart": "Bidi mu Panier"
+    "addedToCart": "Bidi mu Panier",
+    "wishlist": "Bueja ku Malu Asuana",
+    "freeShipping": "Ndeku wa Free"
   },
   "productDetail": {
     "backToProducts": "Pingana ku Bintu",

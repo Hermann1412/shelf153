@@ -12,7 +12,7 @@ const Payment = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cart } = useSelector((state) => state.cart);
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { authUser } = useSelector((state) => state.auth);
   const { orderStep, placingOrder, orderId } = useSelector(
     (state) => state.order
   );
@@ -29,13 +29,13 @@ const Payment = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!authUser) {
       navigate("/");
     }
     if (cart.length === 0 && orderStep === 1) {
       navigate("/cart");
     }
-  }, [isAuthenticated, cart, navigate, orderStep]);
+  }, [authUser, cart, navigate, orderStep]);
 
   const handleShippingChange = (e) => {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
@@ -76,8 +76,8 @@ const Payment = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
-      <div className="container mx-auto px-4 max-w-2xl">
+    <div className="min-h-screen pt-32 pb-12">
+      <div className="container mx-auto px-4 max-w-6xl">
         {/* Back Link */}
         <Link
           to="/cart"
@@ -131,7 +131,11 @@ const Payment = () => {
 
         {/* Step 1 - Shipping Form */}
         {orderStep === 1 && (
-          <form onSubmit={handleShippingSubmit} className="glass-panel space-y-4">
+          <form
+            onSubmit={handleShippingSubmit}
+            className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          >
+          <div className="lg:col-span-2 mp-card p-6 space-y-4">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary" />
               {t("checkout.shippingInfo")}
@@ -250,10 +254,12 @@ const Payment = () => {
                 <p className="text-xs text-destructive mt-1">{errors.phone}</p>
               )}
             </div>
+          </div>
 
-            {/* Order Summary */}
-            <div className="border-t border-border pt-4 mt-6">
-              <h3 className="text-sm font-semibold text-foreground mb-3">
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="mp-card p-6 h-fit sticky top-32 space-y-4">
+              <h3 className="text-sm font-semibold text-foreground">
                 {t("checkout.orderSummary", { count: cart.length })}
               </h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -271,28 +277,31 @@ const Payment = () => {
                   </div>
                 ))}
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={placingOrder}
-              className="w-full py-3 gradient-primary text-primary-foreground rounded-lg font-semibold hover:glow-on-hover animate-smooth disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {placingOrder ? (
-                <>
-                  <Loader className="w-4 h-4 animate-spin" />
-                  {t("checkout.placingOrder")}
-                </>
-              ) : (
-                t("checkout.placeOrder")
-              )}
-            </button>
+              <button
+                type="submit"
+                disabled={placingOrder}
+                className="w-full py-3 gradient-primary text-primary-foreground rounded-lg font-semibold hover:glow-on-hover animate-smooth disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {placingOrder ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    {t("checkout.placingOrder")}
+                  </>
+                ) : (
+                  t("checkout.placeOrder")
+                )}
+              </button>
+            </div>
+          </div>
           </form>
         )}
 
         {/* Step 3 - Payment */}
         {orderStep === 3 && orderId && (
-          <AirtelMoneyPayment phone={shipping.phone} />
+          <div className="max-w-2xl mx-auto">
+            <AirtelMoneyPayment phone={shipping.phone} />
+          </div>
         )}
       </div>
     </div>

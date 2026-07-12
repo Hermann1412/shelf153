@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Search, Sparkles, Star, Filter, X, Loader } from "lucide-react";
 import { categories } from "../data/products";
@@ -26,8 +26,18 @@ const Products = () => {
   const [ratings, setRatings] = useState("");
   const [price, setPrice] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState("");
 
   const totalPages = Math.ceil(totalProducts / 10);
+
+  const sortedProducts = useMemo(() => {
+    if (!sortBy) return products;
+    const sorted = [...products];
+    if (sortBy === "price-asc") sorted.sort((a, b) => Number(a.price) - Number(b.price));
+    else if (sortBy === "price-desc") sorted.sort((a, b) => Number(b.price) - Number(a.price));
+    else if (sortBy === "top-rated") sorted.sort((a, b) => Number(b.ratings) - Number(a.ratings));
+    return sorted;
+  }, [products, sortBy]);
 
   // Read search query from URL
   useEffect(() => {
@@ -74,6 +84,16 @@ const Products = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2 bg-secondary border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">{t('products.sortNewest')}</option>
+              <option value="price-asc">{t('products.sortPriceAsc')}</option>
+              <option value="price-desc">{t('products.sortPriceDesc')}</option>
+              <option value="top-rated">{t('products.sortTopRated')}</option>
+            </select>
             <button
               onClick={() => dispatch(toggleAIModal())}
               className="flex items-center gap-2 px-4 py-2 gradient-primary text-primary-foreground rounded-lg font-medium hover:glow-on-hover animate-smooth"
@@ -98,7 +118,7 @@ const Products = () => {
               showFilters ? "block" : "hidden"
             } lg:block w-full lg:w-64 shrink-0`}
           >
-            <div className="glass-panel space-y-6 sticky top-24">
+            <div className="mp-card p-4 space-y-6 sticky top-32">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground">{t('products.filters')}</h3>
                 {hasFilters && (
@@ -245,8 +265,8 @@ const Products = () => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product) => (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {sortedProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>

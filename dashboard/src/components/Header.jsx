@@ -22,9 +22,14 @@ const Header = () => {
         >
           <Menu className="w-6 h-6" />
         </button>
-        <h2 className="text-xl font-semibold text-gray-800">
-          {t(`sidebar.${openedComponent?.charAt(0).toLowerCase()}${openedComponent?.slice(1)}`, openedComponent)}
-        </h2>
+        <div>
+          <p className="text-xs text-gray-400">
+            {t("sidebar.dashboard")}
+          </p>
+          <h2 className="text-xl font-semibold text-gray-800">
+            {t(`sidebar.${openedComponent?.charAt(0).toLowerCase()}${openedComponent?.slice(1)}`, openedComponent)}
+          </h2>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

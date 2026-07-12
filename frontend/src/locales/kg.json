@@ -71,7 +71,8 @@
       "slide3Title": "Nzo ye Kinunga",
       "slide3Subtitle": "Kitula fulu kiaku ya mbote",
       "slide3Description": "Bima ya kitoko ye ya mfunu mu konso nzo",
-      "slide3Cta": "Sumba mu Nzo"
+      "slide3Cta": "Sumba mu Nzo",
+      "goToSlide": "Kwenda na slide"
     },
     "newsletter": {
       "title": "Zinga ye Beto Ntangu Yonso",
@@ -81,11 +82,20 @@
       "privacy": "Beto ke zitisa kinsweki kiaku. Vaika ntangu yonso odi zolele."
     },
     "newArrivals": "Bima ya Mpa",
-    "topRated": "Bima ya Ntalu ya Zulu"
+    "topRated": "Bima ya Ntalu ya Zulu",
+    "dealsTitle": "Ba Ofele ya Lumbu Kiaki",
+    "dealsBadge": "Ofele",
+    "browseAllTitle": "Odi kuluka kima mosi ya sipesiale?",
+    "browseAllSubtitle": "Mona bima yonso tueti teka na fulu kimosi.",
+    "browseAllProducts": "Mona Bima Yonso"
   },
   "products": {
     "title": "Bima",
     "productsFound": "Bima {{count}} zi monikini",
+    "sortNewest": "ya Mpa Mpenza",
+    "sortPriceAsc": "Ntalu: Fioti tii Nene",
+    "sortPriceDesc": "Ntalu: Nene tii Fioti",
+    "sortTopRated": "ya Ntalu ya Zulu",
     "aiSearch": "Recherche na AI",
     "filters": "Ba Filtre",
     "clearAll": "Katula Yonso",
@@ -113,7 +123,9 @@
     "outOfStock": "Stock Mekala Ve",
     "onlyLeft": "{{count}} kaka i sikaliaka",
     "soldBy": "Ye tekwa kwa {{name}}",
-    "addedToCart": "Yikwa mu Panier"
+    "addedToCart": "Yikwa mu Panier",
+    "wishlist": "Yika mu Mansaka",
+    "freeShipping": "Ntwadulu ya Mfwa Ve"
   },
   "productDetail": {
     "backToProducts": "Vutuka kwa Bima",

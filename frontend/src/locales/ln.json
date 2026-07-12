@@ -71,7 +71,8 @@
       "slide3Title": "Ndako mpe Elanga",
       "slide3Subtitle": "Bongola esika na yo",
       "slide3Description": "Biloko ya kitoko ya ndako mpe décoration mpo na ndako nyonso",
-      "slide3Cta": "Somba mpo na Ndako"
+      "slide3Cta": "Somba mpo na Ndako",
+      "goToSlide": "Kende na slide"
     },
     "newsletter": {
       "title": "Zala na Sango ya Sika",
@@ -81,11 +82,20 @@
       "privacy": "Toza na limemya ya sekele na yo. Okoki kotika ntango nyonso."
     },
     "newArrivals": "Biloko ya Sika",
-    "topRated": "Biloko Oyo Elingami Mingi"
+    "topRated": "Biloko Oyo Elingami Mingi",
+    "dealsTitle": "Ba Ofele ya Lelo",
+    "dealsBadge": "Ofele",
+    "browseAllTitle": "Ozali koluka eloko moko boye?",
+    "browseAllSubtitle": "Tala biloko nyonso oyo tozali koteka esika moko.",
+    "browseAllProducts": "Tala Biloko Nyonso"
   },
   "products": {
     "title": "Biloko",
     "productsFound": "Biloko {{count}} ezwami",
+    "sortNewest": "Ya Sika Mingi",
+    "sortPriceAsc": "Ntalo: Ya Moke na Monene",
+    "sortPriceDesc": "Ntalo: Ya Monene na Moke",
+    "sortTopRated": "Oyo Elingami Mingi",
     "aiSearch": "Koluka na AI",
     "filters": "Ba Filtre",
     "clearAll": "Longola Nyonso",
@@ -113,7 +123,9 @@
     "outOfStock": "Esili na Magazini",
     "onlyLeft": "Etikali kaka {{count}}",
     "soldBy": "Etekami na {{name}}",
-    "addedToCart": "Ebakisami na Panier"
+    "addedToCart": "Ebakisami na Panier",
+    "wishlist": "Bakisa na Ba Mposa",
+    "freeShipping": "Kotinda Ofele"
   },
   "productDetail": {
     "backToProducts": "Zonga na Biloko",

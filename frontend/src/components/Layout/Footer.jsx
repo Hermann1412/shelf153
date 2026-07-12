@@ -171,9 +171,6 @@ const Footer = () => {
             <p className="text-muted-foreground text-sm">
               © 2024 Shelf153. All rights reserved.
             </p>
-            <p className="text-muted-foreground text-xs mt-1">
-              Developed By CodeWithZeeshu
-            </p>
           </div>
         </div>
       </div>

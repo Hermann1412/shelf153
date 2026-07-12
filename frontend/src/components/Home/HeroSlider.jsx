@@ -55,27 +55,27 @@ const HeroSlider = () => {
   const slide = slides[currentSlide];
 
   return (
-    <div className="relative h-[70vh] overflow-hidden rounded-2xl">
+    <div className="relative h-[40vh] md:h-[45vh] overflow-hidden rounded-lg">
       {/* Single Active Slide */}
       <div className="relative h-full">
         <div className="absolute inset-0 bg-cover bg-center transition-all duration-1000"
           style={{ backgroundImage: `url(${slide.image})` }}
         />
-        <div className="absolute inset-0 glass" />
+        <div className="absolute inset-0 bg-black/30" />
         <div className="relative h-full flex items-center justify-center text-center px-6">
           <div className="max-w-3xl animate-fade-in-up">
-            <h3 className="text-lg font-medium text-primary mb-2">
+            <h3 className="text-base font-medium text-primary mb-1">
               {slide.subtitle}
             </h3>
-            <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-4">
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
               {slide.title}
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-white/80 mb-5 max-w-2xl mx-auto">
               {slide.description}
             </p>
             <Link
               to={slide.url}
-              className="px-8 py-4 gradient-primary text-primary-foreground rounded-lg hover:glow-on-hover animate-smooth font-semibold text-lg"
+              className="inline-block px-8 py-4 gradient-primary text-primary-foreground rounded-lg hover:glow-on-hover animate-smooth font-semibold text-lg"
             >
               {slide.cta}
             </Link>
@@ -98,17 +98,22 @@ const HeroSlider = () => {
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide
-                ? "bg-primary glow-primary"
-                : "bg-white/30 hover:bg-white/50"
-            }`}
-          />
+            aria-label={`${t("home.hero.goToSlide")} ${index + 1}`}
+            className="p-2.5"
+          >
+            <span
+              className={`block w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentSlide
+                  ? "bg-primary glow-primary"
+                  : "bg-white/40 hover:bg-white/60"
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>

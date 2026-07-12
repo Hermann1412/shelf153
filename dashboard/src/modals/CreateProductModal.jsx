@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { createNewProduct } from "../store/slices/productsSlice";
 import { toggleCreateProductModal } from "../store/slices/extraSlice";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, X } from "lucide-react";
 
 const CreateProductModal = () => {
   const { t } = useTranslation();
@@ -52,9 +52,9 @@ const CreateProductModal = () => {
         <div className="bg-white rounded-xl w-full max-w-2xl p-6 relative">
           <button
             onClick={() => dispatch(toggleCreateProductModal())}
-            className="absolute top-4 right-4 text-gray-600 hover:text-red-500 text-xl"
+            className="absolute top-4 right-4 text-gray-500 hover:text-red-500 p-1 rounded-lg hover:bg-red-50"
           >
-            &times;
+            <X className="w-5 h-5" />
           </button>
           <h2 className="text-2xl font-bold mb-4 text-center">
             {t("modals.createProduct")}
@@ -74,10 +74,10 @@ const CreateProductModal = () => {
                   name: e.target.value,
                 })
               }
-              className="border px-4 py-2 rounded"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
             <select
-              className="w-full border p-2 rounded-lg"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               value={formData.category}
               onChange={(e) =>
                 setFormData({ ...formData, category: e.target.value })
@@ -100,7 +100,7 @@ const CreateProductModal = () => {
                   price: e.target.value,
                 })
               }
-              className="border px-4 py-2 rounded"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
             <input
               type="number"
@@ -112,7 +112,7 @@ const CreateProductModal = () => {
                   stock: e.target.value,
                 })
               }
-              className="border px-4 py-2 rounded"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
 
             <input
@@ -125,7 +125,7 @@ const CreateProductModal = () => {
                   images: Array.from(e.target.files),
                 })
               }
-              className="border px-4 py-2 rounded col-span-1 md:col-span-2"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent col-span-1 md:col-span-2"
             />
 
             <textarea
@@ -137,13 +137,13 @@ const CreateProductModal = () => {
                   description: e.target.value,
                 })
               }
-              className="border px-4 py-2 rounded col-span-1 md:col-span-2"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent col-span-1 md:col-span-2"
               rows={4}
             />
 
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded col-span-1 md:col-span-2"
+              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2.5 px-6 rounded-lg col-span-1 md:col-span-2"
             >
               {loading ? (
                 <>

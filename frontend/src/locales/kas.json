@@ -71,7 +71,8 @@
       "slide3Title": "Nzubu ne Ntanda",
       "slide3Subtitle": "Aludika muaba webe",
       "slide3Description": "Bulamba bua nzubu buimpe ne bintu bia kulengeja bua nzubu yonso",
-      "slide3Cta": "Sumba bia Nzubu"
+      "slide3Cta": "Sumba bia Nzubu",
+      "goToSlide": "Ya ku slide"
     },
     "newsletter": {
       "title": "Shala mu Mikenji",
@@ -81,11 +82,20 @@
       "privacy": "Tudi tunemeka buashame buebe. Imana dîba dionso diwasua."
     },
     "newArrivals": "Bintu Bipya Bifikile",
-    "topRated": "Bintu Bidi Bela Diyi Dinene"
+    "topRated": "Bintu Bidi Bela Diyi Dinene",
+    "dealsTitle": "Bikengeshi bia Lelu",
+    "dealsBadge": "Ofele",
+    "browseAllTitle": "Udi ukeba tshintu tshimue tshia pa buawu?",
+    "browseAllSubtitle": "Mona bintu byonso bituadi tuenza pa muaba umue.",
+    "browseAllProducts": "Mona Bintu Byonso"
   },
   "products": {
     "title": "Bintu",
     "productsFound": "Bintu {{count}} bipetakane",
+    "sortNewest": "Bipya Kukudimuka",
+    "sortPriceAsc": "Mushinga: Panshi ku Diulu",
+    "sortPriceDesc": "Mushinga: Diulu ku Panshi",
+    "sortTopRated": "Bidi Bela Diyi Dinene",
     "aiSearch": "Kukeba kua IA",
     "filters": "Bikengeshi",
     "clearAll": "Umusha bionso",
@@ -113,7 +123,9 @@
     "outOfStock": "Kaakuena Kudiku",
     "onlyLeft": "{{count}} nkayabu ke bashadile",
     "soldBy": "Bidi bisumbisha kudi {{name}}",
-    "addedToCart": "Bibuedi mu Mukoba"
+    "addedToCart": "Bibuedi mu Mukoba",
+    "wishlist": "Buela mu Malu Asuana",
+    "freeShipping": "Ntuadijilu wa Yowa"
   },
   "productDetail": {
     "backToProducts": "Pingana ku Bintu",

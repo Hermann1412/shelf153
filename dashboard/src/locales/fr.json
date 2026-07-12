@@ -2,7 +2,10 @@
   "common": {
     "cancel": "Annuler",
     "confirm": "Confirmer",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "searchPlaceholder": "Rechercher des produits...",
+    "searchOrderPlaceholder": "Rechercher par ID de commande...",
+    "searchUserPlaceholder": "Rechercher par nom ou email..."
   },
   "validation": {
     "required": "Ce champ est obligatoire",
@@ -26,7 +29,9 @@
     "chat": "Chat",
     "profile": "Profil",
     "storeProfile": "Profil de la boutique",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "collapse": "Réduire le menu",
+    "expand": "Agrandir le menu"
   },
   "header": {
     "adminAlt": "Admin"

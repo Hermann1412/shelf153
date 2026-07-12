@@ -71,7 +71,8 @@
       "slide3Title": "Nyumbani na Bustani",
       "slide3Subtitle": "Badilisha mwonekano wa nafasi yako",
       "slide3Description": "Samani na mapambo mazuri kwa kila nyumba",
-      "slide3Cta": "Nunua kwa Nyumbani"
+      "slide3Cta": "Nunua kwa Nyumbani",
+      "goToSlide": "Nenda kwenye slaidi"
     },
     "newsletter": {
       "title": "Baki na Taarifa",
@@ -81,11 +82,20 @@
       "privacy": "Tunaheshimu faragha yako. Jiondoe wakati wowote."
     },
     "newArrivals": "Bidhaa Mpya",
-    "topRated": "Bidhaa Zenye Ukadiriaji wa Juu"
+    "topRated": "Bidhaa Zenye Ukadiriaji wa Juu",
+    "dealsTitle": "Ofa za Leo",
+    "dealsBadge": "Ofa",
+    "browseAllTitle": "Unatafuta kitu maalum?",
+    "browseAllSubtitle": "Ona kila kitu tunachouza mahali pamoja.",
+    "browseAllProducts": "Ona Bidhaa Zote"
   },
   "products": {
     "title": "Bidhaa",
     "productsFound": "Bidhaa {{count}} zimepatikana",
+    "sortNewest": "Mpya Zaidi",
+    "sortPriceAsc": "Bei: Chini hadi Juu",
+    "sortPriceDesc": "Bei: Juu hadi Chini",
+    "sortTopRated": "Zenye Ukadiriaji wa Juu",
     "aiSearch": "Utafutaji wa AI",
     "filters": "Vichujio",
     "clearAll": "Futa vyote",
@@ -113,7 +123,9 @@
     "outOfStock": "Haipo Stoo",
     "onlyLeft": "Zimebaki {{count}} tu",
     "soldBy": "Inauzwa na {{name}}",
-    "addedToCart": "Imeongezwa kwenye kikapu"
+    "addedToCart": "Imeongezwa kwenye kikapu",
+    "wishlist": "Ongeza kwenye orodha ya matakwa",
+    "freeShipping": "Usafirishaji Bure"
   },
   "productDetail": {
     "backToProducts": "Rudi kwenye Bidhaa",

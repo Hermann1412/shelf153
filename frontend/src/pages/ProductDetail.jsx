@@ -52,7 +52,7 @@ const ProductDetail = () => {
   const rating = Number(productDetails.ratings) || 0;
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-32 pb-12">
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <Link
@@ -63,10 +63,10 @@ const ProductDetail = () => {
           {t('productDetail.backToProducts')}
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Images */}
-          <div className="space-y-4">
-            <div className="glass-panel aspect-square overflow-hidden rounded-xl flex items-center justify-center">
+          <div className="lg:col-span-6 space-y-4">
+            <div className="mp-card aspect-square overflow-hidden flex items-center justify-center">
               {images.length > 0 ? (
                 <img
                   src={images[selectedImage]?.url}
@@ -100,13 +100,13 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Details */}
-          <div className="space-y-6">
+          {/* Info */}
+          <div className="lg:col-span-3 space-y-6">
             <div>
               <p className="text-sm text-primary font-medium uppercase tracking-wider">
                 {productDetails.category}
               </p>
-              <h1 className="text-3xl font-bold text-foreground mt-2">
+              <h1 className="text-2xl font-bold text-foreground mt-2">
                 {productDetails.name}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
@@ -120,7 +120,7 @@ const ProductDetail = () => {
                 {[1, 2, 3, 4, 5].map((s) => (
                   <Star
                     key={s}
-                    className={`w-5 h-5 ${
+                    className={`w-4 h-4 ${
                       s <= Math.round(rating)
                         ? "text-yellow-400 fill-yellow-400"
                         : "text-muted-foreground"
@@ -128,39 +128,40 @@ const ProductDetail = () => {
                   />
                 ))}
               </div>
-              <span className="text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 {t('productDetail.reviews', { count: productReviews.length })}
               </span>
             </div>
 
-            {/* Price */}
-            <p className="text-4xl font-bold text-primary">
-              ${Number(productDetails.price).toFixed(2)}
-            </p>
-
             {/* Description */}
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               {productDetails.description}
             </p>
 
             {/* Stock */}
             <div>
               {productDetails.stock > 5 ? (
-                <span className="text-green-400 font-medium">
+                <span className="text-green-400 font-medium text-sm">
                   {t('productDetail.inStockAvailable', { count: productDetails.stock })}
                 </span>
               ) : productDetails.stock > 0 ? (
-                <span className="text-yellow-400 font-medium">
+                <span className="text-yellow-400 font-medium text-sm">
                   {t('productDetail.lowStockLeft', { count: productDetails.stock })}
                 </span>
               ) : (
-                <span className="text-red-400 font-medium">{t('productDetail.outOfStock')}</span>
+                <span className="text-red-400 font-medium text-sm">{t('productDetail.outOfStock')}</span>
               )}
             </div>
+          </div>
 
-            {/* Quantity & Add to Cart */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex items-center border border-border rounded-lg">
+          {/* Buy box */}
+          <div className="lg:col-span-3">
+            <div className="mp-card p-5 space-y-4 sticky top-32">
+              <p className="text-3xl font-bold text-primary">
+                ${Number(productDetails.price).toFixed(2)}
+              </p>
+
+              <div className="flex items-center border border-border rounded-lg w-fit">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="p-3 hover:bg-secondary animate-smooth"
@@ -185,7 +186,7 @@ const ProductDetail = () => {
               <button
                 onClick={handleAddToCart}
                 disabled={productDetails.stock < 1}
-                className="flex-1 w-full sm:w-auto py-3 px-8 gradient-primary text-primary-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:glow-on-hover animate-smooth disabled:opacity-50"
+                className="w-full py-3 px-8 gradient-primary text-primary-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:glow-on-hover animate-smooth disabled:opacity-50"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {t('productDetail.addToCart')}
@@ -196,6 +197,9 @@ const ProductDetail = () => {
 
         {/* Reviews Section */}
         <div className="mt-16">
+          {/* Known bug (pre-existing, out of scope here): ReviewsContainer destructures
+              { product, productReviews } but is passed productId/reviews, so it always
+              renders the empty state. Not touched as part of this layout pass. */}
           <ReviewsContainer
             productId={id}
             reviews={productReviews}

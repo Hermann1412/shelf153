@@ -2,7 +2,10 @@
   "common": {
     "cancel": "Ghairi",
     "confirm": "Thibitisha",
-    "delete": "Futa"
+    "delete": "Futa",
+    "searchPlaceholder": "Tafuta bidhaa...",
+    "searchOrderPlaceholder": "Tafuta kwa ID ya agizo...",
+    "searchUserPlaceholder": "Tafuta kwa jina au barua pepe..."
   },
   "validation": {
     "required": "Sehemu hii inahitajika",
@@ -26,7 +29,9 @@
     "chat": "Mazungumzo",
     "profile": "Wasifu",
     "storeProfile": "Wasifu wa Duka",
-    "logout": "Toka"
+    "logout": "Toka",
+    "collapse": "Kunja upau wa kando",
+    "expand": "Panua upau wa kando"
   },
   "header": {
     "adminAlt": "Msimamizi"

@@ -2,7 +2,10 @@
   "common": {
     "cancel": "Annuler",
     "confirm": "Confirmer",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "searchPlaceholder": "Keba bintu...",
+    "searchOrderPlaceholder": "Keba ku ID wa komanda...",
+    "searchUserPlaceholder": "Keba ku dina anyi email..."
   },
   "validation": {
     "required": "Muaba eu udi mua dijadika",
@@ -26,7 +29,9 @@
     "chat": "Chat",
     "profile": "Profil",
     "storeProfile": "Profil wa Magasin",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "collapse": "Funga menu wa mu lubombo",
+    "expand": "Vuluja menu wa mu lubombo"
   },
   "header": {
     "adminAlt": "Admin"

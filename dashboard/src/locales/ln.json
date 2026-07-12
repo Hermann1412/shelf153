@@ -2,7 +2,10 @@
   "common": {
     "cancel": "Kotika",
     "confirm": "Kondima",
-    "delete": "Kolongola"
+    "delete": "Kolongola",
+    "searchPlaceholder": "Luka biloko...",
+    "searchOrderPlaceholder": "Luka na ID ya commande...",
+    "searchUserPlaceholder": "Luka na nkombo to email..."
   },
   "validation": {
     "required": "Esika oyo esengeli kotondisama",
@@ -26,7 +29,9 @@
     "chat": "Chat",
     "profile": "Profil",
     "storeProfile": "Profil ya Magazini",
-    "logout": "Kobima"
+    "logout": "Kobima",
+    "collapse": "Kokanga menu ya pembeni",
+    "expand": "Kofungola menu ya pembeni"
   },
   "header": {
     "adminAlt": "Admin"

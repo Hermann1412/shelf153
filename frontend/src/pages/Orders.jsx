@@ -25,7 +25,7 @@ const Orders = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { myOrders, fetchingOrders } = useSelector((state) => state.order);
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { authUser } = useSelector((state) => state.auth);
   const [filter, setFilter] = useState("All");
   const statusLabels = {
     All: t("orders.all"),
@@ -36,12 +36,12 @@ const Orders = () => {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!authUser) {
       navigate("/");
       return;
     }
     dispatch(fetchMyOrders());
-  }, [dispatch, isAuthenticated, navigate]);
+  }, [dispatch, authUser, navigate]);
 
   const filtered =
     filter === "All"
@@ -57,7 +57,7 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-32 pb-12">
       <div className="container mx-auto px-4">
         <h1 className="text-3xl font-bold text-foreground mb-8">{t("orders.title")}</h1>
 

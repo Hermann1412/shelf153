@@ -2,7 +2,10 @@
   "common": {
     "cancel": "Annuler",
     "confirm": "Confirmer",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "searchPlaceholder": "Vava bima...",
+    "searchOrderPlaceholder": "Vava na ID ya commande...",
+    "searchUserPlaceholder": "Vava na nkumbu to email..."
   },
   "validation": {
     "required": "Kisika yayi kilombeka",
@@ -26,7 +29,9 @@
     "chat": "Chat",
     "profile": "Profil",
     "storeProfile": "Profil ya Butiki",
-    "logout": "Vaika"
+    "logout": "Vaika",
+    "collapse": "Kanga menu ya lubongo",
+    "expand": "Yantika menu ya lubongo"
   },
   "header": {
     "adminAlt": "Admin"

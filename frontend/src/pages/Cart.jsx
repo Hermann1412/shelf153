@@ -19,7 +19,7 @@ const Cart = () => {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center">
+      <div className="min-h-screen pt-32 pb-12 flex flex-col items-center justify-center">
         <ShoppingBag className="w-16 h-16 text-muted-foreground mb-4" />
         <h2 className="text-2xl font-bold text-foreground mb-2">
           {t("cart.empty")}
@@ -38,7 +38,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-32 pb-12">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-foreground">
@@ -58,7 +58,7 @@ const Cart = () => {
             {cart.map((item) => (
               <div
                 key={item.product.id}
-                className="glass-panel flex flex-col sm:flex-row items-start sm:items-center gap-4"
+                className="mp-card p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4"
               >
                 <Link to={`/product/${item.product.id}`} className="shrink-0">
                   <img
@@ -137,7 +137,7 @@ const Cart = () => {
           </div>
 
           {/* Order Summary */}
-          <div className="glass-panel h-fit sticky top-24">
+          <div className="mp-card p-6 h-fit sticky top-32">
             <h3 className="text-lg font-semibold text-foreground mb-4">
               {t("cart.orderSummary")}
             </h3>

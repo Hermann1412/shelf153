@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { LoaderCircle, Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { LoaderCircle, Plus, Eye, Pencil, Trash2, Search } from "lucide-react";
 import CreateProductModal from "../modals/CreateProductModal";
 import { useDispatch, useSelector } from "react-redux";
 import UpdateProductModal from "../modals/UpdateProductModal";
@@ -28,8 +28,15 @@ const SellerProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [page, setPage] = useState(1);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [search, setSearch] = useState("");
   const totalPages = Math.ceil(totalProducts / 10);
   const isFirstRender = useRef(true);
+
+  const filteredProducts = useMemo(() => {
+    if (!search.trim()) return products;
+    const q = search.trim().toLowerCase();
+    return products.filter((p) => p.name?.toLowerCase().includes(q));
+  }, [products, search]);
 
   useEffect(() => {
     dispatch(fetchSellerProducts(page));
@@ -68,17 +75,29 @@ const SellerProducts = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-500">
+      <div className="flex items-center justify-between mb-6 gap-4">
+        <p className="text-gray-500 shrink-0">
           {t("products.totalProducts", { count: totalProducts })}
         </p>
-        <button
-          onClick={() => dispatch(toggleCreateProductModal())}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          {t("products.addProduct")}
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("common.searchPlaceholder")}
+              className="pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <button
+            onClick={() => dispatch(toggleCreateProductModal())}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            {t("products.addProduct")}
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -95,34 +114,34 @@ const SellerProducts = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-600 text-left">
                 <tr>
-                  <th className="px-6 py-3 font-medium">{t("products.colImage")}</th>
-                  <th className="px-6 py-3 font-medium">{t("products.colName")}</th>
-                  <th className="px-6 py-3 font-medium">{t("products.colCategory")}</th>
-                  <th className="px-6 py-3 font-medium">{t("products.colPrice")}</th>
-                  <th className="px-6 py-3 font-medium">{t("products.colStock")}</th>
-                  <th className="px-6 py-3 font-medium">{t("products.colActions")}</th>
+                  <th className="px-4 py-3 font-medium">{t("products.colImage")}</th>
+                  <th className="px-4 py-3 font-medium">{t("products.colName")}</th>
+                  <th className="px-4 py-3 font-medium">{t("products.colCategory")}</th>
+                  <th className="px-4 py-3 font-medium">{t("products.colPrice")}</th>
+                  <th className="px-4 py-3 font-medium">{t("products.colStock")}</th>
+                  <th className="px-4 py-3 font-medium">{t("products.colActions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <img
                         src={product.images?.[0]?.url || "/placeholder.png"}
                         alt={product.name}
                         className="w-12 h-12 rounded-lg object-cover"
                       />
                     </td>
-                    <td className="px-6 py-4 font-medium text-gray-800 max-w-[200px] truncate">
+                    <td className="px-4 py-3 font-medium text-gray-800 max-w-[200px] truncate">
                       {product.name}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-4 py-3 text-gray-500">
                       {product.category}
                     </td>
-                    <td className="px-6 py-4 text-gray-800">
+                    <td className="px-4 py-3 text-gray-800">
                       ${Number(product.price).toFixed(2)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           product.stock > 5
@@ -135,7 +154,7 @@ const SellerProducts = () => {
                         {product.stock}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleView(product)}

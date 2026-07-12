@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
+import { X } from "lucide-react";
 import { toggleViewProductModal } from "../store/slices/extraSlice";
 
 const ViewProductModal = ({ selectedProduct }) => {
@@ -12,9 +13,9 @@ const ViewProductModal = ({ selectedProduct }) => {
         <div className="bg-white rounded-xl w-full max-w-3xl p-6 overflow-y-auto max-h-[90vh] relative">
           <button
             onClick={() => dispatch(toggleViewProductModal())}
-            className="absolute top-4 right-4 text-gray-600 hover:text-red-500 text-xl"
+            className="absolute top-4 right-4 text-gray-500 hover:text-red-500 p-1 rounded-lg hover:bg-red-50"
           >
-            &times;
+            <X className="w-5 h-5" />
           </button>
           <h2 className="text-2xl font-bold mb-4">{selectedProduct.title}</h2>
 

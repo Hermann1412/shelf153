@@ -71,7 +71,8 @@
       "slide3Title": "Home & Garden",
       "slide3Subtitle": "Transform your space",
       "slide3Description": "Beautiful furniture and decor for every home",
-      "slide3Cta": "Shop Home"
+      "slide3Cta": "Shop Home",
+      "goToSlide": "Go to slide"
     },
     "newsletter": {
       "title": "Stay in the Loop",
@@ -81,11 +82,20 @@
       "privacy": "We respect your privacy. Unsubscribe at any time."
     },
     "newArrivals": "New Arrivals",
-    "topRated": "Top Rated Products"
+    "topRated": "Top Rated Products",
+    "dealsTitle": "Today's Deals",
+    "dealsBadge": "Deal",
+    "browseAllTitle": "Looking for something specific?",
+    "browseAllSubtitle": "See everything we have for sale in one place.",
+    "browseAllProducts": "See All Products"
   },
   "products": {
     "title": "Products",
     "productsFound": "{{count}} products found",
+    "sortNewest": "Newest",
+    "sortPriceAsc": "Price: Low to High",
+    "sortPriceDesc": "Price: High to Low",
+    "sortTopRated": "Top Rated",
     "aiSearch": "AI Search",
     "filters": "Filters",
     "clearAll": "Clear all",
@@ -113,7 +123,9 @@
     "outOfStock": "Out of Stock",
     "onlyLeft": "Only {{count}} left",
     "soldBy": "Sold by {{name}}",
-    "addedToCart": "Added to cart"
+    "addedToCart": "Added to cart",
+    "wishlist": "Add to wishlist",
+    "freeShipping": "Free Shipping"
   },
   "productDetail": {
     "backToProducts": "Back to Products",
