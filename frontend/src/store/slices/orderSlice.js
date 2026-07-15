@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
+import i18n from "../../lib/i18n";
 
 export const placeOrder = createAsyncThunk(
   "order/placeOrder",
@@ -10,7 +11,7 @@ export const placeOrder = createAsyncThunk(
       toast.success(data.message);
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Order failed");
+      toast.error(error.response?.data?.message || i18n.t("errors.orderFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }

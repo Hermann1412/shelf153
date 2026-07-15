@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
+import i18n from "../../lib/i18n";
 
 export const fetchAllProducts = createAsyncThunk(
   "product/fetchAll",
@@ -39,7 +40,7 @@ export const postProductReview = createAsyncThunk(
       toast.success(data.message);
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to post review");
+      toast.error(error.response?.data?.message || i18n.t("errors.postReviewFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -55,7 +56,19 @@ export const deleteProductReview = createAsyncThunk(
       toast.success(data.message);
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete review");
+      toast.error(error.response?.data?.message || i18n.t("errors.deleteReviewFailed"));
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const fetchShops = createAsyncThunk(
+  "product/fetchShops",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get("/seller/all");
+      return data;
+    } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -70,7 +83,7 @@ export const fetchAIProducts = createAsyncThunk(
       });
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "AI search failed");
+      toast.error(error.response?.data?.message || i18n.t("errors.aiSearchFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -90,6 +103,7 @@ const productSlice = createSlice({
     isReviewDeleting: false,
     isPostingReview: false,
     productReviews: [],
+    shops: [],
   },
   extraReducers: (builder) => {
     builder
@@ -134,6 +148,9 @@ const productSlice = createSlice({
       })
       .addCase(deleteProductReview.rejected, (state) => {
         state.isReviewDeleting = false;
+      })
+      .addCase(fetchShops.fulfilled, (state, action) => {
+        state.shops = action.payload.shops || [];
       })
       .addCase(fetchAIProducts.pending, (state) => {
         state.aiSearching = true;

@@ -26,7 +26,7 @@ const ViewProductModal = ({ selectedProduct }) => {
                 <img
                   key={idx}
                   src={img?.url}
-                  alt={`Product ${idx}`}
+                  alt={t("modals.productImageAlt", { name: selectedProduct.title, index: idx + 1 })}
                   className="w-full h-full object-cover"
                 />
               ))}
@@ -45,7 +45,7 @@ const ViewProductModal = ({ selectedProduct }) => {
                 {selectedProduct.category}
               </p>
               <p>
-                <strong>{t("modals.price")}</strong> Rs{" "}
+                <strong>{t("modals.price")}</strong> ${" "}
                 {selectedProduct.price.toLocaleString()}
               </p>
               <p>

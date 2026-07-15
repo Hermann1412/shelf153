@@ -5,13 +5,36 @@
     "passwordLength": "Mot de passe udi mua kuikala ne ntendu 8 too ne 16",
     "passwordMismatch": "Ba mots de passe kabena bimue to"
   },
+  "errors": {
+    "postReviewFailed": "Kutuma avis kakuenzeka to",
+    "deleteReviewFailed": "Kumbusha avis kakuenzeka to",
+    "aiSearchFailed": "Dikeba dia AI kadienzeki to",
+    "registrationFailed": "Kudienzeja kakuenzeki to",
+    "loginFailed": "Kubuela kakuenzeki to",
+    "logoutFailed": "Kupatuka kakuenzeki to",
+    "updateFailed": "Kuvuija bimpe kakuenzeki to",
+    "requestFailed": "Requête kayienzeki to",
+    "resetFailed": "Kuvuija kakuenzeki to",
+    "orderFailed": "Commande kayienzeki to"
+  },
   "aria": {
     "menu": "Disa menu",
     "search": "Kimba",
     "toggleTheme": "Alaula thème",
     "cart": "Panier",
     "profile": "Profil",
-    "close": "Bala"
+    "close": "Bala",
+    "changeLanguage": "Alaula muakulu"
+  },
+  "categories": {
+    "electronics": "Électronique",
+    "fashion": "Mode",
+    "homeGarden": "Nzubu ne Jardin",
+    "sports": "Sport",
+    "books": "Mikanda",
+    "beauty": "Buimpe",
+    "automotive": "Automobile",
+    "kidsBaby": "Bana ne Tuana"
   },
   "nav": {
     "home": "Nzubu",
@@ -25,6 +48,7 @@
   },
   "footer": {
     "description": "Mulunda wenu mulelela wa musumba pa Internet. Tana bintu bimpe bidi ne mushinga muimpe ne mudimu muimpe.",
+    "address": "San Francisco, CA",
     "company": "Kampani",
     "aboutUs": "Bualu Buetu",
     "careers": "Midimu",
@@ -103,6 +127,8 @@
     "searchPlaceholder": "Keba bintu...",
     "category": "Catégorie",
     "allCategories": "Catégories Zonso",
+    "shop": "Tshisumbu",
+    "allShops": "Bisumbu Byonso",
     "priceRange": "Intervalle ya Mushinga",
     "anyPrice": "Mushinga Wonso",
     "under25": "Muinshi mua $25",
@@ -267,6 +293,7 @@
     "email": "Email",
     "phone": "Téléphone",
     "address": "Aderesse",
+    "addressLine": "123 Rue wa Magasin, Ville, 12345",
     "namePlaceholder": "Dîna Diebe",
     "emailPlaceholder": "Email Webe",
     "subjectPlaceholder": "Bualu",

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
+import i18n from "../../lib/i18n";
 
 export const fetchDashboardStats = createAsyncThunk(
   "admin/dashboardStats",
@@ -36,7 +37,7 @@ export const deleteUser = createAsyncThunk(
       toast.success(data.message);
       return userId;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete user");
+      toast.error(error.response?.data?.message || i18n.t("errors.deleteUserFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -53,7 +54,7 @@ export const updateSellerStatus = createAsyncThunk(
       toast.success(data.message);
       return { userId, status };
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update seller status");
+      toast.error(error.response?.data?.message || i18n.t("errors.updateSellerStatusFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }

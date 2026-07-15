@@ -11,7 +11,9 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   typeCast(field, next) {
-    if (field.type === "JSON") {
+    // mysql2 reports JSON columns as type "BLOB" over the wire, not "JSON" —
+    // without this, product/avatar/store_logo JSON fields are returned as raw strings.
+    if (field.type === "JSON" || field.type === "BLOB") {
       const val = field.string();
       try {
         return val ? JSON.parse(val) : null;

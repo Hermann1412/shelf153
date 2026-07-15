@@ -7,14 +7,14 @@ import Pagination from "../components/Products/Pagination";
 import AISearchModal from "../components/Products/AISearchModal";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { fetchAllProducts } from "../store/slices/productSlice";
+import { fetchAllProducts, fetchShops } from "../store/slices/productSlice";
 import { toggleAIModal } from "../store/slices/popupSlice";
 
 const Products = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { products, totalProducts, loading } = useSelector(
+  const { products, totalProducts, loading, shops } = useSelector(
     (state) => state.product
   );
   const { isAIModalOpen } = useSelector((state) => state.popup);
@@ -22,6 +22,7 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [seller, setSeller] = useState("");
   const [availability, setAvailability] = useState("");
   const [ratings, setRatings] = useState("");
   const [price, setPrice] = useState("");
@@ -39,23 +40,32 @@ const Products = () => {
     return sorted;
   }, [products, sortBy]);
 
-  // Read search query from URL
+  // Read search/category/seller from URL (e.g. from category tiles or a "Sold by X" link)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const q = params.get("search");
+    const cat = params.get("category");
+    const sel = params.get("seller");
     if (q) setSearch(q);
+    if (cat) setCategory(cat);
+    if (sel) setSeller(sel);
   }, [location.search]);
+
+  useEffect(() => {
+    dispatch(fetchShops());
+  }, [dispatch]);
 
   const buildQuery = useCallback(() => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (category) params.set("category", category);
+    if (seller) params.set("seller", seller);
     if (availability) params.set("availability", availability);
     if (ratings) params.set("ratings", ratings);
     if (price) params.set("price", price);
     params.set("page", page);
     return params.toString();
-  }, [search, category, availability, ratings, price, page]);
+  }, [search, category, seller, availability, ratings, price, page]);
 
   useEffect(() => {
     dispatch(fetchAllProducts(buildQuery()));
@@ -64,13 +74,15 @@ const Products = () => {
   const clearFilters = () => {
     setSearch("");
     setCategory("");
+    setSeller("");
     setAvailability("");
     setRatings("");
     setPrice("");
     setPage(1);
   };
 
-  const hasFilters = search || category || availability || ratings || price;
+  const hasFilters = search || category || seller || availability || ratings || price;
+  const selectedShop = seller ? shops.find((s) => s.id === seller) : null;
 
   return (
     <div className="min-h-screen pt-24 pb-12">
@@ -167,11 +179,35 @@ const Products = () => {
                   <option value="">{t('products.allCategories')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.name}>
-                      {cat.name}
+                      {t(`categories.${cat.key}`)}
                     </option>
                   ))}
                 </select>
               </div>
+
+              {/* Shop */}
+              {shops.length > 0 && (
+                <div>
+                  <label className="text-sm text-muted-foreground mb-2 block">
+                    {t('products.shop')}
+                  </label>
+                  <select
+                    value={seller}
+                    onChange={(e) => {
+                      setSeller(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="">{t('products.allShops')}</option>
+                    {shops.map((shop) => (
+                      <option key={shop.id} value={shop.id}>
+                        {shop.store_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Price Range */}
               <div>
@@ -245,6 +281,31 @@ const Products = () => {
 
           {/* Product Grid */}
           <main className="flex-1">
+            {selectedShop && (
+              <div className="mp-card p-4 mb-6 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={selectedShop.store_logo?.url || "/avatar-holder.avif"}
+                    alt={selectedShop.store_name}
+                    className="w-14 h-14 rounded-full object-cover border border-border"
+                  />
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('products.shop')}</p>
+                    <h2 className="text-lg font-bold text-foreground">{selectedShop.store_name}</h2>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setSeller("");
+                    setPage(1);
+                  }}
+                  aria-label={t('aria.close')}
+                  className="p-2 hover:bg-secondary rounded-lg transition-colors"
+                >
+                  <X className="w-4 h-4 text-foreground" />
+                </button>
+              </div>
+            )}
             {loading ? (
               <div className="flex items-center justify-center py-32">
                 <Loader className="w-8 h-8 animate-spin text-primary" />

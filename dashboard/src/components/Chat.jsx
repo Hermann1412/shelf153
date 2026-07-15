@@ -279,17 +279,21 @@ const Chat = () => {
 
           {/* Filter tabs */}
           <div className="flex gap-1 mt-3">
-            {["open", "closed", "all"].map((f) => (
+            {[
+              { key: "open", label: t("chat.open") },
+              { key: "closed", label: t("chat.closedFilter") },
+              { key: "all", label: t("chat.allFilter") },
+            ].map((f) => (
               <button
-                key={f}
-                onClick={() => dispatch(setFilter(f))}
+                key={f.key}
+                onClick={() => dispatch(setFilter(f.key))}
                 className={`flex-1 py-1.5 text-xs font-medium rounded-lg capitalize transition-colors ${
-                  filter === f
+                  filter === f.key
                     ? "bg-green-500 text-white"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                {f}
+                {f.label}
               </button>
             ))}
           </div>
@@ -304,7 +308,7 @@ const Chat = () => {
           ) : filteredConversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 gap-2 text-gray-400">
               <MessageSquare className="w-8 h-8" />
-              <p className="text-sm">No conversations</p>
+              <p className="text-sm">{t("chat.noConversations")}</p>
             </div>
           ) : (
             filteredConversations.map((conv) => (
@@ -324,7 +328,7 @@ const Chat = () => {
         {!selectedConversation ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
             <MessageSquare className="w-12 h-12" />
-            <p className="text-sm font-medium">Select a conversation to start</p>
+            <p className="text-sm font-medium">{t("chat.selectConversation")}</p>
           </div>
         ) : (
           <>
@@ -338,10 +342,10 @@ const Chat = () => {
                   </p>
                   <p className="text-xs text-gray-500">
                     {selectedConversation.status === "closed"
-                      ? "Conversation closed"
+                      ? t("chat.conversationClosed")
                       : selectedConversation.admin_name
-                      ? `Handled by ${selectedConversation.admin_name}`
-                      : "Waiting for agent"}
+                      ? t("chat.handledBy", { name: selectedConversation.admin_name })
+                      : t("chat.waitingForAgent")}
                   </p>
                 </div>
               </div>
@@ -352,7 +356,7 @@ const Chat = () => {
                   className="flex items-center gap-1.5 text-xs text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors font-medium"
                 >
                   <X className="w-3.5 h-3.5" />
-                  Close
+                  {t("chat.close")}
                 </button>
               )}
             </div>
@@ -366,7 +370,7 @@ const Chat = () => {
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-400">
                   <UserCircle2 className="w-8 h-8" />
-                  <p className="text-sm">No messages yet</p>
+                  <p className="text-sm">{t("chat.noMessagesYet")}</p>
                 </div>
               ) : (
                 messages.map((msg) => {
@@ -426,7 +430,7 @@ const Chat = () => {
                   value={input}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type a reply..."
+                  placeholder={t("chat.typeReply")}
                   disabled={!connected}
                   className="flex-1 resize-none bg-gray-50 text-gray-800 text-sm rounded-xl px-4 py-2.5 outline-none border border-gray-200 focus:border-green-400 placeholder:text-gray-400 max-h-28 disabled:opacity-50 leading-relaxed transition-colors"
                 />
@@ -443,7 +447,7 @@ const Chat = () => {
             {selectedConversation.status === "closed" && (
               <div className="px-4 py-3 border-t border-gray-100 bg-gray-50 text-center">
                 <p className="text-xs text-gray-500">
-                  This conversation is closed.
+                  {t("chat.conversationClosedNotice")}
                 </p>
               </div>
             )}

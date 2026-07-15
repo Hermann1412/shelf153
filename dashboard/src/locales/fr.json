@@ -13,6 +13,22 @@
     "passwordLength": "Le mot de passe doit contenir entre 8 et 16 caractères",
     "passwordMismatch": "Les mots de passe ne correspondent pas"
   },
+  "errors": {
+    "applySellerFailed": "Échec de la candidature en tant que vendeur",
+    "updateStoreProfileFailed": "Échec de la mise à jour du profil de la boutique",
+    "updateOrderItemFailed": "Échec de la mise à jour de l'article de la commande",
+    "loginFailed": "Échec de la connexion",
+    "logoutFailed": "Échec de la déconnexion",
+    "requestFailed": "Échec de la demande",
+    "resetFailed": "Échec de la réinitialisation",
+    "updateOrderFailed": "Échec de la mise à jour de la commande",
+    "deleteOrderFailed": "Échec de la suppression de la commande",
+    "deleteUserFailed": "Échec de la suppression de l'utilisateur",
+    "updateSellerStatusFailed": "Échec de la mise à jour du statut du vendeur",
+    "createProductFailed": "Échec de la création du produit",
+    "updateProductFailed": "Échec de la mise à jour du produit",
+    "deleteProductFailed": "Échec de la suppression du produit"
+  },
   "aria": {
     "menu": "Menu",
     "close": "Fermer",
@@ -137,6 +153,7 @@
     "updating": "Mise à jour",
     "updateProductBtn": "Modifier le produit",
     "id": "ID :",
+    "productImageAlt": "Image {{index}} de {{name}}",
     "description": "Description :",
     "category": "Catégorie :",
     "price": "Prix :",

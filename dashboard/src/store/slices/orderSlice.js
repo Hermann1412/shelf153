@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
+import i18n from "../../lib/i18n";
 
 export const fetchAllOrders = createAsyncThunk(
   "order/fetchAll",
@@ -25,7 +26,7 @@ export const updateOrderStatus = createAsyncThunk(
       toast.success(data.message);
       return data.updatedOrder;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update order");
+      toast.error(error.response?.data?.message || i18n.t("errors.updateOrderFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -41,7 +42,7 @@ export const deleteOrder = createAsyncThunk(
       toast.success(data.message);
       return orderId;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete order");
+      toast.error(error.response?.data?.message || i18n.t("errors.deleteOrderFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }

@@ -10,6 +10,13 @@ const Profile = () => {
 
   if (!user) return null;
 
+  const roleLabel =
+    user.role === "Admin"
+      ? t("header.adminAlt")
+      : user.role === "Seller"
+      ? t("users.seller")
+      : t("users.user");
+
   return (
     <div className="max-w-xl mx-auto">
       <div className="bg-white rounded-xl shadow-sm p-8 text-center">
@@ -20,7 +27,7 @@ const Profile = () => {
         />
         <h2 className="text-2xl font-bold text-gray-800">{user.name}</h2>
         <span className="inline-block mt-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-          {user.role}
+          {roleLabel}
         </span>
 
         <div className="mt-6 space-y-4 text-left">
@@ -35,7 +42,7 @@ const Profile = () => {
             <Shield className="w-5 h-5 text-gray-400" />
             <div>
               <p className="text-xs text-gray-400">{t("profile.role")}</p>
-              <p className="text-sm font-medium text-gray-700">{user.role}</p>
+              <p className="text-sm font-medium text-gray-700">{roleLabel}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">

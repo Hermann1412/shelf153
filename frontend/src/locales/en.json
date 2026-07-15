@@ -5,13 +5,36 @@
     "passwordLength": "Password must be between 8 and 16 characters",
     "passwordMismatch": "Passwords do not match"
   },
+  "errors": {
+    "postReviewFailed": "Failed to post review",
+    "deleteReviewFailed": "Failed to delete review",
+    "aiSearchFailed": "AI search failed",
+    "registrationFailed": "Registration failed",
+    "loginFailed": "Login failed",
+    "logoutFailed": "Logout failed",
+    "updateFailed": "Update failed",
+    "requestFailed": "Request failed",
+    "resetFailed": "Reset failed",
+    "orderFailed": "Order failed"
+  },
   "aria": {
     "menu": "Open menu",
     "search": "Search",
     "toggleTheme": "Toggle theme",
     "cart": "Cart",
     "profile": "Profile",
-    "close": "Close"
+    "close": "Close",
+    "changeLanguage": "Change language"
+  },
+  "categories": {
+    "electronics": "Electronics",
+    "fashion": "Fashion",
+    "homeGarden": "Home & Garden",
+    "sports": "Sports",
+    "books": "Books",
+    "beauty": "Beauty",
+    "automotive": "Automotive",
+    "kidsBaby": "Kids & Baby"
   },
   "nav": {
     "home": "Home",
@@ -25,6 +48,7 @@
   },
   "footer": {
     "description": "Your trusted partner for online shopping. Discover amazing products with exceptional quality and service.",
+    "address": "San Francisco, CA",
     "company": "Company",
     "aboutUs": "About Us",
     "careers": "Careers",
@@ -103,6 +127,8 @@
     "searchPlaceholder": "Search products...",
     "category": "Category",
     "allCategories": "All Categories",
+    "shop": "Shop",
+    "allShops": "All Shops",
     "priceRange": "Price Range",
     "anyPrice": "Any Price",
     "under25": "Under $25",
@@ -267,6 +293,7 @@
     "email": "Email",
     "phone": "Phone",
     "address": "Address",
+    "addressLine": "123 Shop Street, City, ST 12345",
     "namePlaceholder": "Your Name",
     "emailPlaceholder": "Your Email",
     "subjectPlaceholder": "Subject",

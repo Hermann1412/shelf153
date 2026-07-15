@@ -5,13 +5,36 @@
     "passwordLength": "Mot de passe fwete kuvwanda ye zitumu 8 tii 16",
     "passwordMismatch": "Ba mots de passe ke fwanana ve"
   },
+  "errors": {
+    "postReviewFailed": "Kutinda avis kuvondisa ve",
+    "deleteReviewFailed": "Kukatula avis kuvondisa ve",
+    "aiSearchFailed": "Kuvava na AI kuvondisa ve",
+    "registrationFailed": "Kusonika kuvondisa ve",
+    "loginFailed": "Kukota kuvondisa ve",
+    "logoutFailed": "Kubasika kuvondisa ve",
+    "updateFailed": "Kusoba kuvondisa ve",
+    "requestFailed": "Nlomba kuvondisa ve",
+    "resetFailed": "Kuvutula kuvondisa ve",
+    "orderFailed": "Kizombo kuvondisa ve"
+  },
   "aria": {
     "menu": "Zibula menu",
     "search": "Vava",
     "toggleTheme": "Soba thème",
     "cart": "Panier",
     "profile": "Profil",
-    "close": "Kanga"
+    "close": "Kanga",
+    "changeLanguage": "Soba ndinga"
+  },
+  "categories": {
+    "electronics": "Électronique",
+    "fashion": "Mode",
+    "homeGarden": "Nzo ye Kunda",
+    "sports": "Sport",
+    "books": "Mikanda",
+    "beauty": "Kitoko",
+    "automotive": "Ba Auto",
+    "kidsBaby": "Bana ye Baleke"
   },
   "nav": {
     "home": "Ku Nzo",
@@ -25,6 +48,7 @@
   },
   "footer": {
     "description": "Nkundi na beno ya kikuikama mu kusumba bima na Internet. Bakula bima ya kitoko ye kisadusu ya mbote kikilu.",
+    "address": "San Francisco, CA",
     "company": "Kompani",
     "aboutUs": "Mambu Meto",
     "careers": "Bisalu",
@@ -103,6 +127,8 @@
     "searchPlaceholder": "Vava bima...",
     "category": "Catégorie",
     "allCategories": "Ba Catégorie Yonso",
+    "shop": "Nzo-teka",
+    "allShops": "Ba Nzo-teka Yonso",
     "priceRange": "Ntalu ya Nate na Nate",
     "anyPrice": "Ntalu Yonso",
     "under25": "Nsi ya $25",
@@ -267,6 +293,7 @@
     "email": "Email",
     "phone": "Telefone",
     "address": "Kisika",
+    "addressLine": "123 Rue ya Nzo-teka, Mbanza, 12345",
     "namePlaceholder": "Nkumbu Aku",
     "emailPlaceholder": "Email Aku",
     "subjectPlaceholder": "Diambu",

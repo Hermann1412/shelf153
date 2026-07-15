@@ -29,7 +29,7 @@ const DealsStrip = () => {
               </span>
             </div>
             <p className="px-3 py-3 text-sm font-semibold text-foreground truncate">
-              {deal.name}
+              {t(`categories.${deal.key}`)}
             </p>
           </Link>
         ))}

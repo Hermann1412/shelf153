@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Star, ShoppingCart, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cartSlice";
 import { toast } from "react-toastify";
@@ -11,6 +11,7 @@ const FREE_SHIPPING_THRESHOLD = 100;
 const ProductCard = ({ product }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [wishlisted, setWishlisted] = useState(false);
 
   const handleAddToCart = (e) => {
@@ -22,6 +23,12 @@ const ProductCard = ({ product }) => {
   const handleToggleWishlist = (e) => {
     e.preventDefault();
     setWishlisted((prev) => !prev);
+  };
+
+  const handleSellerClick = (e) => {
+    if (!product.seller?.id) return;
+    e.preventDefault();
+    navigate(`/products?seller=${product.seller.id}`);
   };
 
   return (
@@ -60,7 +67,10 @@ const ProductCard = ({ product }) => {
         <h3 className="text-base font-semibold text-foreground truncate mb-1">
           {product.name}
         </h3>
-        <p className="text-sm text-muted-foreground/80 mb-1 truncate">
+        <p
+          onClick={handleSellerClick}
+          className={`text-sm text-muted-foreground/80 mb-1 truncate ${product.seller?.id ? "hover:text-primary hover:underline w-fit" : ""}`}
+        >
           {t('productCard.soldBy', { name: product.seller?.name || "Shelf153" })}
         </p>
         <div className="flex items-center gap-1 mb-2">

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
+import i18n from "../../lib/i18n";
 import { toggleCreateProductModal, toggleUpdateProductModal } from "./extraSlice";
 
 export const fetchAllProducts = createAsyncThunk(
@@ -28,7 +29,7 @@ export const createNewProduct = createAsyncThunk(
       dispatch(toggleCreateProductModal());
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create product");
+      toast.error(error.response?.data?.message || i18n.t("errors.createProductFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -46,7 +47,7 @@ export const updateProduct = createAsyncThunk(
       dispatch(toggleUpdateProductModal());
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update product");
+      toast.error(error.response?.data?.message || i18n.t("errors.updateProductFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -62,7 +63,7 @@ export const deleteProduct = createAsyncThunk(
       toast.success(data.message);
       return productId;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete product");
+      toast.error(error.response?.data?.message || i18n.t("errors.deleteProductFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }

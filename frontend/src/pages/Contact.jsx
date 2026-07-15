@@ -60,7 +60,7 @@ const Contact = () => {
               <div>
                 <h3 className="font-semibold text-foreground mb-1">{t('contact.address')}</h3>
                 <p className="text-muted-foreground">
-                  123 Shop Street, City, ST 12345
+                  {t('contact.addressLine')}
                 </p>
               </div>
             </div>

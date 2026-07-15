@@ -3,6 +3,8 @@ import { config } from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
+import path from "path";
+import { fileURLToPath } from "url";
 import { createTables } from "./utils/createTables.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 import authRouter from "./router/authRoutes.js";
@@ -35,6 +37,9 @@ app.use(
     useTempFiles: true,
   })
 );
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/product", productRouter);

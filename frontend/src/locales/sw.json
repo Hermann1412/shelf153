@@ -5,13 +5,36 @@
     "passwordLength": "Nywila lazima iwe na herufi 8 mpaka 16",
     "passwordMismatch": "Nywila hazifanani"
   },
+  "errors": {
+    "postReviewFailed": "Imeshindwa kutuma tathmini",
+    "deleteReviewFailed": "Imeshindwa kufuta tathmini",
+    "aiSearchFailed": "Utafutaji wa AI umeshindwa",
+    "registrationFailed": "Usajili umeshindwa",
+    "loginFailed": "Kuingia kumeshindwa",
+    "logoutFailed": "Kutoka kumeshindwa",
+    "updateFailed": "Kusasisha kumeshindwa",
+    "requestFailed": "Ombi limeshindwa",
+    "resetFailed": "Kuweka upya kumeshindwa",
+    "orderFailed": "Agizo limeshindwa"
+  },
   "aria": {
     "menu": "Fungua menyu",
     "search": "Tafuta",
     "toggleTheme": "Badilisha mandhari",
     "cart": "Kikapu",
     "profile": "Wasifu",
-    "close": "Funga"
+    "close": "Funga",
+    "changeLanguage": "Badilisha lugha"
+  },
+  "categories": {
+    "electronics": "Vifaa vya Elektroniki",
+    "fashion": "Mitindo",
+    "homeGarden": "Nyumbani na Bustani",
+    "sports": "Michezo",
+    "books": "Vitabu",
+    "beauty": "Urembo",
+    "automotive": "Magari",
+    "kidsBaby": "Watoto na Wachanga"
   },
   "nav": {
     "home": "Nyumbani",
@@ -25,6 +48,7 @@
   },
   "footer": {
     "description": "Mshirika wako wa kuaminika kwa ununuzi wa mtandaoni. Gundua bidhaa za kushangaza zenye ubora na huduma bora.",
+    "address": "San Francisco, CA",
     "company": "Kampuni",
     "aboutUs": "Kuhusu Sisi",
     "careers": "Kazi",
@@ -103,6 +127,8 @@
     "searchPlaceholder": "Tafuta bidhaa...",
     "category": "Kategoria",
     "allCategories": "Kategoria Zote",
+    "shop": "Duka",
+    "allShops": "Maduka Yote",
     "priceRange": "Kiwango cha Bei",
     "anyPrice": "Bei Yoyote",
     "under25": "Chini ya $25",
@@ -267,6 +293,7 @@
     "email": "Barua Pepe",
     "phone": "Simu",
     "address": "Anwani",
+    "addressLine": "Barabara ya 123 ya Duka, Mji, 12345",
     "namePlaceholder": "Jina Lako",
     "emailPlaceholder": "Barua Pepe Yako",
     "subjectPlaceholder": "Mada",

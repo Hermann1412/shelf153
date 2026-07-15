@@ -64,7 +64,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <MapPin className="w-5 h-5 text-primary" />
-                <span>San Francisco, CA</span>
+                <span>{t("footer.address")}</span>
               </div>
             </div>
           </div>
@@ -131,23 +131,23 @@ const Footer = () => {
         <div className="glass-panel mb-12">
           <div className="text-center mb-6">
             <h3 className="text-xl font-semibold text-foreground mb-2">
-              Stay Connected
+              {t("footer.stayConnected")}
             </h3>
             <p className="text-muted-foreground">
-              Subscribe to our newsletter for exclusive offers and updates
+              {t("footer.newsletterText")}
             </p>
           </div>
           <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("footer.emailPlaceholder")}
               className="flex-1 px-4 py-3 bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder-muted-foreground"
             />
             <button
               type="submit"
               className="px-6 py-3 gradient-primary text-primary-foreground rounded-lg hover:glow-on-hover animate-smooth font-semibold"
             >
-              Subscribe
+              {t("footer.subscribe")}
             </button>
           </form>
         </div>
@@ -169,7 +169,7 @@ const Footer = () => {
 
           <div className="text-center md:text-right">
             <p className="text-muted-foreground text-sm">
-              © 2024 Shelf153. All rights reserved.
+              {t("footer.copyright")}
             </p>
           </div>
         </div>

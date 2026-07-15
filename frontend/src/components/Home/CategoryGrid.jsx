@@ -29,7 +29,7 @@ const CategoryGrid = () => {
               />
             </div>
             <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
-              {category.name}
+              {t(`categories.${category.key}`)}
             </h3>
           </Link>
         ))}

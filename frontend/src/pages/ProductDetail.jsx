@@ -109,9 +109,18 @@ const ProductDetail = () => {
               <h1 className="text-2xl font-bold text-foreground mt-2">
                 {productDetails.name}
               </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('productDetail.soldBy', { name: productDetails.seller?.name || "Shelf153" })}
-              </p>
+              {productDetails.seller?.id ? (
+                <Link
+                  to={`/products?seller=${productDetails.seller.id}`}
+                  className="text-sm text-muted-foreground hover:text-primary hover:underline mt-1 inline-block"
+                >
+                  {t('productDetail.soldBy', { name: productDetails.seller.name })}
+                </Link>
+              ) : (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {t('productDetail.soldBy', { name: productDetails.seller?.name || "Shelf153" })}
+                </p>
+              )}
             </div>
 
             {/* Rating */}

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  fetchAllShops,
   applyToBecomeSeller,
   getStoreProfile,
   updateStoreProfile,
@@ -15,6 +16,7 @@ import {
 
 const router = express.Router();
 
+router.get("/all", fetchAllShops);
 router.post("/apply", isAuthenticated, applyToBecomeSeller);
 router.get("/store-profile", isAuthenticated, authorizedRoles("Seller"), getStoreProfile);
 router.put("/store-profile", isAuthenticated, authorizedRoles("Seller"), updateStoreProfile);

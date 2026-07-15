@@ -5,13 +5,36 @@
     "passwordLength": "Mot de passe esengeli kozala na ba lettre 8 kino 16",
     "passwordMismatch": "Ba mots de passe ekokani te"
   },
+  "errors": {
+    "postReviewFailed": "Kotinda avis elongi te",
+    "deleteReviewFailed": "Kolongola avis elongi te",
+    "aiSearchFailed": "Koluka na AI elongi te",
+    "registrationFailed": "Kokomisama elongi te",
+    "loginFailed": "Kokɔta elongi te",
+    "logoutFailed": "Kobima elongi te",
+    "updateFailed": "Kobongisa elongi te",
+    "requestFailed": "Demande elongi te",
+    "resetFailed": "Kobongisa lisusu elongi te",
+    "orderFailed": "Commande elongi te"
+  },
   "aria": {
     "menu": "Fungola menu",
     "search": "Luka",
     "toggleTheme": "Bongola thème",
     "cart": "Panier",
     "profile": "Profil",
-    "close": "Kanga"
+    "close": "Kanga",
+    "changeLanguage": "Bongola monoko"
+  },
+  "categories": {
+    "electronics": "Électronique",
+    "fashion": "Mode",
+    "homeGarden": "Ndako na Jardin",
+    "sports": "Sport",
+    "books": "Mikanda",
+    "beauty": "Kitoko",
+    "automotive": "Ba Motuka",
+    "kidsBaby": "Bana na Bébé"
   },
   "nav": {
     "home": "Ndako",
@@ -25,6 +48,7 @@
   },
   "footer": {
     "description": "Moninga na yo ya solo mpo na kosomba na internet. Zwa biloko ya kitoko na kalite mpe mosala ya malamu mingi.",
+    "address": "San Francisco, CA",
     "company": "Kompani",
     "aboutUs": "Mpo na Biso",
     "careers": "Misala",
@@ -103,6 +127,8 @@
     "searchPlaceholder": "Luka biloko...",
     "category": "Kategori",
     "allCategories": "Ba Kategori Nyonso",
+    "shop": "Magazini",
+    "allShops": "Ba Magazini Nyonso",
     "priceRange": "Etando ya Ntalo",
     "anyPrice": "Ntalo Nyonso",
     "under25": "Na se ya $25",
@@ -267,6 +293,7 @@
     "email": "Email",
     "phone": "Telefone",
     "address": "Adrese",
+    "addressLine": "123 Rue ya Magazini, Vile, 12345",
     "namePlaceholder": "Kombo na Yo",
     "emailPlaceholder": "Email na Yo",
     "subjectPlaceholder": "Sujet",

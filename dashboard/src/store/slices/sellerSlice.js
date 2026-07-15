@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
+import i18n from "../../lib/i18n";
 import { getUser } from "./authSlice";
 
 export const applyToBecomeSeller = createAsyncThunk(
@@ -14,7 +15,7 @@ export const applyToBecomeSeller = createAsyncThunk(
       dispatch(getUser());
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to apply as seller");
+      toast.error(error.response?.data?.message || i18n.t("errors.applySellerFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -42,7 +43,7 @@ export const updateStoreProfile = createAsyncThunk(
       toast.success(data.message);
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update store profile");
+      toast.error(error.response?.data?.message || i18n.t("errors.updateStoreProfileFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -83,7 +84,7 @@ export const updateOrderItemStatus = createAsyncThunk(
       toast.success(data.message);
       return data.orderItem;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update order item");
+      toast.error(error.response?.data?.message || i18n.t("errors.updateOrderItemFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }

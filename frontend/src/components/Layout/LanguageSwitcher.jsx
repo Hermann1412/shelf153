@@ -4,7 +4,7 @@ import { Globe, Check } from "lucide-react";
 import { languages } from "../../lib/i18n";
 
 const LanguageSwitcher = ({ className = "" }) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const current = languages.find((l) => l.code === i18n.language) || languages[0];
 
@@ -18,7 +18,7 @@ const LanguageSwitcher = ({ className = "" }) => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary animate-smooth"
-        aria-label="Change language"
+        aria-label={t("aria.changeLanguage")}
       >
         <Globe className="w-4 h-4" />
         <span>{current.label}</span>

@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { categories } from "../../data/products";
 
 const CategoryStrip = () => {
+  const { t } = useTranslation();
   return (
     <div className="mp-strip">
       <div className="container mx-auto px-4 flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
@@ -11,7 +13,7 @@ const CategoryStrip = () => {
             to={`/products?category=${encodeURIComponent(category.name)}`}
             className="shrink-0 px-3 py-2 text-base font-medium text-foreground/90 hover:text-primary hover:bg-secondary rounded-lg transition-colors whitespace-nowrap"
           >
-            {category.name}
+            {t(`categories.${category.key}`)}
           </Link>
         ))}
       </div>

@@ -5,13 +5,36 @@
     "passwordLength": "Mot de passe udi mua kuikala ne ntendu 8 too ne 16",
     "passwordMismatch": "Ba mots de passe kabena bimue to"
   },
+  "errors": {
+    "postReviewFailed": "Kutuma avis kakuenzeki to",
+    "deleteReviewFailed": "Kumbusha avis kakuenzeki to",
+    "aiSearchFailed": "Dikeba dia IA kadienzeki to",
+    "registrationFailed": "Kudienzeja kakuenzeki to",
+    "loginFailed": "Kubuela kakuenzeki to",
+    "logoutFailed": "Kupatuka kakuenzeki to",
+    "updateFailed": "Kuvuija bimpe kakuenzeki to",
+    "requestFailed": "Requête kayienzeki to",
+    "resetFailed": "Kuvuija kakuenzeki to",
+    "orderFailed": "Commande kayienzeki to"
+  },
   "aria": {
     "menu": "Disa menu",
     "search": "Kimba",
     "toggleTheme": "Alaula thème",
     "cart": "Panier",
     "profile": "Profil",
-    "close": "Bala"
+    "close": "Bala",
+    "changeLanguage": "Alaula muakulu"
+  },
+  "categories": {
+    "electronics": "Elektroniki",
+    "fashion": "Mode",
+    "homeGarden": "Nzubu ne Ditapu",
+    "sports": "Masport",
+    "books": "Mikanda",
+    "beauty": "Buimpe",
+    "automotive": "Ma-oto",
+    "kidsBaby": "Bana ne Tuana Tukese"
   },
   "nav": {
     "home": "Kumbelu",
@@ -25,6 +48,7 @@
   },
   "footer": {
     "description": "Mulunda wenu wa kanaka mu masumbu a pa internete. Tanga bintu bimpe bidi ne buimpe ne mudimu muimpe.",
+    "address": "San Francisco, CA",
     "company": "Tshisumbu",
     "aboutUs": "Bua Metu",
     "careers": "Midimu",
@@ -103,6 +127,8 @@
     "searchPlaceholder": "Keba bintu...",
     "category": "Mushindu",
     "allCategories": "Mishindu Yonso",
+    "shop": "Tshisumbu",
+    "allShops": "Bisumbu Byonso",
     "priceRange": "Mushinga",
     "anyPrice": "Mushinga Wonso",
     "under25": "Muinshi mua $25",
@@ -267,6 +293,7 @@
     "email": "Email",
     "phone": "Telefone",
     "address": "Aderese",
+    "addressLine": "123 Rue wa Tshisumbu, Ville, 12345",
     "namePlaceholder": "Dîna Diebe",
     "emailPlaceholder": "Email Webe",
     "subjectPlaceholder": "Tshiena Bualu",

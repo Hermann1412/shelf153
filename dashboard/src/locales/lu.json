@@ -13,6 +13,22 @@
     "passwordLength": "Mot de passe udi mua kuikala ne ntendu 8 too ne 16",
     "passwordMismatch": "Ba mots de passe kabena bimue to"
   },
+  "errors": {
+    "applySellerFailed": "Kulomba bua kuikala mu sumbisha kakuenzeki to",
+    "updateStoreProfileFailed": "Kuvuija profil wa tshisumbu kakuenzeki to",
+    "updateOrderItemFailed": "Kuvuija tshintu tshia komanda kakuenzeki to",
+    "loginFailed": "Kubuela kakuenzeki to",
+    "logoutFailed": "Kupatuka kakuenzeki to",
+    "requestFailed": "Requête kayienzeki to",
+    "resetFailed": "Kuvuija kakuenzeki to",
+    "updateOrderFailed": "Kuvuija komanda kakuenzeki to",
+    "deleteOrderFailed": "Kumbusha komanda kakuenzeki to",
+    "deleteUserFailed": "Kumbusha muena-tshisumbu kakuenzeki to",
+    "updateSellerStatusFailed": "Kuvuija statut wa musumbisha kakuenzeki to",
+    "createProductFailed": "Kuenza tshintu tshipya kakuenzeki to",
+    "updateProductFailed": "Kuvuija tshintu kakuenzeki to",
+    "deleteProductFailed": "Kumbusha tshintu kakuenzeki to"
+  },
   "aria": {
     "menu": "Menu",
     "close": "Bala",
@@ -137,6 +153,7 @@
     "updating": "Modification...",
     "updateProductBtn": "Modifier Tshintu",
     "id": "ID:",
+    "productImageAlt": "Tshimfuanyi {{index}} tshia {{name}}",
     "description": "Description:",
     "category": "Catégorie:",
     "price": "Prix:",

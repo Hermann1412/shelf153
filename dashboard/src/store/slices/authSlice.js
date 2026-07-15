@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
+import i18n from "../../lib/i18n";
 
 export const login = createAsyncThunk(
   "auth/login",
@@ -13,7 +14,7 @@ export const login = createAsyncThunk(
       toast.success(data.message);
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed");
+      toast.error(error.response?.data?.message || i18n.t("errors.loginFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -39,7 +40,7 @@ export const logout = createAsyncThunk(
       toast.success(data.message);
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Logout failed");
+      toast.error(error.response?.data?.message || i18n.t("errors.logoutFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -55,7 +56,7 @@ export const forgotPassword = createAsyncThunk(
       toast.success(data.message);
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed");
+      toast.error(error.response?.data?.message || i18n.t("errors.requestFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -72,7 +73,7 @@ export const resetPassword = createAsyncThunk(
       toast.success(data.message);
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed");
+      toast.error(error.response?.data?.message || i18n.t("errors.resetFailed"));
       return rejectWithValue(error.response?.data?.message);
     }
   }

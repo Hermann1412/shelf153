@@ -13,6 +13,22 @@
     "passwordLength": "Mot de passe esengeli kozala na ba lettre 8 kino 16",
     "passwordMismatch": "Ba mots de passe ekokani te"
   },
+  "errors": {
+    "applySellerFailed": "Kosala demande ya kozala mochuzi elongi te",
+    "updateStoreProfileFailed": "Kobongisa profil ya magazini elongi te",
+    "updateOrderItemFailed": "Kobongisa article ya commande elongi te",
+    "loginFailed": "Kokɔta elongi te",
+    "logoutFailed": "Kobima elongi te",
+    "requestFailed": "Demande elongi te",
+    "resetFailed": "Kobongisa lisusu elongi te",
+    "updateOrderFailed": "Kobongisa commande elongi te",
+    "deleteOrderFailed": "Kolongola commande elongi te",
+    "deleteUserFailed": "Kolongola utilisateur elongi te",
+    "updateSellerStatusFailed": "Kobongisa statut ya mochuzi elongi te",
+    "createProductFailed": "Kosala ekipe ya sika elongi te",
+    "updateProductFailed": "Kobongisa ekipe elongi te",
+    "deleteProductFailed": "Kolongola ekipe elongi te"
+  },
   "aria": {
     "menu": "Menu",
     "close": "Kanga",
@@ -137,6 +153,7 @@
     "updating": "Ezali Kobongisama",
     "updateProductBtn": "Bongisa Eloko",
     "id": "ID:",
+    "productImageAlt": "Elilingi {{index}} ya {{name}}",
     "description": "Description:",
     "category": "Catégorie:",
     "price": "Ntalo:",

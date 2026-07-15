@@ -5,13 +5,36 @@
     "passwordLength": "Le mot de passe doit contenir entre 8 et 16 caractères",
     "passwordMismatch": "Les mots de passe ne correspondent pas"
   },
+  "errors": {
+    "postReviewFailed": "Échec de l'envoi de l'avis",
+    "deleteReviewFailed": "Échec de la suppression de l'avis",
+    "aiSearchFailed": "Échec de la recherche IA",
+    "registrationFailed": "Échec de l'inscription",
+    "loginFailed": "Échec de la connexion",
+    "logoutFailed": "Échec de la déconnexion",
+    "updateFailed": "Échec de la mise à jour",
+    "requestFailed": "Échec de la demande",
+    "resetFailed": "Échec de la réinitialisation",
+    "orderFailed": "Échec de la commande"
+  },
   "aria": {
     "menu": "Ouvrir le menu",
     "search": "Rechercher",
     "toggleTheme": "Changer le thème",
     "cart": "Panier",
     "profile": "Profil",
-    "close": "Fermer"
+    "close": "Fermer",
+    "changeLanguage": "Changer de langue"
+  },
+  "categories": {
+    "electronics": "Électronique",
+    "fashion": "Mode",
+    "homeGarden": "Maison & Jardin",
+    "sports": "Sport",
+    "books": "Livres",
+    "beauty": "Beauté",
+    "automotive": "Automobile",
+    "kidsBaby": "Enfants & Bébé"
   },
   "nav": {
     "home": "Accueil",
@@ -25,6 +48,7 @@
   },
   "footer": {
     "description": "Votre partenaire de confiance pour les achats en ligne. Découvrez des produits exceptionnels avec une qualité et un service irréprochables.",
+    "address": "San Francisco, CA",
     "company": "Entreprise",
     "aboutUs": "À propos de nous",
     "careers": "Carrières",
@@ -103,6 +127,8 @@
     "searchPlaceholder": "Rechercher des produits...",
     "category": "Catégorie",
     "allCategories": "Toutes les catégories",
+    "shop": "Boutique",
+    "allShops": "Toutes les boutiques",
     "priceRange": "Fourchette de prix",
     "anyPrice": "Tous les prix",
     "under25": "Moins de 25$",
@@ -267,6 +293,7 @@
     "email": "Email",
     "phone": "Téléphone",
     "address": "Adresse",
+    "addressLine": "123 Rue du Commerce, Ville, 12345",
     "namePlaceholder": "Votre nom",
     "emailPlaceholder": "Votre email",
     "subjectPlaceholder": "Sujet",

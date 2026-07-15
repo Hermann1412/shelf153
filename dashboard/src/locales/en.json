@@ -13,6 +13,22 @@
     "passwordLength": "Password must be between 8 and 16 characters",
     "passwordMismatch": "Passwords do not match"
   },
+  "errors": {
+    "applySellerFailed": "Failed to apply as seller",
+    "updateStoreProfileFailed": "Failed to update store profile",
+    "updateOrderItemFailed": "Failed to update order item",
+    "loginFailed": "Login failed",
+    "logoutFailed": "Logout failed",
+    "requestFailed": "Request failed",
+    "resetFailed": "Reset failed",
+    "updateOrderFailed": "Failed to update order",
+    "deleteOrderFailed": "Failed to delete order",
+    "deleteUserFailed": "Failed to delete user",
+    "updateSellerStatusFailed": "Failed to update seller status",
+    "createProductFailed": "Failed to create product",
+    "updateProductFailed": "Failed to update product",
+    "deleteProductFailed": "Failed to delete product"
+  },
   "aria": {
     "menu": "Menu",
     "close": "Close",
@@ -137,6 +153,7 @@
     "updating": "Updating",
     "updateProductBtn": "Update Product",
     "id": "ID:",
+    "productImageAlt": "{{name}} image {{index}}",
     "description": "Description:",
     "category": "Category:",
     "price": "Price:",

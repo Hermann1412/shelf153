@@ -13,6 +13,22 @@
     "passwordLength": "Nywila lazima iwe na herufi 8 mpaka 16",
     "passwordMismatch": "Nywila hazifanani"
   },
+  "errors": {
+    "applySellerFailed": "Imeshindwa kuomba kuwa muuzaji",
+    "updateStoreProfileFailed": "Imeshindwa kusasisha wasifu wa duka",
+    "updateOrderItemFailed": "Imeshindwa kusasisha bidhaa ya agizo",
+    "loginFailed": "Kuingia kumeshindwa",
+    "logoutFailed": "Kutoka kumeshindwa",
+    "requestFailed": "Ombi limeshindwa",
+    "resetFailed": "Kuweka upya kumeshindwa",
+    "updateOrderFailed": "Imeshindwa kusasisha agizo",
+    "deleteOrderFailed": "Imeshindwa kufuta agizo",
+    "deleteUserFailed": "Imeshindwa kufuta mtumiaji",
+    "updateSellerStatusFailed": "Imeshindwa kusasisha hali ya muuzaji",
+    "createProductFailed": "Imeshindwa kuunda bidhaa",
+    "updateProductFailed": "Imeshindwa kusasisha bidhaa",
+    "deleteProductFailed": "Imeshindwa kufuta bidhaa"
+  },
   "aria": {
     "menu": "Menyu",
     "close": "Funga",
@@ -137,6 +153,7 @@
     "updating": "Inasasisha",
     "updateProductBtn": "Sasisha Bidhaa",
     "id": "ID:",
+    "productImageAlt": "Picha {{index}} ya {{name}}",
     "description": "Maelezo:",
     "category": "Aina:",
     "price": "Bei:",

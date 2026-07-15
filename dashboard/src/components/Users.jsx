@@ -140,7 +140,9 @@ const Users = () => {
                       >
                         {user.role === "Seller" && user.seller_status === "Suspended"
                           ? t("users.suspendedSeller")
-                          : user.role}
+                          : user.role === "Seller"
+                          ? t("users.seller")
+                          : t("users.user")}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500">

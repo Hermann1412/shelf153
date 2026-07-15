@@ -53,7 +53,7 @@ const attachSeller = (row) => {
 };
 
 export const fetchAllProducts = catchAsyncErrors(async (req, res) => {
-  const { availability, price, category, ratings, search } = req.query;
+  const { availability, price, category, ratings, search, seller } = req.query;
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const offset = (page - 1) * limit;
@@ -86,6 +86,11 @@ export const fetchAllProducts = catchAsyncErrors(async (req, res) => {
   if (search) {
     conditions.push("(p.name LIKE ? OR p.description LIKE ?)");
     values.push(`%${search}%`, `%${search}%`);
+  }
+
+  if (seller) {
+    conditions.push("p.created_by = ?");
+    values.push(seller);
   }
 
   const whereClause = `WHERE ${conditions.join(" AND ")}`;

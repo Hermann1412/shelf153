@@ -13,6 +13,22 @@
     "passwordLength": "Mot de passe fwete kuvwanda ye zitumu 8 tii 16",
     "passwordMismatch": "Ba mots de passe ke fwanana ve"
   },
+  "errors": {
+    "applySellerFailed": "Nlomba ya kuvwanda musumbisi kuvondisa ve",
+    "updateStoreProfileFailed": "Kusoba profil ya nzo-teka kuvondisa ve",
+    "updateOrderItemFailed": "Kusoba kima ya kizombo kuvondisa ve",
+    "loginFailed": "Kukota kuvondisa ve",
+    "logoutFailed": "Kubasika kuvondisa ve",
+    "requestFailed": "Nlomba kuvondisa ve",
+    "resetFailed": "Kuvutula kuvondisa ve",
+    "updateOrderFailed": "Kusoba kizombo kuvondisa ve",
+    "deleteOrderFailed": "Kukatula kizombo kuvondisa ve",
+    "deleteUserFailed": "Kukatula muena-nzo-teka kuvondisa ve",
+    "updateSellerStatusFailed": "Kusoba kimonikini kya musumbisi kuvondisa ve",
+    "createProductFailed": "Kusala kima ya mpa kuvondisa ve",
+    "updateProductFailed": "Kusoba kima kuvondisa ve",
+    "deleteProductFailed": "Kukatula kima kuvondisa ve"
+  },
   "aria": {
     "menu": "Menu",
     "close": "Kanga",
@@ -137,6 +153,7 @@
     "updating": "Ke Soba...",
     "updateProductBtn": "Soba Kima",
     "id": "ID:",
+    "productImageAlt": "Fwanisu {{index}} ya {{name}}",
     "description": "Ntendula:",
     "category": "Catégorie:",
     "price": "Ntalu:",

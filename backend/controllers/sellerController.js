@@ -4,6 +4,16 @@ import database from "../database/db.js";
 import { v2 as cloudinary } from "cloudinary";
 import { v4 as uuidv4 } from "uuid";
 
+export const fetchAllShops = catchAsyncErrors(async (req, res) => {
+  const { rows } = await database.query(
+    `SELECT sp.user_id AS id, sp.store_name, sp.store_logo
+     FROM seller_profiles sp
+     WHERE sp.status != 'Suspended'
+     ORDER BY sp.store_name ASC`
+  );
+  res.status(200).json({ success: true, shops: rows });
+});
+
 export const applyToBecomeSeller = catchAsyncErrors(async (req, res, next) => {
   const { store_name, store_description, payout_phone } = req.body;
 
