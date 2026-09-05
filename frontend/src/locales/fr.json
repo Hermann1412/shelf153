@@ -171,18 +171,19 @@
     "country": "Pays",
     "pincode": "Code postal",
     "phone": "Téléphone",
+    "mobileMoneyProvider": "Opérateur Mobile Money",
     "orderSummary": "Résumé de la commande ({{count}} articles)",
     "placingOrder": "Commande en cours...",
     "placeOrder": "Passer la commande et payer",
     "fillAllFields": "Veuillez remplir tous les champs de livraison"
   },
-  "airtelPayment": {
-    "title": "Paiement Airtel Money",
+  "pawaPayPayment": {
+    "title": "Paiement Mobile Money via pawaPay",
     "totalAmount": "Montant total",
     "paymentFailed": "Échec du paiement",
     "tryAgainMessage": "Veuillez revenir en arrière et repasser la commande.",
     "requestSentTo": "Demande de paiement envoyée au {{phone}}",
-    "instructions": "Entrez votre code PIN Airtel Money sur votre téléphone pour confirmer le paiement. Cette page se mettra à jour automatiquement une fois le paiement confirmé.",
+    "instructions": "Entrez votre code PIN Mobile Money via pawaPay sur votre téléphone pour confirmer le paiement. Cette page se mettra à jour automatiquement une fois le paiement confirmé.",
     "paymentSuccessful": "Paiement réussi !",
     "paymentFailedRetry": "Échec du paiement. Veuillez réessayer."
   },

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Menu, User, ShoppingCart, Sun, Moon, Search } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "../../contexts/theme-context";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";

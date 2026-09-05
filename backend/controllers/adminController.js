@@ -1,177 +1,92 @@
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
-import database from "../database/db.js";
+import prisma from "../database/db.js";
 import { v2 as cloudinary } from "cloudinary";
+import { PUBLIC_USER_SELECT } from "../utils/publicUser.js";
+
+const sum = (values) => values.reduce((total, value) => total + Number(value || 0), 0);
+const dayStart = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 export const getAllUsers = catchAsyncErrors(async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const offset = (page - 1) * 10;
-
-  const { rows: countRows } = await database.query(
-    "SELECT COUNT(*) AS count FROM users WHERE role IN ('User', 'Seller')"
-  );
-  const totalUsers = parseInt(countRows[0].count) || 0;
-
-  const { rows: users } = await database.query(
-    `SELECT u.*, sp.store_name, sp.status AS seller_status
-     FROM users u
-     LEFT JOIN seller_profiles sp ON sp.user_id = u.id
-     WHERE u.role IN ('User', 'Seller')
-     ORDER BY u.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [10, offset]
-  );
-
+  const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+  const where = { role: { in: ["User", "Seller"] } };
+  const [totalUsers, rows] = await Promise.all([
+    prisma.user.count({ where }),
+    prisma.user.findMany({
+      where,
+      select: { ...PUBLIC_USER_SELECT, seller_profile: { select: { store_name: true, status: true } } },
+      orderBy: { created_at: "desc" }, take: 10, skip: (page - 1) * 10,
+    }),
+  ]);
+  const users = rows.map(({ seller_profile, ...user }) => ({
+    ...user, store_name: seller_profile?.store_name || null, seller_status: seller_profile?.status || null,
+  }));
   res.status(200).json({ success: true, totalUsers, currentPage: page, users });
 });
 
 export const updateSellerStatus = catchAsyncErrors(async (req, res, next) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  if (!["Approved", "Suspended"].includes(status)) {
-    return next(new ErrorHandler("Provide a valid status.", 400));
-  }
-
-  const { rows } = await database.query("SELECT * FROM seller_profiles WHERE user_id = ?", [id]);
-  if (rows.length === 0) return next(new ErrorHandler("Seller profile not found.", 404));
-
-  await database.query("UPDATE seller_profiles SET status = ? WHERE user_id = ?", [status, id]);
-  const { rows: updated } = await database.query("SELECT * FROM seller_profiles WHERE user_id = ?", [id]);
-
-  res.status(200).json({ success: true, message: `Seller ${status.toLowerCase()}.`, storeProfile: updated[0] });
+  if (!["Approved", "Suspended"].includes(req.body.status)) return next(new ErrorHandler("Provide a valid status.", 400));
+  const existing = await prisma.sellerProfile.findUnique({ where: { user_id: req.params.id }, select: { id: true } });
+  if (!existing) return next(new ErrorHandler("Seller profile not found.", 404));
+  const storeProfile = await prisma.sellerProfile.update({ where: { user_id: req.params.id }, data: { status: req.body.status } });
+  res.status(200).json({ success: true, message: `Seller ${req.body.status.toLowerCase()}.`, storeProfile });
 });
 
 export const deleteUser = catchAsyncErrors(async (req, res, next) => {
-  const { id } = req.params;
-
-  const { rows } = await database.query("SELECT * FROM users WHERE id = ?", [id]);
-  if (rows.length === 0) {
-    return next(new ErrorHandler("User not found", 404));
-  }
-  const user = rows[0];
-
-  await database.query("DELETE FROM users WHERE id = ?", [id]);
-
-  if (user.avatar?.public_id) {
-    await cloudinary.uploader.destroy(user.avatar.public_id);
-  }
-
+  const user = await prisma.user.findUnique({ where: { id: req.params.id }, select: { id: true, avatar: true } });
+  if (!user) return next(new ErrorHandler("User not found", 404));
+  await prisma.user.delete({ where: { id: user.id } });
+  if (user.avatar?.public_id) await cloudinary.uploader.destroy(user.avatar.public_id);
   res.status(200).json({ success: true, message: "User deleted successfully" });
 });
 
-export const dashboardStats = catchAsyncErrors(async (req, res) => {
-  const today = new Date();
-  const todayDate = today.toISOString().split("T")[0];
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const yesterdayDate = yesterday.toISOString().split("T")[0];
+export const dashboardStats = catchAsyncErrors(async (_req, res) => {
+  const now = new Date();
+  const today = dayStart(now);
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-  const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-  const currentMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  const previousMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-  const previousMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
-
-  const { rows: revAll } = await database.query(
-    "SELECT SUM(total_price) AS sum FROM orders WHERE paid_at IS NOT NULL"
-  );
-  const totalRevenueAllTime = parseFloat(revAll[0].sum) || 0;
-
-  const { rows: usersCount } = await database.query(
-    "SELECT COUNT(*) AS count FROM users WHERE role = 'User'"
-  );
-  const totalUsersCount = parseInt(usersCount[0].count) || 0;
-
-  const { rows: statusRows } = await database.query(
-    "SELECT order_status, COUNT(*) AS count FROM orders WHERE paid_at IS NOT NULL GROUP BY order_status"
-  );
-  const orderStatusCounts = { Processing: 0, Shipped: 0, Delivered: 0, Cancelled: 0 };
-  statusRows.forEach((row) => {
-    orderStatusCounts[row.order_status] = parseInt(row.count);
+  const paidOrders = await prisma.order.findMany({
+    where: { paid_at: { not: null } }, select: { total_price: true, created_at: true, order_status: true },
   });
+  const totalUsersCount = await prisma.user.count({ where: { role: "User" } });
+  const totalRevenueAllTime = sum(paidOrders.map((order) => order.total_price));
+  const inRange = (order, start, end) => order.created_at >= start && order.created_at < end;
+  const todayRevenue = sum(paidOrders.filter((order) => inRange(order, today, tomorrow)).map((order) => order.total_price));
+  const yesterdayRevenue = sum(paidOrders.filter((order) => inRange(order, yesterday, today)).map((order) => order.total_price));
+  const currentMonthSales = sum(paidOrders.filter((order) => inRange(order, currentMonthStart, nextMonthStart)).map((order) => order.total_price));
+  const lastMonthRevenue = sum(paidOrders.filter((order) => inRange(order, previousMonthStart, currentMonthStart)).map((order) => order.total_price));
 
-  const { rows: todayRev } = await database.query(
-    "SELECT SUM(total_price) AS sum FROM orders WHERE DATE(created_at) = ? AND paid_at IS NOT NULL",
-    [todayDate]
-  );
-  const todayRevenue = parseFloat(todayRev[0].sum) || 0;
-
-  const { rows: yestRev } = await database.query(
-    "SELECT SUM(total_price) AS sum FROM orders WHERE DATE(created_at) = ? AND paid_at IS NOT NULL",
-    [yesterdayDate]
-  );
-  const yesterdayRevenue = parseFloat(yestRev[0].sum) || 0;
-
-  const { rows: monthlyRows } = await database.query(
-    `SELECT DATE_FORMAT(created_at, '%b %Y') AS month,
-            DATE_FORMAT(created_at, '%Y-%m-01') AS date,
-            SUM(total_price) AS totalsales
-     FROM orders WHERE paid_at IS NOT NULL
-     GROUP BY month, date
-     ORDER BY date ASC`
-  );
-  const monthlySales = monthlyRows.map((row) => ({
-    month: row.month,
-    totalsales: parseFloat(row.totalsales) || 0,
+  const orderStatusCounts = { Processing: 0, Shipped: 0, Delivered: 0, Cancelled: 0 };
+  for (const order of paidOrders) orderStatusCounts[order.order_status] = (orderStatusCounts[order.order_status] || 0) + 1;
+  const monthlyMap = new Map();
+  for (const order of paidOrders) {
+    const key = `${order.created_at.getFullYear()}-${String(order.created_at.getMonth() + 1).padStart(2, "0")}`;
+    monthlyMap.set(key, (monthlyMap.get(key) || 0) + Number(order.total_price));
+  }
+  const monthlySales = [...monthlyMap].sort(([a], [b]) => a.localeCompare(b)).map(([key, totalsales]) => ({
+    month: new Date(`${key}-01T00:00:00Z`).toLocaleString("en", { month: "short", year: "numeric", timeZone: "UTC" }), totalsales,
   }));
 
-  const { rows: topRows } = await database.query(
-    `SELECT p.name,
-            JSON_UNQUOTE(JSON_EXTRACT(p.images, '$[0].url')) AS image,
-            p.category,
-            p.ratings,
-            SUM(oi.quantity) AS total_sold
-     FROM order_items oi
-     JOIN products p ON p.id = oi.product_id
-     JOIN orders o ON o.id = oi.order_id
-     WHERE o.paid_at IS NOT NULL
-     GROUP BY p.id, p.name, p.images, p.category, p.ratings
-     ORDER BY total_sold DESC
-     LIMIT 5`
-  );
-  const topSellingProducts = topRows;
-
-  const { rows: curMonthRows } = await database.query(
-    "SELECT SUM(total_price) AS total FROM orders WHERE paid_at IS NOT NULL AND created_at BETWEEN ? AND ?",
-    [currentMonthStart, currentMonthEnd]
-  );
-  const currentMonthSales = parseFloat(curMonthRows[0].total) || 0;
-
-  const { rows: lowStockRows } = await database.query(
-    "SELECT name, stock FROM products WHERE stock <= 5"
-  );
-  const lowStockProducts = lowStockRows;
-
-  const { rows: lastMonthRows } = await database.query(
-    "SELECT SUM(total_price) AS total FROM orders WHERE paid_at IS NOT NULL AND created_at BETWEEN ? AND ?",
-    [previousMonthStart, previousMonthEnd]
-  );
-  const lastMonthRevenue = parseFloat(lastMonthRows[0].total) || 0;
-
-  let revenueGrowth = "0%";
-  if (lastMonthRevenue > 0) {
-    const growthRate = ((currentMonthSales - lastMonthRevenue) / lastMonthRevenue) * 100;
-    revenueGrowth = `${growthRate >= 0 ? "+" : ""}${growthRate.toFixed(2)}%`;
-  }
-
-  const { rows: newUsersRows } = await database.query(
-    "SELECT COUNT(*) AS count FROM users WHERE created_at >= ? AND role = 'User'",
-    [currentMonthStart]
-  );
-  const newUsersThisMonth = parseInt(newUsersRows[0].count) || 0;
+  const grouped = await prisma.orderItem.groupBy({
+    by: ["product_id"], where: { order: { paid_at: { not: null } } }, _sum: { quantity: true },
+    orderBy: { _sum: { quantity: "desc" } }, take: 5,
+  });
+  const productRows = await prisma.product.findMany({ where: { id: { in: grouped.map((row) => row.product_id) } } });
+  const topSellingProducts = grouped.map((row) => {
+    const product = productRows.find((item) => item.id === row.product_id);
+    return { name: product?.name, image: product?.images?.[0]?.url, category: product?.category, ratings: product?.ratings, total_sold: row._sum.quantity || 0 };
+  });
+  const lowStockProducts = await prisma.product.findMany({ where: { stock: { lte: 5 } }, select: { name: true, stock: true } });
+  const newUsersThisMonth = await prisma.user.count({ where: { role: "User", created_at: { gte: currentMonthStart } } });
+  const revenueGrowth = lastMonthRevenue > 0 ? `${currentMonthSales >= lastMonthRevenue ? "+" : ""}${(((currentMonthSales - lastMonthRevenue) / lastMonthRevenue) * 100).toFixed(2)}%` : "0%";
 
   res.status(200).json({
-    success: true,
-    message: "Dashboard Stats Fetched Successfully",
-    totalRevenueAllTime,
-    todayRevenue,
-    yesterdayRevenue,
-    totalUsersCount,
-    orderStatusCounts,
-    monthlySales,
-    currentMonthSales,
-    topSellingProducts,
-    lowStockProducts,
-    revenueGrowth,
-    newUsersThisMonth,
+    success: true, message: "Dashboard Stats Fetched Successfully", totalRevenueAllTime, todayRevenue,
+    yesterdayRevenue, totalUsersCount, orderStatusCounts, monthlySales, currentMonthSales,
+    topSellingProducts, lowStockProducts, revenueGrowth, newUsersThisMonth,
   });
 });

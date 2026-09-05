@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                     String         @id @default(uuid()) @db.Uuid
+  name                   String         @db.VarChar(100)
+  email                  String         @unique @db.VarChar(100)
+  password               String
+  role                   String         @default("User") @db.VarChar(10)
+  avatar                 Json?
+  reset_password_token   String?
+  reset_password_expire  DateTime?
+  created_at             DateTime       @default(now())
+  products               Product[]
+  reviews                Review[]
+  orders                 Order[]
+  seller_profile         SellerProfile?
+  customer_conversations Conversation[] @relation("ConversationCustomer")
+  admin_conversations    Conversation[] @relation("ConversationAdmin")
+  messages               Message[]
+  sold_items             OrderItem[]    @relation("OrderItemSeller")
+
+  @@map("users")
+}
+
+model SellerProfile {
+  id                String   @id @default(uuid()) @db.Uuid
+  user_id           String   @unique @db.Uuid
+  store_name        String   @db.VarChar(150)
+  store_description String?
+  store_logo        Json?
+  payout_phone      String?  @db.VarChar(20)
+  status            String   @default("Approved") @db.VarChar(20)
+  created_at        DateTime @default(now())
+  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("seller_profiles")
+}
+
+model Product {
+  id          String      @id @default(uuid()) @db.Uuid
+  name        String      @db.VarChar(255)
+  description String
+  price       Decimal     @db.Decimal(10, 2)
+  category    String      @db.VarChar(100)
+  ratings     Decimal     @default(0) @db.Decimal(3, 2)
+  images      Json?
+  stock       Int
+  created_by  String      @db.Uuid
+  created_at  DateTime    @default(now())
+  creator     User        @relation(fields: [created_by], references: [id], onDelete: Restrict)
+  reviews     Review[]
+  order_items OrderItem[]
+
+  @@index([created_by])
+  @@index([category])
+  @@map("products")
+}
+
+model Review {
+  id         String   @id @default(uuid()) @db.Uuid
+  product_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  rating     Decimal  @db.Decimal(2, 1)
+  comment    String
+  created_at DateTime @default(now())
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([product_id, user_id])
+  @@index([user_id])
+  @@map("reviews")
+}
+
+model Order {
+  id             String        @id @default(uuid()) @db.Uuid
+  buyer_id       String        @db.Uuid
+  total_price    Decimal       @db.Decimal(10, 2)
+  tax_price      Decimal       @db.Decimal(10, 2)
+  shipping_price Decimal       @db.Decimal(10, 2)
+  order_status   String        @default("Processing") @db.VarChar(50)
+  paid_at        DateTime?
+  stock_reserved Boolean       @default(true)
+  created_at     DateTime      @default(now())
+  buyer          User          @relation(fields: [buyer_id], references: [id], onDelete: Restrict)
+  order_items    OrderItem[]
+  shipping_info  ShippingInfo?
+  payment        Payment?
+
+  @@index([buyer_id, created_at])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String  @id @default(uuid()) @db.Uuid
+  order_id    String  @db.Uuid
+  product_id  String  @db.Uuid
+  seller_id   String? @db.Uuid
+  quantity    Int
+  price       Decimal @db.Decimal(10, 2)
+  item_status String  @default("Processing") @db.VarChar(50)
+  image       String?
+  title       String?
+  order       Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product     Product @relation(fields: [product_id], references: [id], onDelete: Restrict)
+  seller      User?   @relation("OrderItemSeller", fields: [seller_id], references: [id], onDelete: SetNull)
+
+  @@index([order_id])
+  @@index([seller_id])
+  @@map("order_items")
+}
+
+model ShippingInfo {
+  id        String @id @default(uuid()) @db.Uuid
+  order_id  String @unique @db.Uuid
+  full_name String @db.VarChar(100)
+  state     String @db.VarChar(100)
+  city      String @db.VarChar(100)
+  country   String @db.VarChar(100)
+  address   String
+  pincode   String @db.VarChar(20)
+  phone     String @db.VarChar(20)
+  order     Order  @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@map("shipping_info")
+}
+
+model Payment {
+  id               String    @id @default(uuid()) @db.Uuid
+  order_id         String    @unique @db.Uuid
+  payment_type     String    @default("pawaPay") @db.VarChar(20)
+  payment_status   String    @default("Pending") @db.VarChar(20)
+  transaction_id   String    @unique @db.VarChar(255)
+  provider         String    @default("AIRTEL_COD") @db.VarChar(50)
+  currency         String    @default("USD") @db.VarChar(3)
+  provider_payload Json?
+  processed_at     DateTime?
+  created_at       DateTime  @default(now())
+  order            Order     @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Conversation {
+  id          String    @id @default(uuid()) @db.Uuid
+  customer_id String    @db.Uuid
+  admin_id    String?   @db.Uuid
+  status      String    @default("open") @db.VarChar(20)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  customer    User      @relation("ConversationCustomer", fields: [customer_id], references: [id], onDelete: Cascade)
+  admin       User?     @relation("ConversationAdmin", fields: [admin_id], references: [id], onDelete: SetNull)
+  messages    Message[]
+
+  @@index([customer_id, status, created_at])
+  @@map("conversations")
+}
+
+model Message {
+  id              String       @id @default(uuid()) @db.Uuid
+  conversation_id String       @db.Uuid
+  sender_id       String       @db.Uuid
+  sender_role     String       @db.VarChar(10)
+  content         String
+  is_read         Boolean      @default(false)
+  created_at      DateTime     @default(now())
+  conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  sender          User         @relation(fields: [sender_id], references: [id], onDelete: Cascade)
+
+  @@index([conversation_id, created_at])
+  @@map("messages")
+}

@@ -171,18 +171,19 @@
     "country": "Ditunga",
     "pincode": "Kode Postale",
     "phone": "Telefone",
+    "mobileMoneyProvider": "Mobile Money provider",
     "orderSummary": "Mvutuilu wa Malombolo ({{count}} bintu)",
     "placingOrder": "Tudi Tulomba...",
     "placeOrder": "Lomba ne Uye ku Difuta",
     "fillAllFields": "Wuvule mikanda yonso ya kutuma bintu"
   },
-  "airtelPayment": {
-    "title": "Difuta dia Airtel Money",
+  "pawaPayPayment": {
+    "title": "Difuta dia Mobile Money via pawaPay",
     "totalAmount": "Mushinga Wonso",
     "paymentFailed": "Difuta kadiakumbane",
     "tryAgainMessage": "Pingana kumpala ulombe malombolo kabidi.",
     "requestSentTo": "Dilombo dia difuta didi ditumibue kudi {{phone}}",
-    "instructions": "Teka nomba yebe ya PIN ya Airtel Money pa telefone webe bua kuyitaba difuta. Dyese edi nedishintuluke dinyeke pashishe difuta diakumbane.",
+    "instructions": "Teka nomba yebe ya PIN ya Mobile Money via pawaPay pa telefone webe bua kuyitaba difuta. Dyese edi nedishintuluke dinyeke pashishe difuta diakumbane.",
     "paymentSuccessful": "Difuta diakumbane!",
     "paymentFailedRetry": "Difuta kadiakumbane. Keta kabidi."
   },

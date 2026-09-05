@@ -1,4 +1,4 @@
-export async function getAIRecommendation(req, res, userPrompt, products) {
+export async function getAIRecommendation(userPrompt, products) {
   const API_KEY = process.env.GEMINI_API_KEY;
   const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
@@ -27,21 +27,17 @@ export async function getAIRecommendation(req, res, userPrompt, products) {
     const cleanedText = aiResponseText.replace(/```json|```/g, ``).trim();
 
     if (!cleanedText) {
-      return res
-        .status(500)
-        .json({ success: false, message: "AI response is empty or invalid." });
+      throw new Error("AI response is empty or invalid.");
     }
 
     let parsedProducts;
     try {
       parsedProducts = JSON.parse(cleanedText);
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ success: false, message: "Failed to parse AI response" });
+    } catch {
+      throw new Error("Failed to parse AI response");
     }
-    return { success: true, products: parsedProducts };
+    return parsedProducts;
   } catch (error) {
-    res.status(500).json({ success: false, message: "Internal server error." });
+    throw new Error("AI recommendation failed.", { cause: error });
   }
 }

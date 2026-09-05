@@ -171,18 +171,19 @@
     "country": "Ekolo",
     "pincode": "Code Postal",
     "phone": "Telefone",
+    "mobileMoneyProvider": "Mobile Money provider",
     "orderSummary": "Résumé ya Commande ({{count}} biloko)",
     "placingOrder": "Kosala Commande...",
     "placeOrder": "Sala Commande mpe Kende na Paiement",
     "fillAllFields": "Osengeli kotondisa bisika nyonso ya livraison"
   },
-  "airtelPayment": {
-    "title": "Paiement na Airtel Money",
+  "pawaPayPayment": {
+    "title": "Paiement na Mobile Money via pawaPay",
     "totalAmount": "Total ya Mbongo",
     "paymentFailed": "Paiement elongi te",
     "tryAgainMessage": "Zonga sima mpe sala commande lisusu.",
     "requestSentTo": "Requête ya paiement etindami na {{phone}}",
-    "instructions": "Kotisa code PIN ya Airtel Money na yo na telefone na yo mpo na kondima paiement. Paje oyo ekobongwana yango moko soki paiement endimami.",
+    "instructions": "Kotisa code PIN ya Mobile Money via pawaPay na yo na telefone na yo mpo na kondima paiement. Paje oyo ekobongwana yango moko soki paiement endimami.",
     "paymentSuccessful": "Paiement elongi!",
     "paymentFailedRetry": "Paiement elongi te. Meka lisusu."
   },

@@ -120,7 +120,7 @@ const productSlice = createSlice({
       .addCase(postProductReview.pending, (state) => {
         state.isPostingReview = true;
       })
-      .addCase(postProductReview.fulfilled, (state, action) => {
+      .addCase(postProductReview.fulfilled, (state) => {
         state.isPostingReview = false;
       })
       .addCase(postProductReview.rejected, (state) => {

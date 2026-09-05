@@ -106,26 +106,26 @@ const SideBar = () => {
 
           {/* Nav Items */}
           <nav className="flex-1 p-4 space-y-1">
-            {navItems.map(({ label, icon: Icon, display }) => (
+            {navItems.map((item) => (
               <button
-                key={label}
-                onClick={() => dispatch(setOpenedComponent(label))}
-                title={isCollapsed ? display || t(`sidebar.${label.charAt(0).toLowerCase()}${label.slice(1)}`, label) : undefined}
+                key={item.label}
+                onClick={() => dispatch(setOpenedComponent(item.label))}
+                title={isCollapsed ? item.display || t(`sidebar.${item.label.charAt(0).toLowerCase()}${item.label.slice(1)}`, item.label) : undefined}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  openedComponent === label
+                  openedComponent === item.label
                     ? "bg-green-50 text-green-600"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
-                <Icon className="w-5 h-5 shrink-0" />
+                {React.createElement(item.icon, { className: "w-5 h-5 shrink-0" })}
                 <span className={`flex-1 text-left ${isCollapsed ? "lg:hidden" : ""}`}>
-                  {display ||
+                  {item.display ||
                     t(
-                      `sidebar.${label.charAt(0).toLowerCase()}${label.slice(1)}`,
-                      label
+                      `sidebar.${item.label.charAt(0).toLowerCase()}${item.label.slice(1)}`,
+                      item.label
                     )}
                 </span>
-                {label === "Chat" && totalUnread > 0 && (
+                {item.label === "Chat" && totalUnread > 0 && (
                   <span
                     className={`bg-green-500 text-white rounded-full font-bold flex items-center justify-center shrink-0 ${
                       isCollapsed
