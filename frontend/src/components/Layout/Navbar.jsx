@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import CategoryStrip from "./CategoryStrip";
+import Logo from "./Logo";
 import {
   toggleAuthPopup,
   toggleSidebar,
@@ -42,12 +43,7 @@ const Navbar = () => {
           >
             <Menu className="w-6 h-6 text-foreground" />
           </button>
-          <Link
-            to="/"
-            className="text-2xl font-bold gradient-primary bg-clip-text text-transparent"
-          >
-            Shelf153
-          </Link>
+          <Logo />
         </div>
 
         <form

@@ -9,6 +9,7 @@ import {
   Instagram,
   Youtube,
 } from "lucide-react";
+import Logo from "./Logo";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -47,9 +48,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Brand & Contact */}
           <div className="lg:col-span-1">
-            <h2 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent mb-4">
-              Shelf153
-            </h2>
+            <Logo className="mb-4" />
             <p className="text-muted-foreground mb-6">
               {t("footer.description")}
             </p>

@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { toggleSidebar } from "../../store/slices/popupSlice";
 import LanguageSwitcher from "./LanguageSwitcher";
+import Logo from "./Logo";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -39,9 +40,7 @@ const Sidebar = () => {
       />
       <div className="fixed top-0 left-0 h-full w-72 bg-background border-r border-border z-50 p-6 lg:hidden">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl font-bold gradient-primary bg-clip-text text-transparent">
-            Shelf153
-          </h2>
+          <Logo textClassName="text-xl" />
           <button
             onClick={() => dispatch(toggleSidebar())}
             aria-label={t("aria.close")}

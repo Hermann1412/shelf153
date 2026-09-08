@@ -89,6 +89,54 @@ app.post("/api/v1/payment/airtel/callback", async (req, res) => {
   }
 });
 
+app.post("/api/v1/payment/pawapay/callback", async (req, res) => {
+  try {
+    const { depositId, status } = req.body;
+
+    if (!depositId) return res.status(400).json({ success: false });
+
+    if (status === "COMPLETED") {
+      await database.query(
+        "UPDATE payments SET payment_status = 'Paid' WHERE transaction_id = ?",
+        [depositId]
+      );
+
+      const { rows: payment } = await database.query(
+        "SELECT order_id FROM payments WHERE transaction_id = ?",
+        [depositId]
+      );
+      const orderId = payment[0]?.order_id;
+
+      if (orderId) {
+        await database.query("UPDATE orders SET paid_at = NOW() WHERE id = ?", [
+          orderId,
+        ]);
+
+        const { rows: orderedItems } = await database.query(
+          "SELECT product_id, quantity FROM order_items WHERE order_id = ?",
+          [orderId]
+        );
+        for (const item of orderedItems) {
+          await database.query(
+            "UPDATE products SET stock = stock - ? WHERE id = ?",
+            [item.quantity, item.product_id]
+          );
+        }
+      }
+    } else if (status === "FAILED") {
+      await database.query(
+        "UPDATE payments SET payment_status = 'Failed' WHERE transaction_id = ?",
+        [depositId]
+      );
+    }
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("PawaPay callback error:", error.message);
+    res.status(500).json({ success: false });
+  }
+});
+
 createTables();
 
 app.use(errorMiddleware);
