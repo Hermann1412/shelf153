@@ -1,0 +1,72 @@
+databases:
+  - name: shelf153-db
+    plan: free
+    postgresMajorVersion: "17"
+
+services:
+  - type: web
+    name: shelf153-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npx prisma migrate deploy && node server.js
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shelf153-db
+          property: connectionString
+
+      # Set these to your deployed Vercel URLs once you have them (see README).
+      - key: FRONTEND_URL
+        sync: false
+      - key: DASHBOARD_URL
+        sync: false
+
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: COOKIE_EXPIRES_IN
+        value: "7"
+
+      - key: SMTP_SERVICE
+        value: gmail
+      - key: SMTP_MAIL
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "465"
+
+      # Optional: leave unset in the Render dashboard to disable the AI search feature.
+      - key: GEMINI_API_KEY
+        sync: false
+
+      - key: CLOUDINARY_CLIENT_NAME
+        sync: false
+      - key: CLOUDINARY_CLIENT_API
+        sync: false
+      - key: CLOUDINARY_CLIENT_SECRET
+        sync: false
+
+      - key: PAWAPAY_BASE_URL
+        value: https://api.sandbox.pawapay.io
+      - key: PAWAPAY_API_TOKEN
+        sync: false
+      - key: PAWAPAY_CURRENCY
+        value: USD
+      - key: PAWAPAY_DEFAULT_PROVIDER
+        value: AIRTEL_COD
+      - key: PAWAPAY_ALLOWED_PROVIDERS
+        value: AIRTEL_COD,VODACOM_MPESA_COD,ORANGE_COD
+      - key: PAWAPAY_TIMEOUT_MS
+        value: "15000"
+
+      - key: PRICE_INPUT_DIVISOR
+        value: "283"
