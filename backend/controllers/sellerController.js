@@ -8,13 +8,13 @@ const ITEM_STATUSES = ["Processing", "Shipped", "Delivered", "Cancelled"];
 const sumRevenue = (items) => items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
 
 export const fetchAllShops = catchAsyncErrors(async (req, res) => {
-  const { rows } = await database.query(
-    `SELECT sp.user_id AS id, sp.store_name, sp.store_logo
-     FROM seller_profiles sp
-     WHERE sp.status != 'Suspended'
-     ORDER BY sp.store_name ASC`
-  );
-  res.status(200).json({ success: true, shops: rows });
+  const rows = await prisma.sellerProfile.findMany({
+    where: { status: { not: "Suspended" } },
+    select: { user_id: true, store_name: true, store_logo: true },
+    orderBy: { store_name: "asc" },
+  });
+  const shops = rows.map(({ user_id, ...rest }) => ({ id: user_id, ...rest }));
+  res.status(200).json({ success: true, shops });
 });
 
 export const applyToBecomeSeller = catchAsyncErrors(async (req, res, next) => {

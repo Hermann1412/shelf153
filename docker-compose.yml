@@ -19,8 +19,7 @@ services:
   backend:
     build: ./backend
     env_file:
-      - path: ./backend/.env
-        required: false
+      - ./backend/.env
     environment:
       DATABASE_URL: postgresql://shelf153:shelf153-local-only@postgres:5432/shelf153?schema=public
     ports:
