@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toggleAuthPopup } from "../../store/slices/popupSlice";
 import {
@@ -30,15 +30,13 @@ const LoginModal = () => {
   const location = useLocation();
 
   // Check for reset token in URL
-  const resetTokenMatch = location.pathname.match(
-    /\/password\/reset\/(.+)/
-  );
+  const resetToken = location.pathname.match(/\/password\/reset\/(.+)/)?.[1];
 
   useEffect(() => {
-    if (resetTokenMatch) {
+    if (resetToken) {
       setMode("reset");
     }
-  }, [location.pathname]);
+  }, [resetToken]);
 
   useEffect(() => {
     setErrors({});
@@ -48,7 +46,7 @@ const LoginModal = () => {
     if (authUser && isAuthPopupOpen) {
       dispatch(toggleAuthPopup());
     }
-  }, [authUser]);
+  }, [authUser, dispatch, isAuthPopupOpen]);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -91,16 +89,11 @@ const LoginModal = () => {
         })
       );
     } else if (mode === "forgot") {
-      dispatch(
-        forgotPassword({
-          email: formData.email,
-          frontendUrl: window.location.origin,
-        })
-      );
-    } else if (mode === "reset" && resetTokenMatch) {
+      dispatch(forgotPassword({ email: formData.email }));
+    } else if (mode === "reset" && resetToken) {
       dispatch(
         resetPassword({
-          token: resetTokenMatch[1],
+          token: resetToken,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
         })
@@ -108,13 +101,13 @@ const LoginModal = () => {
     }
   };
 
-  if (!isAuthPopupOpen && !resetTokenMatch) return null;
+  if (!isAuthPopupOpen && !resetToken) return null;
 
   return (
     <>
       <div
         className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
-        onClick={() => !resetTokenMatch && dispatch(toggleAuthPopup())}
+        onClick={() => !resetToken && dispatch(toggleAuthPopup())}
       >
         <div
           className="w-full max-w-md bg-background border border-border rounded-2xl p-8"
@@ -132,7 +125,7 @@ const LoginModal = () => {
             </h2>
             <button
               onClick={() =>
-                resetTokenMatch
+                resetToken
                   ? (window.location.href = "/")
                   : dispatch(toggleAuthPopup())
               }

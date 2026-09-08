@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: shelf153_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d shelf153_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/shelf153_test?schema=public
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/shelf153_test?schema=public
+      JWT_SECRET_KEY: ci-secret-at-least-thirty-two-characters
+      JWT_EXPIRES_IN: 1h
+      COOKIE_EXPIRES_IN: 1
+      FRONTEND_URL: http://localhost:5173
+      DASHBOARD_URL: http://localhost:5174
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            dashboard/package-lock.json
+      - name: Backend dependencies and migration
+        working-directory: backend
+        run: |
+          npm ci
+          npx prisma migrate deploy
+      - name: Backend integration tests
+        working-directory: backend
+        run: |
+          npm run lint
+          npm run test:integration
+      - name: Frontend checks
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+      - name: Dashboard checks
+        working-directory: dashboard
+        run: |
+          npm ci
+          npm run lint
+          npm run build

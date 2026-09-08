@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ToastContainer } from "react-toastify";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getUser } from "./store/slices/authSlice";
 import { fetchAllProducts } from "./store/slices/productSlice";
@@ -17,16 +17,16 @@ import Footer from "./components/Layout/Footer";
 import ChatWidget from "./components/Chat/ChatWidget";
 
 // Pages
-import Index from "./pages/Home";
-import Products from "./pages/Products";
-import ProductDetail from "./pages/ProductDetail";
-import Cart from "./pages/Cart";
-import Orders from "./pages/Orders";
-import Payment from "./pages/Payment";
-import About from "./pages/About";
-import FAQ from "./pages/FAQ";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
+const Index = lazy(() => import("./pages/Home"));
+const Products = lazy(() => import("./pages/Products"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Payment = lazy(() => import("./pages/Payment"));
+const About = lazy(() => import("./pages/About"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Contact = lazy(() => import("./pages/Contact"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -45,6 +45,7 @@ const AppContent = () => {
       <ProfilePanel />
       <LoginModal />
       <ChatWidget />
+      <Suspense fallback={<div className="min-h-screen pt-32 text-center text-muted-foreground">Loading…</div>}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/password/reset/:token" element={<Index />} />
@@ -58,6 +59,7 @@ const AppContent = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
       <Footer />
     </div>
   );

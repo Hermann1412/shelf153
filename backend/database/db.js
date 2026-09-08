@@ -1,46 +1,12 @@
-import mysql from "mysql2/promise";
-import { config } from "dotenv";
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@prisma/client";
 
-config();
-
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "shelf153_ecommerce",
-  waitForConnections: true,
-  connectionLimit: 10,
-  typeCast(field, next) {
-    // mysql2 reports JSON columns as type "BLOB" over the wire, not "JSON" —
-    // without this, product/avatar/store_logo JSON fields are returned as raw strings.
-    if (field.type === "JSON" || field.type === "BLOB") {
-      const val = field.string();
-      try {
-        return val ? JSON.parse(val) : null;
-      } catch {
-        return val;
-      }
-    }
-    return next();
-  },
-});
-
-// Test connection on startup
-try {
-  const conn = await pool.getConnection();
-  console.log("Connected to the database successfully");
-  conn.release();
-} catch (error) {
-  console.error("Database connection failed:", error.message);
-  process.exit(1);
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is required.");
 }
 
-// Compatibility wrapper — keeps all controllers using result.rows
-const db = {
-  async query(sql, params = []) {
-    const [rows] = await pool.execute(sql, params);
-    return { rows: Array.isArray(rows) ? rows : [] };
-  },
-};
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
-export default db;
+export default prisma;

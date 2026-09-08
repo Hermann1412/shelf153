@@ -197,18 +197,19 @@
     "country": "Nchi",
     "pincode": "Nambari ya Posta",
     "phone": "Simu",
+    "mobileMoneyProvider": "Mobile Money provider",
     "orderSummary": "Muhtasari wa Agizo ({{count}} bidhaa)",
     "placingOrder": "Inaweka Agizo...",
     "placeOrder": "Weka Agizo na Endelea kwenye Malipo",
     "fillAllFields": "Tafadhali jaza sehemu zote za usafirishaji"
   },
-  "airtelPayment": {
-    "title": "Malipo ya Airtel Money",
+  "pawaPayPayment": {
+    "title": "Malipo ya Mobile Money via pawaPay",
     "totalAmount": "Kiasi Chote",
     "paymentFailed": "Malipo hayajafanikiwa",
     "tryAgainMessage": "Tafadhali rudi nyuma na uweke agizo tena.",
     "requestSentTo": "Ombi la malipo limetumwa kwa {{phone}}",
-    "instructions": "Weka PIN yako ya Airtel Money kwenye simu yako ili kuthibitisha malipo. Ukurasa huu utasasishwa kiotomatiki mara malipo yatakapothibitishwa.",
+    "instructions": "Weka PIN yako ya Mobile Money via pawaPay kwenye simu yako ili kuthibitisha malipo. Ukurasa huu utasasishwa kiotomatiki mara malipo yatakapothibitishwa.",
     "paymentSuccessful": "Malipo yamefanikiwa!",
     "paymentFailedRetry": "Malipo hayajafanikiwa. Tafadhali jaribu tena."
   },

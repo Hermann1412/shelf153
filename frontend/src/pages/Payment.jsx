@@ -3,8 +3,8 @@ import { ArrowLeft, Check, MapPin, CreditCard, Loader } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import AirtelMoneyPayment from "../components/AirtelMoneyPayment";
-import { placeOrder, setOrderStep } from "../store/slices/orderSlice";
+import PawaPayPayment from "../components/PawaPayPayment";
+import { placeOrder } from "../store/slices/orderSlice";
 import { toast } from "react-toastify";
 
 const Payment = () => {
@@ -25,6 +25,7 @@ const Payment = () => {
     country: "",
     pincode: "",
     phone: "",
+    provider: "AIRTEL_COD",
   });
   const [errors, setErrors] = useState({});
 
@@ -254,6 +255,21 @@ const Payment = () => {
                 <p className="text-xs text-destructive mt-1">{errors.phone}</p>
               )}
             </div>
+            <div>
+              <label className="text-sm text-muted-foreground mb-1 block">
+                {t("checkout.mobileMoneyProvider")}
+              </label>
+              <select
+                name="provider"
+                value={shipping.provider}
+                onChange={handleShippingChange}
+                className={fieldClass("provider")}
+              >
+                <option value="AIRTEL_COD">Airtel Money</option>
+                <option value="VODACOM_MPESA_COD">Vodacom M-Pesa</option>
+                <option value="ORANGE_COD">Orange Money</option>
+              </select>
+            </div>
           </div>
 
           {/* Order Summary */}
@@ -300,7 +316,7 @@ const Payment = () => {
         {/* Step 3 - Payment */}
         {orderStep === 3 && orderId && (
           <div className="max-w-2xl mx-auto">
-            <AirtelMoneyPayment phone={shipping.phone} />
+            <PawaPayPayment phone={shipping.phone} provider={shipping.provider} />
           </div>
         )}
       </div>

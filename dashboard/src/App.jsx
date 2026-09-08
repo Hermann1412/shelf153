@@ -4,22 +4,22 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SideBar from "./components/SideBar";
 import Header from "./components/Header";
-import Dashboard from "./components/Dashboard";
-import Products from "./components/Products";
-import Orders from "./components/Orders";
-import Users from "./components/Users";
-import Profile from "./components/Profile";
-import Chat from "./components/Chat";
-import StoreProfile from "./components/StoreProfile";
-import SellerProducts from "./components/SellerProducts";
-import SellerOrders from "./components/SellerOrders";
-import Login from "./pages/Login";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const Products = lazy(() => import("./components/Products"));
+const Orders = lazy(() => import("./components/Orders"));
+const Users = lazy(() => import("./components/Users"));
+const Profile = lazy(() => import("./components/Profile"));
+const Chat = lazy(() => import("./components/Chat"));
+const StoreProfile = lazy(() => import("./components/StoreProfile"));
+const SellerProducts = lazy(() => import("./components/SellerProducts"));
+const SellerOrders = lazy(() => import("./components/SellerOrders"));
+const Login = lazy(() => import("./pages/Login"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 import { ToastContainer } from "react-toastify";
 import { getUser } from "./store/slices/authSlice";
 
@@ -78,6 +78,7 @@ function AppContent() {
   }
 
   return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading…</div>}>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/password/forgot" element={<ForgotPassword />} />
@@ -104,6 +105,7 @@ function AppContent() {
         }
       />
     </Routes>
+    </Suspense>
   );
 }
 

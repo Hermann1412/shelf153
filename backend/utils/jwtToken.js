@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { toPublicUser } from "./publicUser.js";
 
 export const sendToken = (user, statusCode, message, res) => {
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
@@ -12,11 +13,13 @@ export const sendToken = (user, statusCode, message, res) => {
         Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
       ),
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
     })
     .json({
       success: true,
-      user,
+      user: toPublicUser(user),
       message,
-      token,
     });
 };

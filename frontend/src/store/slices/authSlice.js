@@ -87,12 +87,9 @@ export const updatePassword = createAsyncThunk(
 
 export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
-  async ({ email, frontendUrl }, { rejectWithValue }) => {
+  async ({ email }, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.post(
-        `/auth/password/forgot?frontendUrl=${frontendUrl}`,
-        { email }
-      );
+      const { data } = await axiosInstance.post("/auth/password/forgot", { email });
       toast.success(data.message);
       return data;
     } catch (error) {

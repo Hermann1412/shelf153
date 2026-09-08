@@ -1,6 +1,6 @@
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
-import database from "../database/db.js";
+import prisma from "../database/db.js";
 import bcrypt from "bcrypt";
 import { sendToken } from "../utils/jwtToken.js";
 import { generateResetPasswordToken } from "../utils/generateResetPasswordToken.js";
@@ -8,10 +8,11 @@ import { generateEmailTemplate } from "../utils/generateForgotPasswordEmailTempl
 import { sendEmail } from "../utils/sendEmail.js";
 import crypto from "crypto";
 import { v2 as cloudinary } from "cloudinary";
-import { v4 as uuidv4 } from "uuid";
+import { toPublicUser } from "../utils/publicUser.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, password } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
   if (!name || !email || !password) {
     return next(new ErrorHandler("Please provide all required fields.", 400));
   }
@@ -21,90 +22,82 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  const existing = await database.query(
-    "SELECT id FROM users WHERE email = ?",
-    [email]
-  );
-  if (existing.rows.length > 0) {
+  const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+  if (existing) {
     return next(new ErrorHandler("User already registered with this email.", 400));
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const id = uuidv4();
-
-  await database.query(
-    "INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)",
-    [id, name, email, hashedPassword]
-  );
-
-  const { rows } = await database.query("SELECT * FROM users WHERE id = ?", [id]);
-  sendToken(rows[0], 201, "User registered successfully", res);
+  const user = await prisma.user.create({
+    data: { name: name.trim(), email, password: hashedPassword },
+  });
+  sendToken(user, 201, "User registered successfully", res);
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
   if (!email || !password) {
     return next(new ErrorHandler("Please provide email and password.", 400));
   }
-  const { rows } = await database.query(
-    "SELECT * FROM users WHERE email = ?",
-    [email]
-  );
-  if (rows.length === 0) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
     return next(new ErrorHandler("Invalid email or password.", 401));
   }
-  const isPasswordMatch = await bcrypt.compare(password, rows[0].password);
+  const isPasswordMatch = await bcrypt.compare(password, user.password);
   if (!isPasswordMatch) {
     return next(new ErrorHandler("Invalid email or password.", 401));
   }
-  sendToken(rows[0], 200, "Logged In.", res);
+  sendToken(user, 200, "Logged In.", res);
 });
 
 export const getUser = catchAsyncErrors(async (req, res) => {
-  res.status(200).json({ success: true, user: req.user });
+  res.status(200).json({ success: true, user: toPublicUser(req.user) });
 });
 
 export const logout = catchAsyncErrors(async (req, res) => {
   res
     .status(200)
-    .cookie("token", "", { expires: new Date(Date.now()), httpOnly: true })
+    .cookie("token", "", {
+      expires: new Date(0),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    })
     .json({ success: true, message: "Logged out successfully." });
 });
 
 export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
-  const { email } = req.body;
-  const { frontendUrl } = req.query;
-
-  const { rows } = await database.query(
-    "SELECT * FROM users WHERE email = ?",
-    [email]
-  );
-  if (rows.length === 0) {
-    return next(new ErrorHandler("User not found with this email.", 404));
-  }
-  const user = rows[0];
+  const email = req.body.email?.trim().toLowerCase();
+  if (!email) return next(new ErrorHandler("Please provide an email address.", 400));
+  const user = await prisma.user.findUnique({ where: { email } });
+  const genericMessage = "If an account exists, a password reset email has been sent.";
+  if (!user) return res.status(200).json({ success: true, message: genericMessage });
   const { hashedToken, resetPasswordExpireTime, resetToken } =
     generateResetPasswordToken();
 
-  await database.query(
-    "UPDATE users SET reset_password_token = ?, reset_password_expire = FROM_UNIXTIME(?) WHERE email = ?",
-    [hashedToken, resetPasswordExpireTime / 1000, email]
-  );
+  await prisma.user.update({
+    where: { email },
+    data: { reset_password_token: hashedToken, reset_password_expire: new Date(resetPasswordExpireTime) },
+  });
 
-  const resetPasswordUrl = `${frontendUrl}/password/reset/${resetToken}`;
+  const allowedOrigins = [process.env.FRONTEND_URL, process.env.DASHBOARD_URL].filter(Boolean);
+  const origin = allowedOrigins.includes(req.get("origin")) ? req.get("origin") : process.env.FRONTEND_URL;
+  const resetPasswordUrl = `${origin}/password/reset/${resetToken}`;
   const message = generateEmailTemplate(resetPasswordUrl);
 
   try {
     await sendEmail({ email: user.email, subject: "Ecommerce Password Recovery", message });
     res.status(200).json({
       success: true,
-      message: `Email sent to ${user.email} successfully.`,
+      message: genericMessage,
     });
   } catch {
-    await database.query(
-      "UPDATE users SET reset_password_token = NULL, reset_password_expire = NULL WHERE email = ?",
-      [email]
-    );
+    await prisma.user.update({
+      where: { email },
+      data: { reset_password_token: null, reset_password_expire: null },
+    });
     return next(new ErrorHandler("Email could not be sent.", 500));
   }
 });
@@ -113,11 +106,10 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.params;
   const resetPasswordToken = crypto.createHash("sha256").update(token).digest("hex");
 
-  const { rows } = await database.query(
-    "SELECT * FROM users WHERE reset_password_token = ? AND reset_password_expire > NOW()",
-    [resetPasswordToken]
-  );
-  if (rows.length === 0) {
+  const user = await prisma.user.findFirst({
+    where: { reset_password_token: resetPasswordToken, reset_password_expire: { gt: new Date() } },
+  });
+  if (!user) {
     return next(new ErrorHandler("Invalid or expired reset token.", 400));
   }
   if (req.body.password !== req.body.confirmPassword) {
@@ -133,15 +125,11 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
   }
 
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  const userId = rows[0].id;
-
-  await database.query(
-    "UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expire = NULL WHERE id = ?",
-    [hashedPassword, userId]
-  );
-
-  const { rows: updated } = await database.query("SELECT * FROM users WHERE id = ?", [userId]);
-  sendToken(updated[0], 200, "Password reset successfully", res);
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: { password: hashedPassword, reset_password_token: null, reset_password_expire: null },
+  });
+  sendToken(updated, 200, "Password reset successfully", res);
 });
 
 export const updatePassword = catchAsyncErrors(async (req, res, next) => {
@@ -166,10 +154,7 @@ export const updatePassword = catchAsyncErrors(async (req, res, next) => {
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await database.query("UPDATE users SET password = ? WHERE id = ?", [
-    hashedPassword,
-    req.user.id,
-  ]);
+  await prisma.user.update({ where: { id: req.user.id }, data: { password: hashedPassword } });
 
   res.status(200).json({ success: true, message: "Password updated successfully." });
 });
@@ -198,21 +183,21 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
   }
 
   if (avatarData) {
-    await database.query(
-      "UPDATE users SET name = ?, email = ?, avatar = ? WHERE id = ?",
-      [name, email, JSON.stringify(avatarData), req.user.id]
-    );
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: { name: name.trim(), email: email.trim().toLowerCase(), avatar: avatarData },
+    });
   } else {
-    await database.query(
-      "UPDATE users SET name = ?, email = ? WHERE id = ?",
-      [name, email, req.user.id]
-    );
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: { name: name.trim(), email: email.trim().toLowerCase() },
+    });
   }
 
-  const { rows } = await database.query("SELECT * FROM users WHERE id = ?", [req.user.id]);
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
   res.status(200).json({
     success: true,
     message: "Profile updated successfully.",
-    user: rows[0],
+    user: toPublicUser(user),
   });
 });

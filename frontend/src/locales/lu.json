@@ -197,18 +197,19 @@
     "country": "Ditunga",
     "pincode": "Code Postal",
     "phone": "Téléphone",
+    "mobileMoneyProvider": "Mobile Money provider",
     "orderSummary": "Rezime ya Commande ({{count}} bintu)",
     "placingOrder": "Tudi tuenza Commande...",
     "placeOrder": "Enza Commande Kabidi Uye ku Difutu",
     "fillAllFields": "Tudi tulomba, ufula bibaka bionso bia kutuma bintu"
   },
-  "airtelPayment": {
-    "title": "Difutu dia Airtel Money",
+  "pawaPayPayment": {
+    "title": "Difutu dia Mobile Money via pawaPay",
     "totalAmount": "Total Yonso",
     "paymentFailed": "Difutu kadiyi dienzeka",
     "tryAgainMessage": "Tudi tulomba pingana kabidi ne wenze commande kabidi.",
     "requestSentTo": "Lulombu lua difutu ludi lutumibua kudi {{phone}}",
-    "instructions": "Fila PIN yebe ya Airtel Money pa telephone webe bua konfirme difutu. Page eyi neyikudimuke automatiquement pa mutu difutu didi dikonfirme.",
+    "instructions": "Fila PIN yebe ya Mobile Money via pawaPay pa telephone webe bua konfirme difutu. Page eyi neyikudimuke automatiquement pa mutu difutu didi dikonfirme.",
     "paymentSuccessful": "Difutu dienzeki bimpe!",
     "paymentFailedRetry": "Difutu kadiyi dienzeka. Tudi tulomba wenze kabidi."
   },

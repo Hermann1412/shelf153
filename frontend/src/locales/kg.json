@@ -197,18 +197,19 @@
     "country": "Nsi",
     "pincode": "Code Postale",
     "phone": "Telefone",
+    "mobileMoneyProvider": "Mobile Money provider",
     "orderSummary": "Mfunda ya Komanda ({{count}} bima)",
     "placingOrder": "Ke Tuma Komanda...",
     "placeOrder": "Tuma Komanda ye Kwenda kwa Mfutu",
     "fillAllFields": "Fwana ba champ yonso ya livraison, mu bomba"
   },
-  "airtelPayment": {
-    "title": "Mfutu na Airtel Money",
+  "pawaPayPayment": {
+    "title": "Mfutu na Mobile Money via pawaPay",
     "totalAmount": "Ntalu Yonso",
     "paymentFailed": "Mfutu widi mbi",
     "tryAgainMessage": "Vutuka mu nima ye tuma komanda diaka, mu bomba.",
     "requestSentTo": "Nsatu ya mfutu tumwa kwa {{phone}}",
-    "instructions": "Tula PIN ya Airtel Money aku va telefone aku mu kwikisa mfutu. Page yayi ta kudikitula yandi mosi kana mfutu mekwikiswa.",
+    "instructions": "Tula PIN ya Mobile Money via pawaPay aku va telefone aku mu kwikisa mfutu. Page yayi ta kudikitula yandi mosi kana mfutu mekwikiswa.",
     "paymentSuccessful": "Mfutu mewiza mbote!",
     "paymentFailedRetry": "Mfutu widi mbi. Vutuka mu meka diaka, mu bomba."
   },

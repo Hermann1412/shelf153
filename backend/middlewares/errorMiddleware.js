@@ -5,13 +5,20 @@ class ErrorHandler extends Error {
   }
 }
 
-export const errorMiddleware = (err, req, res, next) => {
+export const errorMiddleware = (err, req, res, _next) => {
   err.message = err.message || "Internal Server Error";
   err.statusCode = err.statusCode || 500;
 
-  if (err.code === 11000) {
-    const message = `Duplicate field value entered`;
-    err = new ErrorHandler(message, 400);
+  if (err.code === "P2002") {
+    err = new ErrorHandler("A record with this unique value already exists.", 409);
+  }
+
+  if (err.code === "P2003") {
+    err = new ErrorHandler("This record is still referenced and cannot be deleted.", 409);
+  }
+
+  if (["P2023", "P2006"].includes(err.code)) {
+    err = new ErrorHandler("Invalid identifier or field value.", 400);
   }
 
   if (err.name === "JsonWebTokenError") {

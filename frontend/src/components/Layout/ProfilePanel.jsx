@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { X, LogOut, Upload, Eye, EyeOff, Store } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { toggleProfilePanel } from "../../store/slices/popupSlice";
 import {

@@ -120,7 +120,7 @@
     "logoAlt": "Store logo",
     "storeName": "Store Name",
     "storeDescription": "Store Description",
-    "payoutPhone": "Payout Phone (Airtel Money)",
+    "payoutPhone": "Payout Phone (pawaPay Mobile Money)",
     "payoutPhonePlaceholder": "e.g. 0700000000",
     "storeLogo": "Store Logo",
     "createStore": "Create Store",

@@ -197,18 +197,19 @@
     "country": "Country",
     "pincode": "Pincode",
     "phone": "Phone",
+    "mobileMoneyProvider": "Mobile Money provider",
     "orderSummary": "Order Summary ({{count}} items)",
     "placingOrder": "Placing Order...",
     "placeOrder": "Place Order & Proceed to Payment",
     "fillAllFields": "Please fill in all shipping fields"
   },
-  "airtelPayment": {
-    "title": "Airtel Money Payment",
+  "pawaPayPayment": {
+    "title": "Mobile Money via pawaPay Payment",
     "totalAmount": "Total Amount",
     "paymentFailed": "Payment failed",
     "tryAgainMessage": "Please go back and place the order again.",
     "requestSentTo": "Payment request sent to {{phone}}",
-    "instructions": "Enter your Airtel Money PIN on your phone to confirm the payment. This page will update automatically once payment is confirmed.",
+    "instructions": "Enter your Mobile Money via pawaPay PIN on your phone to confirm the payment. This page will update automatically once payment is confirmed.",
     "paymentSuccessful": "Payment successful!",
     "paymentFailedRetry": "Payment failed. Please try again."
   },
