@@ -6,6 +6,7 @@ import productReducer from "./slices/productsSlice";
 import orderReducer from "./slices/orderSlice";
 import chatReducer from "./slices/chatSlice";
 import sellerReducer from "./slices/sellerSlice";
+import settingsReducer from "./slices/settingsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export const store = configureStore({
     order: orderReducer,
     chat: chatReducer,
     seller: sellerReducer,
+    settings: settingsReducer,
   },
 });

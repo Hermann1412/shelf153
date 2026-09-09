@@ -37,7 +37,7 @@ i18n
     supportedLngs: ["en", "fr", "sw", "ln", "lu", "kg", "kas"],
     interpolation: { escapeValue: false },
     detection: {
-      order: ["localStorage", "navigator"],
+      order: ["localStorage"],
       caches: ["localStorage"],
       lookupLocalStorage: "shelf153_language",
     },

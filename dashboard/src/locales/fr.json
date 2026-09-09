@@ -27,7 +27,8 @@
     "updateSellerStatusFailed": "Échec de la mise à jour du statut du vendeur",
     "createProductFailed": "Échec de la création du produit",
     "updateProductFailed": "Échec de la mise à jour du produit",
-    "deleteProductFailed": "Échec de la suppression du produit"
+    "deleteProductFailed": "Échec de la suppression du produit",
+    "updateSettingsFailed": "Échec de la mise à jour des paramètres"
   },
   "aria": {
     "menu": "Menu",
@@ -43,6 +44,7 @@
     "orders": "Commandes",
     "users": "Utilisateurs",
     "chat": "Chat",
+    "settings": "Paramètres",
     "profile": "Profil",
     "storeProfile": "Profil de la boutique",
     "logout": "Déconnexion",
@@ -124,6 +126,17 @@
     "payoutPhonePlaceholder": "ex. 0700000000",
     "storeLogo": "Logo de la boutique",
     "createStore": "Créer la boutique",
+    "saveChanges": "Enregistrer les modifications"
+  },
+  "settings": {
+    "title": "Paramètres du site",
+    "subtitle": "Gérez les coordonnées affichées aux clients sur la boutique.",
+    "contactEmail": "Email de contact",
+    "contactEmailPlaceholder": "ex. contact@shelf153.com",
+    "contactPhone": "Téléphone de contact",
+    "contactPhonePlaceholder": "ex. +243 000 000 000",
+    "address": "Adresse",
+    "addressPlaceholder": "ex. Lubumbashi, RD Congo",
     "saveChanges": "Enregistrer les modifications"
   },
   "users": {

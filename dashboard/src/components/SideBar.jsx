@@ -11,6 +11,7 @@ import {
   Store,
   ChevronLeft,
   ChevronRight,
+  Settings,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -39,6 +40,7 @@ const SideBar = () => {
       { label: "Orders", icon: ListOrdered },
       { label: "Users", icon: Users },
       { label: "Chat", icon: MessageSquare },
+      { label: "Settings", icon: Settings },
       { label: "Profile", icon: User },
     ],
     Seller: [

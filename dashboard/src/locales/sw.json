@@ -27,7 +27,8 @@
     "updateSellerStatusFailed": "Imeshindwa kusasisha hali ya muuzaji",
     "createProductFailed": "Imeshindwa kuunda bidhaa",
     "updateProductFailed": "Imeshindwa kusasisha bidhaa",
-    "deleteProductFailed": "Imeshindwa kufuta bidhaa"
+    "deleteProductFailed": "Imeshindwa kufuta bidhaa",
+    "updateSettingsFailed": "Imeshindwa kusasisha mipangilio"
   },
   "aria": {
     "menu": "Menyu",
@@ -43,6 +44,7 @@
     "orders": "Maagizo",
     "users": "Watumiaji",
     "chat": "Mazungumzo",
+    "settings": "Mipangilio",
     "profile": "Wasifu",
     "storeProfile": "Wasifu wa Duka",
     "logout": "Toka",
@@ -124,6 +126,17 @@
     "payoutPhonePlaceholder": "mfano: 0700000000",
     "storeLogo": "Alama ya Duka",
     "createStore": "Fungua Duka",
+    "saveChanges": "Hifadhi Mabadiliko"
+  },
+  "settings": {
+    "title": "Mipangilio ya Tovuti",
+    "subtitle": "Simamia maelezo ya mawasiliano yanayoonyeshwa kwa wateja dukani.",
+    "contactEmail": "Barua pepe ya mawasiliano",
+    "contactEmailPlaceholder": "mfano contact@shelf153.com",
+    "contactPhone": "Simu ya mawasiliano",
+    "contactPhonePlaceholder": "mfano +243 000 000 000",
+    "address": "Anwani",
+    "addressPlaceholder": "mfano Lubumbashi, DR Congo",
     "saveChanges": "Hifadhi Mabadiliko"
   },
   "users": {

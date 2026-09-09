@@ -27,7 +27,8 @@
     "updateSellerStatusFailed": "Kusoba kimonikini kya musumbisi kuvondisa ve",
     "createProductFailed": "Kusala kima ya mpa kuvondisa ve",
     "updateProductFailed": "Kusoba kima kuvondisa ve",
-    "deleteProductFailed": "Kukatula kima kuvondisa ve"
+    "deleteProductFailed": "Kukatula kima kuvondisa ve",
+    "updateSettingsFailed": "Kusoba ba paramètre kuvondisa ve"
   },
   "aria": {
     "menu": "Menu",
@@ -43,6 +44,7 @@
     "orders": "Ba Commande",
     "users": "Bantu",
     "chat": "Chat",
+    "settings": "Paramètres",
     "profile": "Profil",
     "storeProfile": "Profil ya Butiki",
     "logout": "Vaika",
@@ -124,6 +126,17 @@
     "payoutPhonePlaceholder": "Mu mbandu 0700000000",
     "storeLogo": "Logo ya Butiki",
     "createStore": "Sala Butiki",
+    "saveChanges": "Bumba Ba Changement"
+  },
+  "settings": {
+    "title": "Ba Paramètre ya Site",
+    "subtitle": "Yala mambu ya contact kele monika na baklienti.",
+    "contactEmail": "Email ya contact",
+    "contactEmailPlaceholder": "mbandu contact@shelf153.com",
+    "contactPhone": "Numéro ya contact",
+    "contactPhonePlaceholder": "mbandu +243 000 000 000",
+    "address": "Adrese",
+    "addressPlaceholder": "mbandu Lubumbashi, RD Congo",
     "saveChanges": "Bumba Ba Changement"
   },
   "users": {

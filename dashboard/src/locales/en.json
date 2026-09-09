@@ -27,7 +27,8 @@
     "updateSellerStatusFailed": "Failed to update seller status",
     "createProductFailed": "Failed to create product",
     "updateProductFailed": "Failed to update product",
-    "deleteProductFailed": "Failed to delete product"
+    "deleteProductFailed": "Failed to delete product",
+    "updateSettingsFailed": "Failed to update settings"
   },
   "aria": {
     "menu": "Menu",
@@ -43,6 +44,7 @@
     "orders": "Orders",
     "users": "Users",
     "chat": "Chat",
+    "settings": "Settings",
     "profile": "Profile",
     "storeProfile": "Store Profile",
     "logout": "Logout",
@@ -124,6 +126,17 @@
     "payoutPhonePlaceholder": "e.g. 0700000000",
     "storeLogo": "Store Logo",
     "createStore": "Create Store",
+    "saveChanges": "Save Changes"
+  },
+  "settings": {
+    "title": "Site Settings",
+    "subtitle": "Manage the contact details shown to customers on the storefront.",
+    "contactEmail": "Contact Email",
+    "contactEmailPlaceholder": "e.g. contact@shelf153.com",
+    "contactPhone": "Contact Phone",
+    "contactPhonePlaceholder": "e.g. +243 000 000 000",
+    "address": "Address",
+    "addressPlaceholder": "e.g. Lubumbashi, DR Congo",
     "saveChanges": "Save Changes"
   },
   "users": {

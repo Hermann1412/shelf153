@@ -27,7 +27,8 @@
     "updateSellerStatusFailed": "Kuvuija statut wa musumbisha kakuenzeki to",
     "createProductFailed": "Kuenza tshintu tshipya kakuenzeki to",
     "updateProductFailed": "Kuvuija tshintu kakuenzeki to",
-    "deleteProductFailed": "Kumbusha tshintu kakuenzeki to"
+    "deleteProductFailed": "Kumbusha tshintu kakuenzeki to",
+    "updateSettingsFailed": "Kushintulula paramètres kakuenzeki to"
   },
   "aria": {
     "menu": "Menu",
@@ -43,6 +44,7 @@
     "orders": "Bikomanda",
     "users": "Basadidi",
     "chat": "Chat",
+    "settings": "Paramètres",
     "profile": "Profil",
     "storeProfile": "Profil wa Butiki",
     "logout": "Umuka",
@@ -124,6 +126,17 @@
     "payoutPhonePlaceholder": "tshilejilu: 0700000000",
     "storeLogo": "Tshimanyinu tsha Butiki",
     "createStore": "Fuka Butiki",
+    "saveChanges": "Bika Mishintuluile"
+  },
+  "settings": {
+    "title": "Paramètres wa Site",
+    "subtitle": "Longolola mikanda ya contact idi ilejibua kudi bakuidi.",
+    "contactEmail": "Email wa contact",
+    "contactEmailPlaceholder": "tshimfuanyi contact@shelf153.com",
+    "contactPhone": "Numéro wa contact",
+    "contactPhonePlaceholder": "tshimfuanyi +243 000 000 000",
+    "address": "Aderese",
+    "addressPlaceholder": "tshimfuanyi Lubumbashi, RD Congo",
     "saveChanges": "Bika Mishintuluile"
   },
   "users": {

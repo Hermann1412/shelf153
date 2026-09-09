@@ -27,7 +27,8 @@
     "updateSellerStatusFailed": "Kobongisa statut ya mochuzi elongi te",
     "createProductFailed": "Kosala ekipe ya sika elongi te",
     "updateProductFailed": "Kobongisa ekipe elongi te",
-    "deleteProductFailed": "Kolongola ekipe elongi te"
+    "deleteProductFailed": "Kolongola ekipe elongi te",
+    "updateSettingsFailed": "Kobongisa ba paramètre elongi te"
   },
   "aria": {
     "menu": "Menu",
@@ -43,6 +44,7 @@
     "orders": "Ba Commande",
     "users": "Ba Utilisateur",
     "chat": "Chat",
+    "settings": "Ba Paramètre",
     "profile": "Profil",
     "storeProfile": "Profil ya Magazini",
     "logout": "Kobima",
@@ -124,6 +126,17 @@
     "payoutPhonePlaceholder": "Ndakisa: 0700000000",
     "storeLogo": "Logo ya Magazini",
     "createStore": "Sala Magazini",
+    "saveChanges": "Bomba Mbongwana"
+  },
+  "settings": {
+    "title": "Ba Paramètre ya Site",
+    "subtitle": "Bongisa ba détails ya contact oyo emonisami epai ya ba client.",
+    "contactEmail": "Email ya contact",
+    "contactEmailPlaceholder": "ndakisa contact@shelf153.com",
+    "contactPhone": "Numéro ya contact",
+    "contactPhonePlaceholder": "ndakisa +243 000 000 000",
+    "address": "Adrese",
+    "addressPlaceholder": "ndakisa Lubumbashi, RD Congo",
     "saveChanges": "Bomba Mbongwana"
   },
   "users": {

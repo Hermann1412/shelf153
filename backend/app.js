@@ -12,6 +12,7 @@ import adminRouter from "./router/adminRoutes.js";
 import orderRouter from "./router/orderRoutes.js";
 import chatRouter from "./router/chatRoutes.js";
 import sellerRouter from "./router/sellerRoutes.js";
+import settingsRouter from "./router/settingsRoutes.js";
 import { extractPawaPayStatus, getPawaPayDepositStatus } from "./utils/pawaPay.js";
 import { transitionPayment } from "./services/paymentService.js";
 
@@ -64,6 +65,7 @@ app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/seller", sellerRouter);
+app.use("/api/v1/settings", settingsRouter);
 
 app.post("/api/v1/payment/pawapay/callback", paymentLimiter, async (req, res) => {
   try {

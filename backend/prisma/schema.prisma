@@ -161,6 +161,16 @@ model Conversation {
   @@map("conversations")
 }
 
+model SiteSettings {
+  id            String   @id @default("singleton")
+  contact_email String?  @db.VarChar(150)
+  contact_phone String?  @db.VarChar(20)
+  address       String?
+  updated_at    DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
 model Message {
   id              String       @id @default(uuid()) @db.Uuid
   conversation_id String       @db.Uuid

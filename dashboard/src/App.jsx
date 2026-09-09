@@ -15,6 +15,7 @@ const Users = lazy(() => import("./components/Users"));
 const Profile = lazy(() => import("./components/Profile"));
 const Chat = lazy(() => import("./components/Chat"));
 const StoreProfile = lazy(() => import("./components/StoreProfile"));
+const Settings = lazy(() => import("./components/Settings"));
 const SellerProducts = lazy(() => import("./components/SellerProducts"));
 const SellerOrders = lazy(() => import("./components/SellerOrders"));
 const Login = lazy(() => import("./pages/Login"));
@@ -62,6 +63,8 @@ function AppContent() {
         return <Users />;
       case "Chat":
         return <Chat />;
+      case "Settings":
+        return <Settings />;
       case "Profile":
         return <Profile />;
       default:
