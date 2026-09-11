@@ -85,7 +85,7 @@ const Products = () => {
   const selectedShop = seller ? shops.find((s) => s.id === seller) : null;
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-32 pb-12">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
