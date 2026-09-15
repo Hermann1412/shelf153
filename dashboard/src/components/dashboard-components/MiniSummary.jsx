@@ -23,6 +23,7 @@ const MiniSummary = () => {
     revenueGrowth,
     newUsersThisMonth,
     newOrdersThisMonth,
+    financialSummary,
   } = useSelector((state) => (isSeller ? state.seller : state.admin));
 
   const totalOrders = Object.values(orderStatusCounts).reduce(
@@ -80,6 +81,7 @@ const MiniSummary = () => {
   ].filter(Boolean);
 
   return (
+    <div className="space-y-4">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
       {cards.map((card) => {
         const Icon = card.icon;
@@ -98,6 +100,27 @@ const MiniSummary = () => {
           </div>
         );
       })}
+    </div>
+    {!isSeller && financialSummary && (
+      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
+        {[
+          ["Ventes brutes", financialSummary.grossSales],
+          ["Commission 7 %", financialSummary.grossCommission],
+          ["Frais dépôts", financialSummary.paymentFees],
+          ["Frais payouts", financialSummary.payoutFees],
+          ["Revenu plateforme", financialSummary.platformNetRevenue],
+          ["Versé vendeurs", financialSummary.paidToSellers],
+          ["Dû aux vendeurs", financialSummary.dueToSellers],
+          ["Remboursements", financialSummary.refunds],
+          ["Dettes vendeurs", financialSummary.sellerDebt],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-xl bg-white p-3 shadow-sm">
+            <p className="text-xs text-gray-500">{label}</p>
+            <p className="font-bold text-gray-800">${Number(value || 0).toLocaleString()}</p>
+          </div>
+        ))}
+      </div>
+    )}
     </div>
   );
 };

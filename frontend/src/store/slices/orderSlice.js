@@ -48,6 +48,9 @@ const orderSlice = createSlice({
     fetchingOrders: false,
     placingOrder: false,
     finalPrice: null,
+    finalCurrency: "USD",
+    sourceTotalPrice: null,
+    exchangeRate: 1,
     orderStep: 1,
     orderId: "",
     paymentStatus: "",
@@ -61,6 +64,9 @@ const orderSlice = createSlice({
       state.orderId = "";
       state.paymentStatus = "";
       state.finalPrice = null;
+      state.finalCurrency = "USD";
+      state.sourceTotalPrice = null;
+      state.exchangeRate = 1;
     },
   },
   extraReducers: (builder) => {
@@ -73,6 +79,9 @@ const orderSlice = createSlice({
         state.orderId = action.payload.orderId;
         state.paymentStatus = "Pending";
         state.finalPrice = action.payload.total_price;
+        state.finalCurrency = action.payload.currency;
+        state.sourceTotalPrice = action.payload.source_total_price;
+        state.exchangeRate = action.payload.exchange_rate;
         state.orderStep = 3;
       })
       .addCase(placeOrder.rejected, (state) => {

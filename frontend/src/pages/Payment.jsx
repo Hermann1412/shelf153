@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import PawaPayPayment from "../components/PawaPayPayment";
 import { placeOrder } from "../store/slices/orderSlice";
 import { toast } from "react-toastify";
+import { axiosInstance } from "../lib/axios";
 
 const Payment = () => {
   const { t } = useTranslation();
@@ -26,8 +27,10 @@ const Payment = () => {
     pincode: "",
     phone: "",
     provider: "AIRTEL_COD",
+    currency: "USD",
   });
   const [errors, setErrors] = useState({});
+  const [paymentConfig, setPaymentConfig] = useState({ cdf_exchange_rate: null });
 
   useEffect(() => {
     if (!authUser) {
@@ -37,6 +40,12 @@ const Payment = () => {
       navigate("/cart");
     }
   }, [authUser, cart, navigate, orderStep]);
+
+  useEffect(() => {
+    axiosInstance.get("/order/payment/config")
+      .then(({ data }) => setPaymentConfig(data))
+      .catch(() => setPaymentConfig({ currencies: ["USD"], cdf_exchange_rate: null }));
+  }, []);
 
   const handleShippingChange = (e) => {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
@@ -69,6 +78,16 @@ const Payment = () => {
     `w-full px-4 py-2 bg-secondary border rounded-lg text-foreground focus:outline-none focus:ring-2 ${
       errors[name] ? "border-destructive focus:ring-destructive" : "border-border focus:ring-primary"
     }`;
+
+  const subtotal = cart.reduce(
+    (sum, item) => sum + Number(item.product.price) * item.quantity,
+    0,
+  );
+  const usdTotal = Math.round((subtotal + subtotal * 0.18 + (subtotal >= 50 ? 0 : 2)) * 100) / 100;
+  const cdfAvailable = paymentConfig.currencies?.includes("CDF") && paymentConfig.cdf_exchange_rate;
+  const selectedTotal = shipping.currency === "CDF" && cdfAvailable
+    ? Math.round(usdTotal * paymentConfig.cdf_exchange_rate)
+    : usdTotal;
 
   const steps = [
     { num: 1, label: t("checkout.stepShipping"), icon: MapPin },
@@ -270,6 +289,23 @@ const Payment = () => {
                 <option value="ORANGE_COD">Orange Money</option>
               </select>
             </div>
+            <div>
+              <label className="text-sm text-muted-foreground mb-1 block">
+                {t("checkout.paymentCurrency")}
+              </label>
+              <select
+                name="currency"
+                value={shipping.currency}
+                onChange={handleShippingChange}
+                className={fieldClass("currency")}
+              >
+                <option value="USD">USD</option>
+                <option value="CDF" disabled={!cdfAvailable}>CDF</option>
+              </select>
+              {!cdfAvailable && (
+                <p className="text-xs text-amber-500 mt-1">{t("checkout.cdfUnavailable")}</p>
+              )}
+            </div>
           </div>
 
           {/* Order Summary */}
@@ -292,6 +328,16 @@ const Payment = () => {
                     </span>
                   </div>
                 ))}
+              </div>
+
+              <div className="border-t border-border pt-3 flex justify-between font-semibold text-foreground">
+                <span>{t("checkout.paymentTotal")}</span>
+                <span>
+                  {shipping.currency} {selectedTotal.toLocaleString(undefined, {
+                    minimumFractionDigits: shipping.currency === "CDF" ? 0 : 2,
+                    maximumFractionDigits: shipping.currency === "CDF" ? 0 : 2,
+                  })}
+                </span>
               </div>
 
               <button

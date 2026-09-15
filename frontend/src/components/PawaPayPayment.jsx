@@ -17,7 +17,7 @@ const PawaPayPayment = ({ phone, provider }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { orderId, paymentStatus, finalPrice } = useSelector((state) => state.order);
+  const { orderId, paymentStatus, finalPrice, finalCurrency } = useSelector((state) => state.order);
   const pollRef = useRef(null);
 
   useEffect(() => {
@@ -50,7 +50,12 @@ const PawaPayPayment = ({ phone, provider }) => {
         <div className="mb-6 p-4 bg-secondary rounded-lg">
           <div className="flex justify-between text-foreground">
             <span>{t("pawaPayPayment.totalAmount")}</span>
-            <span className="font-bold text-primary">${finalPrice?.toFixed(2) || "0.00"}</span>
+            <span className="font-bold text-primary">
+              {finalCurrency || "USD"} {Number(finalPrice || 0).toLocaleString(undefined, {
+                minimumFractionDigits: finalCurrency === "CDF" ? 0 : 2,
+                maximumFractionDigits: finalCurrency === "CDF" ? 0 : 2,
+              })}
+            </span>
           </div>
         </div>
         {paymentStatus === "Failed" ? (

@@ -49,15 +49,21 @@ jobs:
         run: |
           npm run lint
           npm run test:integration
+          npm run build
+          npm audit --omit=dev --audit-level=high
       - name: Frontend checks
         working-directory: frontend
         run: |
           npm ci
           npm run lint
+          npm test
           npm run build
+          npm audit --omit=dev --audit-level=high
       - name: Dashboard checks
         working-directory: dashboard
         run: |
           npm ci
           npm run lint
+          npm test
           npm run build
+          npm audit --omit=dev --audit-level=high

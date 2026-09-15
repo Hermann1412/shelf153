@@ -90,7 +90,9 @@ const SellerOrders = () => {
                   <th className="px-4 py-3 font-medium">{t("orders.colItem")}</th>
                   <th className="px-4 py-3 font-medium">{t("orders.colOrderId")}</th>
                   <th className="px-4 py-3 font-medium">{t("orders.colQty")}</th>
-                  <th className="px-4 py-3 font-medium">{t("products.colPrice")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.saleAmount")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.platformCommission")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.sellerNet")}</th>
                   <th className="px-4 py-3 font-medium">{t("orders.colShipTo")}</th>
                   <th className="px-4 py-3 font-medium">{t("orders.colStatus")}</th>
                   <th className="px-4 py-3 font-medium">{t("orders.colDate")}</th>
@@ -118,7 +120,13 @@ const SellerOrders = () => {
                       {item.quantity}
                     </td>
                     <td className="px-4 py-3 font-semibold text-gray-800">
-                      ${Number(item.price).toFixed(2)}
+                      ${Number(item.gross_amount).toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      ${Number(item.platform_commission).toFixed(2)} ({(Number(item.commission_rate) * 100).toFixed(0)}%)
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-green-700">
+                      ${(Number(item.seller_net_amount) - Number(item.refunded_seller_amount || 0)).toFixed(2)}
                     </td>
                     <td className="px-4 py-3 text-gray-500">
                       {item.full_name

@@ -21,6 +21,7 @@ const StoreProfile = () => {
     store_name: "",
     store_description: "",
     payout_phone: "",
+    payout_provider: "",
   });
   const [logoFile, setLogoFile] = useState(null);
 
@@ -34,6 +35,7 @@ const StoreProfile = () => {
         store_name: storeProfile.store_name || "",
         store_description: storeProfile.store_description || "",
         payout_phone: storeProfile.payout_phone || "",
+        payout_provider: storeProfile.payout_provider || "",
       });
     }
   }, [storeProfile]);
@@ -48,6 +50,7 @@ const StoreProfile = () => {
     data.append("store_name", form.store_name);
     data.append("store_description", form.store_description);
     data.append("payout_phone", form.payout_phone);
+    data.append("payout_provider", form.payout_provider);
     if (logoFile) data.append("store_logo", logoFile);
 
     if (isSeller) {
@@ -134,6 +137,23 @@ const StoreProfile = () => {
               placeholder={t("storeProfile.payoutPhonePlaceholder")}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("storeProfile.payoutProvider")}
+            </label>
+            <select
+              name="payout_provider"
+              value={form.payout_provider}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            >
+              <option value="">{t("storeProfile.selectPayoutProvider")}</option>
+              <option value="AIRTEL_COD">Airtel Money</option>
+              <option value="VODACOM_MPESA_COD">Vodacom M-Pesa</option>
+              <option value="ORANGE_COD">Orange Money</option>
+            </select>
           </div>
 
           <div>

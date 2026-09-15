@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  fetchPaymentConfig,
   fetchSingleOrder,
   placeNewOrder,
   fetchMyOrders,
@@ -7,6 +8,7 @@ import {
   updateOrderStatus,
   deleteOrder,
   checkPaymentStatus,
+  updatePaymentFee,
 } from "../controllers/orderController.js";
 import {
   isAuthenticated,
@@ -14,9 +16,16 @@ import {
 } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
+router.get("/payment/config", fetchPaymentConfig);
 router.post("/new", isAuthenticated, placeNewOrder);
 router.get("/orders/me", isAuthenticated, fetchMyOrders);
 router.get("/payment/status/:orderId", isAuthenticated, checkPaymentStatus);
+router.patch(
+  "/payment/:orderId/fee",
+  isAuthenticated,
+  authorizedRoles("Admin"),
+  updatePaymentFee,
+);
 router.get("/:orderId", isAuthenticated, fetchSingleOrder);
 router.get(
   "/admin/getall",

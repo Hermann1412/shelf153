@@ -7,6 +7,7 @@ import orderReducer from "./slices/orderSlice";
 import chatReducer from "./slices/chatSlice";
 import sellerReducer from "./slices/sellerSlice";
 import settingsReducer from "./slices/settingsSlice";
+import payoutReducer from "./slices/payoutSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +19,6 @@ export const store = configureStore({
     chat: chatReducer,
     seller: sellerReducer,
     settings: settingsReducer,
+    payout: payoutReducer,
   },
 });
