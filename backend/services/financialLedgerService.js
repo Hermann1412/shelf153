@@ -1,0 +1,61 @@
+import { minorUnitsToDecimal } from "./financialService.js";
+
+export const appendLedgerEntry = async (tx, {
+  idempotencyKey,
+  type,
+  amountMinor,
+  currency = "USD",
+  orderId = null,
+  paymentId = null,
+  sellerId = null,
+  refundId = null,
+  payoutId = null,
+  externalReference = null,
+  source = "Automatic",
+  adminUserId = null,
+  metadata = undefined,
+}) => tx.financialLedgerEntry.upsert({
+  where: { idempotency_key: idempotencyKey },
+  update: {},
+  create: {
+    idempotency_key: idempotencyKey,
+    type,
+    amount: minorUnitsToDecimal(amountMinor),
+    currency,
+    order_id: orderId,
+    payment_id: paymentId,
+    seller_id: sellerId,
+    refund_id: refundId,
+    payout_id: payoutId,
+    external_reference: externalReference,
+    source,
+    admin_user_id: adminUserId,
+    metadata,
+  },
+});
+
+export const auditFinancialAdjustment = async (tx, {
+  entityType,
+  entityId,
+  field,
+  previousValue,
+  newValue,
+  currency,
+  reason,
+  source = "Admin",
+  adminUserId = null,
+  externalReference = null,
+}) => tx.financialAdjustmentAudit.create({
+  data: {
+    entity_type: entityType,
+    entity_id: entityId,
+    field,
+    previous_value: previousValue,
+    new_value: newValue,
+    currency,
+    reason,
+    source,
+    admin_user_id: adminUserId,
+    external_reference: externalReference,
+  },
+});

@@ -3,9 +3,29 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
 import prisma from "../database/db.js";
 import { v2 as cloudinary } from "cloudinary";
 import { toPublicUser } from "../utils/publicUser.js";
+import { normalizePhoneNumber } from "../utils/pawaPay.js";
 
 const ITEM_STATUSES = ["Processing", "Shipped", "Delivered", "Cancelled"];
-const sumRevenue = (items) => items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+const sumRevenue = (items) => items.reduce(
+  (sum, item) => sum + Number(item.seller_net_amount) - Number(item.refunded_seller_amount || 0),
+  0,
+);
+const payoutProviders = () => new Set(
+  (process.env.PAWAPAY_PAYOUT_ALLOWED_PROVIDERS
+    || process.env.PAWAPAY_ALLOWED_PROVIDERS
+    || "AIRTEL_COD,VODACOM_MPESA_COD,ORANGE_COD")
+    .split(",").map((value) => value.trim()).filter(Boolean),
+);
+
+const parsePayoutDestination = (phoneValue, providerValue) => {
+  const phone = normalizePhoneNumber(phoneValue);
+  const provider = String(providerValue || "").trim();
+  if (!phone && !provider) return { payout_phone: null, payout_provider: null };
+  if (!/^\d{10,15}$/.test(phone) || !payoutProviders().has(provider)) {
+    throw new ErrorHandler("Provide a valid international payout phone and Mobile Money provider.", 400);
+  }
+  return { payout_phone: phone, payout_provider: provider };
+};
 
 export const fetchAllShops = catchAsyncErrors(async (req, res) => {
   const rows = await prisma.sellerProfile.findMany({
@@ -18,9 +38,11 @@ export const fetchAllShops = catchAsyncErrors(async (req, res) => {
 });
 
 export const applyToBecomeSeller = catchAsyncErrors(async (req, res, next) => {
-  const { store_name, store_description, payout_phone } = req.body;
+  const { store_name, store_description, payout_phone, payout_provider } = req.body;
   if (req.user.role !== "User") return next(new ErrorHandler("Only regular users can apply to become a seller.", 400));
   if (!store_name?.trim()) return next(new ErrorHandler("Please provide a store name.", 400));
+  let payoutDestination;
+  try { payoutDestination = parsePayoutDestination(payout_phone, payout_provider); } catch (error) { return next(error); }
 
   let storeLogo = null;
   if (req.files?.store_logo) {
@@ -34,7 +56,7 @@ export const applyToBecomeSeller = catchAsyncErrors(async (req, res, next) => {
       data: {
         user_id: req.user.id, store_name: store_name.trim(),
         store_description: store_description?.trim() || null,
-        store_logo: storeLogo, payout_phone: payout_phone?.trim() || null,
+        store_logo: storeLogo, ...payoutDestination,
       },
     });
     const user = await tx.user.update({ where: { id: req.user.id }, data: { role: "Seller" } });
@@ -50,8 +72,10 @@ export const getStoreProfile = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const updateStoreProfile = catchAsyncErrors(async (req, res, next) => {
-  const { store_name, store_description, payout_phone } = req.body;
+  const { store_name, store_description, payout_phone, payout_provider } = req.body;
   if (!store_name?.trim()) return next(new ErrorHandler("Please provide a store name.", 400));
+  let payoutDestination;
+  try { payoutDestination = parsePayoutDestination(payout_phone, payout_provider); } catch (error) { return next(error); }
   const existing = await prisma.sellerProfile.findUnique({ where: { user_id: req.user.id } });
   if (!existing) return next(new ErrorHandler("Store profile not found.", 404));
   let storeLogo = existing.store_logo;
@@ -66,7 +90,7 @@ export const updateStoreProfile = catchAsyncErrors(async (req, res, next) => {
     where: { user_id: req.user.id },
     data: {
       store_name: store_name.trim(), store_description: store_description?.trim() || null,
-      store_logo: storeLogo, payout_phone: payout_phone?.trim() || null,
+      store_logo: storeLogo, ...payoutDestination,
     },
   });
   res.status(200).json({ success: true, message: "Store profile updated.", storeProfile });

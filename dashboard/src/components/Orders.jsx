@@ -119,6 +119,18 @@ const Orders = () => {
                     </td>
                     <td className="px-4 py-3 font-semibold text-gray-800">
                       ${Number(order.total_price).toFixed(2)}
+                      {order.payment && (
+                        <div className="mt-1 space-y-0.5 text-[11px] font-normal text-gray-500">
+                          <div>{t("orders.grossSales")}: ${Number(order.payment.gross_sales_amount).toFixed(2)}</div>
+                          <div>{t("orders.platformCommission")}: ${Number(order.payment.gross_commission).toFixed(2)}</div>
+                          <div>{t("orders.paymentFee")}: ${Number(order.payment.payment_fee).toFixed(2)}</div>
+                          <div>{t("orders.platformNet")}: ${Number(order.payment.platform_net_revenue).toFixed(2)}</div>
+                          <div>{t("orders.sellerNet")}: ${(
+                            Number(order.payment.seller_net_amount)
+                            - Number(order.payment.refunded_seller_amount || 0)
+                          ).toFixed(2)}</div>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <select

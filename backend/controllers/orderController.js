@@ -2,33 +2,112 @@ import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
 import prisma from "../database/db.js";
 import { initiatePayment } from "../utils/pawaPayPayment.js";
-import { extractPawaPayStatus, getPawaPayDepositStatus, normalizePhoneNumber } from "../utils/pawaPay.js";
-import { transitionPayment } from "../services/paymentService.js";
+import {
+  extractPawaPayStatus,
+  getPawaPayDepositStatus,
+  matchesStoredPayment,
+  normalizePhoneNumber,
+} from "../utils/pawaPay.js";
+import { recordPaymentFee, transitionPayment } from "../services/paymentService.js";
 import { randomUUID } from "crypto";
+import { calculateOrderFinancials } from "../services/financialService.js";
+import { getExchangeRate } from "../services/exchangeRateService.js";
 
 const ORDER_STATUSES = ["Processing", "Shipped", "Delivered", "Cancelled"];
-const orderInclude = { order_items: true, shipping_info: true, payment: true };
+const publicPaymentSelect = {
+  payment_type: true,
+  payment_status: true,
+  provider: true,
+  amount: true,
+  currency: true,
+  source_currency: true,
+  exchange_rate: true,
+  processed_at: true,
+  created_at: true,
+};
+const accountingPaymentSelect = {
+  ...publicPaymentSelect,
+  accounting_currency: true,
+  commission_rate: true,
+  gross_sales_amount: true,
+  gross_commission: true,
+  payment_fee: true,
+  payment_fee_refunded: true,
+  platform_net_revenue: true,
+  seller_net_amount: true,
+  refunded_gross_amount: true,
+  refunded_commission: true,
+  refunded_seller_amount: true,
+  accounting_status: true,
+};
+const publicOrderItemSelect = {
+  id: true,
+  order_id: true,
+  product_id: true,
+  seller_id: true,
+  quantity: true,
+  price: true,
+  item_status: true,
+  image: true,
+  title: true,
+};
+const orderInclude = {
+  order_items: { select: publicOrderItemSelect },
+  shipping_info: true,
+  payment: { select: publicPaymentSelect },
+};
+const adminOrderInclude = {
+  order_items: true,
+  shipping_info: true,
+  payment: { select: accountingPaymentSelect },
+};
 const canReadOrder = (order, user) => user.role === "Admin" || order.buyer_id === user.id;
 const configuredProviders = () => new Set(
   (process.env.PAWAPAY_ALLOWED_PROVIDERS || "AIRTEL_COD,VODACOM_MPESA_COD,ORANGE_COD")
     .split(",").map((provider) => provider.trim()).filter(Boolean),
 );
+const configuredCurrencies = () => new Set(
+  (process.env.PAWAPAY_ALLOWED_CURRENCIES || "USD,CDF")
+    .split(",").map((currency) => currency.trim().toUpperCase()).filter(Boolean),
+);
+const cdfExchangeRate = async () => {
+  const configured = await getExchangeRate("USD", "CDF");
+  return configured ? Number(configured.rate) : null;
+};
+
+export const fetchPaymentConfig = async (_req, res) => {
+  const configured = await getExchangeRate("USD", "CDF");
+  return res.status(200).json({
+    success: true,
+    currencies: [...configuredCurrencies()],
+    cdf_exchange_rate: configured ? Number(configured.rate) : null,
+    cdf_exchange_rate_source: configured?.source || null,
+  });
+};
 
 const PENDING_ORDER_WINDOW_MS = 10 * 60 * 1000;
 const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9_-]{16,64}$/;
 
 // Asks pawaPay for the latest status of a pending payment and persists a final result.
+// `mismatch` flags a provider answer that does not match the stored payment.
 const refreshPaymentStatus = async (payment) => {
-  if (payment.payment_status !== "Pending") return payment.payment_status;
+  if (payment.payment_status !== "Pending") return { status: payment.payment_status };
   try {
     const providerPayload = await getPawaPayDepositStatus(payment.transaction_id);
+    await prisma.payment.updateMany({
+      where: { id: payment.id, payment_status: "Pending" },
+      data: { last_checked_at: new Date(), check_attempts: { increment: 1 } },
+    });
     const providerStatus = extractPawaPayStatus(providerPayload);
+    if (["COMPLETED", "FAILED"].includes(providerStatus) && !matchesStoredPayment(payment, providerPayload)) {
+      return { status: "Pending", mismatch: true };
+    }
     const status = providerStatus === "COMPLETED" ? "Paid" : providerStatus === "FAILED" ? "Failed" : "Pending";
     if (status !== "Pending") await transitionPayment(payment.order_id, status, providerPayload);
-    return status;
+    return { status };
   } catch (error) {
     console.error("pawaPay status check failed:", error.response?.data || error.message);
-    return "Pending";
+    return { status: "Pending" };
   }
 };
 
@@ -36,7 +115,10 @@ const existingOrderResponse = (res, order, statusCode, extra = {}) => res.status
   success: true,
   orderId: order.id,
   transactionId: order.payment?.transaction_id || order.id,
-  total_price: Number(order.total_price),
+  total_price: Number(order.payment?.amount ?? order.total_price),
+  currency: order.payment?.currency || "USD",
+  source_total_price: Number(order.total_price),
+  exchange_rate: Number(order.payment?.exchange_rate ?? 1),
   paymentStatus: order.payment?.payment_status || "Pending",
   ...extra,
 });
@@ -55,7 +137,7 @@ const parseItems = (orderedItems) => {
   return [...quantities].map(([productId, quantity]) => ({ productId, quantity }));
 };
 
-export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
+export const createPlaceNewOrderHandler = ({ startPayment = initiatePayment } = {}) => async (req, res, next) => {
   const { full_name, state, city, country, address, pincode, phone } = req.body;
   if (![full_name, state, city, country, address, pincode, phone].every((value) => typeof value === "string" && value.trim())) {
     return next(new ErrorHandler("Please provide complete shipping details.", 400));
@@ -69,14 +151,19 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
   }
   if (items.length === 0) return next(new ErrorHandler("No items in cart.", 400));
   const provider = req.body.provider || process.env.PAWAPAY_DEFAULT_PROVIDER || "AIRTEL_COD";
-  const currency = process.env.PAWAPAY_CURRENCY || "USD";
+  const currency = String(req.body.currency || process.env.PAWAPAY_CURRENCY || "USD").toUpperCase();
   if (!configuredProviders().has(provider)) return next(new ErrorHandler("Unsupported Mobile Money provider.", 400));
+  if (!configuredCurrencies().has(currency)) return next(new ErrorHandler("Payment currency must be USD or CDF.", 400));
+  const exchangeRate = currency === "CDF" ? await cdfExchangeRate() : 1;
+  if (!exchangeRate) {
+    return next(new ErrorHandler("CDF payments are temporarily unavailable because the exchange rate is not configured.", 503));
+  }
   if (!/^\d{10,15}$/.test(normalizePhoneNumber(phone))) {
     return next(new ErrorHandler("Phone number must use international format, for example 243XXXXXXXXX.", 400));
   }
 
   // A retried checkout attempt (same key) gets the original order back instead of a second charge.
-  const idempotencyKey = req.get("Idempotency-Key") || null;
+  const idempotencyKey = req.headers?.["idempotency-key"] || null;
   if (idempotencyKey && !IDEMPOTENCY_KEY_PATTERN.test(idempotencyKey)) {
     return next(new ErrorHandler("Invalid Idempotency-Key header.", 400));
   }
@@ -99,7 +186,7 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
     include: { payment: true },
     orderBy: { created_at: "desc" },
   });
-  if (pendingOrder && await refreshPaymentStatus(pendingOrder.payment) === "Pending") {
+  if (pendingOrder && (await refreshPaymentStatus(pendingOrder.payment)).status === "Pending") {
     return existingOrderResponse(res, pendingOrder, 409, {
       code: "PAYMENT_PENDING",
       message: "A payment for a previous order is still awaiting confirmation on your phone.",
@@ -112,10 +199,17 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
     product: products.find((product) => product.id === item.productId),
     quantity: item.quantity,
   }));
-  const subtotal = pricedItems.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0);
+  let financials;
+  try {
+    financials = calculateOrderFinancials(pricedItems);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+  const subtotal = Number(financials.grossSalesAmount);
   const tax_price = Math.round(subtotal * 0.18 * 100) / 100;
   const shipping_price = subtotal >= 50 ? 0 : 2;
   const total_price = Math.round((subtotal + tax_price + shipping_price) * 100) / 100;
+  const paymentAmount = currency === "CDF" ? Math.round(total_price * exchangeRate) : total_price;
 
   const orderId = randomUUID();
   let order;
@@ -138,17 +232,36 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
           tax_price,
           shipping_price,
           order_items: {
-            create: pricedItems.map(({ product, quantity }) => ({
+            create: pricedItems.map(({ product, quantity }, index) => ({
               product_id: product.id,
               seller_id: product.created_by,
               quantity,
               price: product.price,
               image: product.images?.[0]?.url || "",
               title: product.name,
+              gross_amount: financials.lines[index].grossAmount,
+              commission_rate: financials.lines[index].commissionRate,
+              platform_commission: financials.lines[index].commissionAmount,
+              seller_net_amount: financials.lines[index].sellerAmount,
             })),
           },
           shipping_info: { create: { full_name, state, city, country, address, pincode, phone } },
-          payment: { create: { transaction_id: orderId, provider, currency } },
+          payment: {
+            create: {
+              transaction_id: orderId,
+              provider,
+              amount: paymentAmount,
+              currency,
+              source_currency: "USD",
+              exchange_rate: exchangeRate,
+              accounting_currency: "USD",
+              commission_rate: financials.commissionRate,
+              gross_sales_amount: financials.grossSalesAmount,
+              gross_commission: financials.grossCommission,
+              platform_net_revenue: financials.grossCommission,
+              seller_net_amount: financials.sellerNetAmount,
+            },
+          },
         },
         include: { payment: true },
       });
@@ -162,7 +275,7 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
     throw error;
   }
 
-  const paymentResponse = await initiatePayment(order.id, total_price, phone, provider, currency);
+  const paymentResponse = await startPayment(order.id, paymentAmount, phone, provider, currency);
   if (!paymentResponse.success) {
     if (paymentResponse.definitive) {
       await transitionPayment(order.id, "Failed", paymentResponse.providerResponse || { reason: "initiation_rejected" });
@@ -173,7 +286,10 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
       message: "Payment confirmation is delayed. Status verification will continue.",
       orderId: order.id,
       transactionId: order.id,
-      total_price,
+      total_price: paymentAmount,
+      currency,
+      source_total_price: total_price,
+      exchange_rate: exchangeRate,
     });
   }
 
@@ -182,9 +298,14 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
     message: "Order placed. Please confirm the Mobile Money request sent by pawaPay.",
     orderId: order.id,
     transactionId: paymentResponse.transactionId,
-    total_price,
+    total_price: paymentAmount,
+    currency,
+    source_total_price: total_price,
+    exchange_rate: exchangeRate,
   });
-});
+};
+
+export const placeNewOrder = catchAsyncErrors(createPlaceNewOrderHandler());
 
 export const checkPaymentStatus = catchAsyncErrors(async (req, res, next) => {
   const payment = await prisma.payment.findUnique({
@@ -194,7 +315,31 @@ export const checkPaymentStatus = catchAsyncErrors(async (req, res, next) => {
   if (!payment) return next(new ErrorHandler("Payment not found.", 404));
   if (req.user.role !== "Admin" && payment.order.buyer_id !== req.user.id) return next(new ErrorHandler("Access denied.", 403));
 
-  res.status(200).json({ success: true, paymentStatus: await refreshPaymentStatus(payment) });
+  const { status, mismatch } = await refreshPaymentStatus(payment);
+  if (mismatch) return next(new ErrorHandler("Payment provider data did not match this order.", 502));
+  res.status(200).json({ success: true, paymentStatus: status });
+});
+
+export const updatePaymentFee = catchAsyncErrors(async (req, res, next) => {
+  const fee = String(req.body?.fee ?? "").trim();
+  const currency = String(req.body?.currency || "USD").toUpperCase();
+  const reason = String(req.body?.reason || "Payment fee reconciliation").trim();
+  if (!/^\d+(\.\d{1,2})?$/.test(fee) || !["USD", "CDF"].includes(currency) || reason.length < 3) {
+    return next(new ErrorHandler("Provide a valid non-negative payment fee, currency and audit reason.", 400));
+  }
+  const result = await recordPaymentFee(req.params.orderId, fee, currency, {
+    adminUserId: req.user.id,
+    reason,
+  });
+  res.status(200).json({
+    success: true,
+    changed: result.changed,
+    payment: {
+      payment_fee: result.payment.payment_fee,
+      accounting_currency: result.payment.accounting_currency,
+      platform_net_revenue: result.payment.platform_net_revenue,
+    },
+  });
 });
 
 export const fetchSingleOrder = catchAsyncErrors(async (req, res, next) => {
@@ -213,7 +358,7 @@ export const fetchMyOrders = catchAsyncErrors(async (req, res) => {
 
 export const fetchAllOrders = catchAsyncErrors(async (_req, res) => {
   const orders = await prisma.order.findMany({
-    where: { paid_at: { not: null } }, include: orderInclude, orderBy: { created_at: "desc" },
+    where: { paid_at: { not: null } }, include: adminOrderInclude, orderBy: { created_at: "desc" },
   });
   res.status(200).json({ success: true, message: "All orders fetched.", orders });
 });
@@ -227,8 +372,15 @@ export const updateOrderStatus = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const deleteOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await prisma.order.findUnique({ where: { id: req.params.orderId } });
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.orderId },
+    include: { payment: true, order_items: { include: { refunds: { select: { id: true } } } } },
+  });
   if (!order) return next(new ErrorHandler("Invalid order ID.", 404));
+  if (order.payment?.payment_status === "Paid"
+      || order.order_items.some((item) => item.payout_id || item.refunds.length > 0)) {
+    return next(new ErrorHandler("A financially posted order cannot be deleted; cancel or refund it instead.", 409));
+  }
   if (order.stock_reserved) await transitionPayment(order.id, "Failed", { reason: "admin_deletion" });
   await prisma.order.delete({ where: { id: order.id } });
   res.status(200).json({ success: true, message: "Order deleted.", order });

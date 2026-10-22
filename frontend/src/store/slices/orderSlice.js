@@ -114,6 +114,9 @@ const orderSlice = createSlice({
     fetchingOrders: false,
     placingOrder: false,
     finalPrice: pendingOrder?.finalPrice ?? null,
+    finalCurrency: pendingOrder?.currency || "USD",
+    sourceTotalPrice: pendingOrder?.sourceTotalPrice ?? null,
+    exchangeRate: pendingOrder?.exchangeRate ?? 1,
     orderStep: pendingOrder ? 3 : 1,
     orderId: pendingOrder?.orderId || "",
     paymentStatus: pendingOrder ? "Pending" : "",
@@ -130,6 +133,9 @@ const orderSlice = createSlice({
       state.orderId = "";
       state.paymentStatus = "";
       state.finalPrice = null;
+      state.finalCurrency = "USD";
+      state.sourceTotalPrice = null;
+      state.exchangeRate = 1;
       state.paymentPhone = "";
       state.paymentProvider = "";
     },
@@ -140,16 +146,29 @@ const orderSlice = createSlice({
         state.placingOrder = true;
       })
       .addCase(placeOrder.fulfilled, (state, action) => {
-        const { orderId, total_price, paymentStatus, phone, provider } = action.payload;
+        const {
+          orderId, total_price, currency, source_total_price, exchange_rate, paymentStatus, phone, provider,
+        } = action.payload;
         state.placingOrder = false;
         state.orderId = orderId;
         state.paymentStatus = paymentStatus || "Pending";
         state.finalPrice = Number(total_price);
+        state.finalCurrency = currency;
+        state.sourceTotalPrice = source_total_price;
+        state.exchangeRate = exchange_rate;
         state.paymentPhone = phone;
         state.paymentProvider = provider;
         state.orderStep = 3;
         if (state.paymentStatus === "Pending") {
-          storage.set(PENDING_ORDER_KEY, JSON.stringify({ orderId, finalPrice: state.finalPrice, phone, provider }));
+          storage.set(PENDING_ORDER_KEY, JSON.stringify({
+            orderId,
+            finalPrice: state.finalPrice,
+            currency,
+            sourceTotalPrice: source_total_price,
+            exchangeRate: exchange_rate,
+            phone,
+            provider,
+          }));
         }
       })
       .addCase(placeOrder.rejected, (state) => {

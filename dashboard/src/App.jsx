@@ -16,6 +16,8 @@ const Profile = lazy(() => import("./components/Profile"));
 const Chat = lazy(() => import("./components/Chat"));
 const StoreProfile = lazy(() => import("./components/StoreProfile"));
 const Settings = lazy(() => import("./components/Settings"));
+const Payouts = lazy(() => import("./components/Payouts"));
+const Finance = lazy(() => import("./components/Finance"));
 const SellerProducts = lazy(() => import("./components/SellerProducts"));
 const SellerOrders = lazy(() => import("./components/SellerOrders"));
 const Login = lazy(() => import("./pages/Login"));
@@ -45,6 +47,8 @@ function AppContent() {
           return <SellerOrders />;
         case "StoreProfile":
           return <StoreProfile />;
+        case "Payouts":
+          return <Payouts />;
         case "Profile":
           return <Profile />;
         default:
@@ -65,6 +69,10 @@ function AppContent() {
         return <Chat />;
       case "Settings":
         return <Settings />;
+      case "Payouts":
+        return <Payouts />;
+      case "Finance":
+        return <Finance />;
       case "Profile":
         return <Profile />;
       default:

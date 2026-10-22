@@ -21,6 +21,7 @@ const PawaPayPayment = () => {
     orderId,
     paymentStatus,
     finalPrice,
+    finalCurrency,
     paymentPhone: phone,
     paymentProvider: provider,
   } = useSelector((state) => state.order);
@@ -56,7 +57,12 @@ const PawaPayPayment = () => {
         <div className="mb-6 p-4 bg-secondary rounded-lg">
           <div className="flex justify-between text-foreground">
             <span>{t("pawaPayPayment.totalAmount")}</span>
-            <span className="font-bold text-primary">${finalPrice?.toFixed(2) || "0.00"}</span>
+            <span className="font-bold text-primary">
+              {finalCurrency || "USD"} {Number(finalPrice || 0).toLocaleString(undefined, {
+                minimumFractionDigits: finalCurrency === "CDF" ? 0 : 2,
+                maximumFractionDigits: finalCurrency === "CDF" ? 0 : 2,
+              })}
+            </span>
           </div>
         </div>
         {paymentStatus === "Failed" ? (

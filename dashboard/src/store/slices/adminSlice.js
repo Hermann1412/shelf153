@@ -77,6 +77,7 @@ export const adminSlice = createSlice({
     revenueGrowth: "",
     newUsersThisMonth: 0,
     currentMonthSales: 0,
+    financialSummary: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -97,6 +98,7 @@ export const adminSlice = createSlice({
         state.revenueGrowth = action.payload.revenueGrowth;
         state.newUsersThisMonth = action.payload.newUsersThisMonth;
         state.currentMonthSales = action.payload.currentMonthSales;
+        state.financialSummary = action.payload.financialSummary || {};
       })
       .addCase(fetchDashboardStats.rejected, (state) => {
         state.loading = false;

@@ -3,6 +3,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
 import prisma from "../database/db.js";
 import { v2 as cloudinary } from "cloudinary";
 import { PUBLIC_USER_SELECT } from "../utils/publicUser.js";
+import { decimalToMinorUnits, minorUnitsToDecimal } from "../services/financialService.js";
 
 const sum = (values) => values.reduce((total, value) => total + Number(value || 0), 0);
 const dayStart = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -35,6 +36,14 @@ export const updateSellerStatus = catchAsyncErrors(async (req, res, next) => {
 export const deleteUser = catchAsyncErrors(async (req, res, next) => {
   const user = await prisma.user.findUnique({ where: { id: req.params.id }, select: { id: true, avatar: true } });
   if (!user) return next(new ErrorHandler("User not found", 404));
+  const [payouts, debts, ledger] = await Promise.all([
+    prisma.sellerPayout.count({ where: { seller_id: user.id } }),
+    prisma.sellerDebt.count({ where: { seller_id: user.id } }),
+    prisma.financialLedgerEntry.count({ where: { seller_id: user.id } }),
+  ]);
+  if (payouts || debts || ledger) {
+    return next(new ErrorHandler("A user with financial history cannot be deleted; suspend the account instead.", 409));
+  }
   await prisma.user.delete({ where: { id: user.id } });
   if (user.avatar?.public_id) await cloudinary.uploader.destroy(user.avatar.public_id);
   res.status(200).json({ success: true, message: "User deleted successfully" });
@@ -52,6 +61,57 @@ export const dashboardStats = catchAsyncErrors(async (_req, res) => {
   const paidOrders = await prisma.order.findMany({
     where: { paid_at: { not: null } }, select: { total_price: true, created_at: true, order_status: true },
   });
+  const [paidPayments, completedPayouts, debtAggregate, pendingRefunds, pendingPayouts, pendingDeposits] = await Promise.all([prisma.payment.findMany({
+    where: { payment_status: "Paid" },
+    select: {
+      gross_sales_amount: true,
+      gross_commission: true,
+      payment_fee: true,
+      platform_net_revenue: true,
+      seller_net_amount: true,
+      refunded_gross_amount: true,
+      refunded_seller_amount: true,
+    },
+  }), prisma.sellerPayout.findMany({
+    where: { status: "Completed" },
+    select: { source_amount: true, payout_fee: true, debt_recovered_amount: true },
+  }), prisma.sellerDebt.aggregate({
+    where: { status: "Open" }, _sum: { remaining_amount: true },
+  }), prisma.saleRefund.count({ where: { status: { in: ["Pending", "Accepted", "Processing", "Enqueued"] } } }),
+  prisma.sellerPayout.count({ where: { status: "Pending" } }),
+  prisma.payment.count({ where: { payment_status: "Pending" } })]);
+  const financialMinor = paidPayments.reduce((summary, payment) => ({
+    grossSales: summary.grossSales + decimalToMinorUnits(payment.gross_sales_amount)
+      - decimalToMinorUnits(payment.refunded_gross_amount),
+    grossCommission: summary.grossCommission + decimalToMinorUnits(payment.gross_commission),
+    paymentFees: summary.paymentFees + decimalToMinorUnits(payment.payment_fee),
+    platformNetRevenue: summary.platformNetRevenue + decimalToMinorUnits(payment.platform_net_revenue),
+    sellerNet: summary.sellerNet + decimalToMinorUnits(payment.seller_net_amount)
+      - decimalToMinorUnits(payment.refunded_seller_amount),
+  }), { grossSales: 0n, grossCommission: 0n, paymentFees: 0n, platformNetRevenue: 0n, sellerNet: 0n });
+  const financialSummary = Object.fromEntries(
+    Object.entries(financialMinor).map(([key, value]) => [key, minorUnitsToDecimal(value)]),
+  );
+  const payoutFeesMinor = completedPayouts.reduce(
+    (total, payout) => total + decimalToMinorUnits(payout.payout_fee), 0n,
+  );
+  financialSummary.payoutFees = minorUnitsToDecimal(payoutFeesMinor);
+  financialSummary.platformNetRevenue = minorUnitsToDecimal(
+    financialMinor.platformNetRevenue - payoutFeesMinor,
+  );
+  const paidToSellersMinor = completedPayouts.reduce(
+    (total, payout) => total + decimalToMinorUnits(payout.source_amount), 0n,
+  );
+  financialSummary.paidToSellers = minorUnitsToDecimal(paidToSellersMinor);
+  financialSummary.dueToSellers = minorUnitsToDecimal(financialMinor.sellerNet - paidToSellersMinor);
+  financialSummary.debtRecovered = minorUnitsToDecimal(completedPayouts.reduce(
+    (total, payout) => total + decimalToMinorUnits(payout.debt_recovered_amount), 0n,
+  ));
+  financialSummary.sellerDebt = String(debtAggregate._sum.remaining_amount || "0.00");
+  financialSummary.refunds = minorUnitsToDecimal(paidPayments.reduce(
+    (total, payment) => total + decimalToMinorUnits(payment.refunded_gross_amount), 0n,
+  ));
+  financialSummary.reconciliationRequired = pendingRefunds + pendingPayouts + pendingDeposits;
   const totalUsersCount = await prisma.user.count({ where: { role: "User" } });
   const totalRevenueAllTime = sum(paidOrders.map((order) => order.total_price));
   const inRange = (order, start, end) => order.created_at >= start && order.created_at < end;
@@ -88,5 +148,6 @@ export const dashboardStats = catchAsyncErrors(async (_req, res) => {
     success: true, message: "Dashboard Stats Fetched Successfully", totalRevenueAllTime, todayRevenue,
     yesterdayRevenue, totalUsersCount, orderStatusCounts, monthlySales, currentMonthSales,
     topSellingProducts, lowStockProducts, revenueGrowth, newUsersThisMonth,
+    financialSummary,
   });
 });

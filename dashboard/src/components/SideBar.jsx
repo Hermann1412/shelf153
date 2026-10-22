@@ -12,6 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
+  WalletCards,
+  Landmark,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -39,6 +41,8 @@ const SideBar = () => {
       { label: "Products", icon: Package },
       { label: "Orders", icon: ListOrdered },
       { label: "Users", icon: Users },
+      { label: "Payouts", icon: WalletCards },
+      { label: "Finance", icon: Landmark },
       { label: "Chat", icon: MessageSquare },
       { label: "Settings", icon: Settings },
       { label: "Profile", icon: User },
@@ -47,6 +51,7 @@ const SideBar = () => {
       { label: "Dashboard", icon: LayoutDashboard },
       { label: "Products", icon: Package },
       { label: "Orders", icon: ListOrdered },
+      { label: "Payouts", icon: WalletCards },
       { label: "StoreProfile", icon: Store, display: t("sidebar.storeProfile") },
       { label: "Profile", icon: User },
     ],
