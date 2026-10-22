@@ -207,11 +207,14 @@
     "title": "Mobile Money via pawaPay Payment",
     "totalAmount": "Total Amount",
     "paymentFailed": "Payment failed",
-    "tryAgainMessage": "Please go back and place the order again.",
+    "tryAgainMessage": "No money was taken. You can start the payment again.",
     "requestSentTo": "Payment request sent to {{phone}}",
     "instructions": "Enter your Mobile Money via pawaPay PIN on your phone to confirm the payment. This page will update automatically once payment is confirmed.",
     "paymentSuccessful": "Payment successful!",
-    "paymentFailedRetry": "Payment failed. Please try again."
+    "paymentFailedRetry": "Payment failed. Please try again.",
+    "tryAgain": "Try payment again",
+    "doNotRetry": "Do not restart the payment: the request has already been sent to your phone.",
+    "previousPaymentPending": "A previous payment is still awaiting your confirmation on your phone."
   },
   "orders": {
     "title": "My Orders",

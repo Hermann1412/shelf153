@@ -16,6 +16,27 @@ if (!databaseUrl) {
   process.env.FRONTEND_URL ||= "http://localhost:5173";
   process.env.DASHBOARD_URL ||= "http://localhost:5174";
 
+  // Local stand-in for pawaPay: accepts every deposit and keeps it pending, counting how many were requested.
+  const { createServer } = await import("node:http");
+  const fakePawaPay = { deposits: [] };
+  const pawaPayServer = createServer((req, res) => {
+    let body = "";
+    req.on("data", (chunk) => { body += chunk; });
+    req.on("end", () => {
+      res.setHeader("Content-Type", "application/json");
+      if (req.method === "POST" && req.url === "/v2/deposits") {
+        const { depositId } = JSON.parse(body);
+        fakePawaPay.deposits.push(depositId);
+        return res.end(JSON.stringify({ depositId, status: "ACCEPTED" }));
+      }
+      res.end(JSON.stringify({ status: "FOUND", data: { status: "ACCEPTED" } }));
+    });
+  });
+  await new Promise((resolve) => pawaPayServer.listen(0, "127.0.0.1", resolve));
+  process.env.PAWAPAY_BASE_URL = `http://127.0.0.1:${pawaPayServer.address().port}`;
+  process.env.PAWAPAY_API_TOKEN = "integration-test-token";
+  process.env.PAWAPAY_ALLOWED_PROVIDERS = "AIRTEL_COD";
+
   const [{ default: request }, { default: jwt }, { default: bcrypt }, { default: app }, { default: prisma }, paymentService] = await Promise.all([
     import("supertest"), import("jsonwebtoken"), import("bcrypt"), import("../app.js"),
     import("../database/db.js"), import("../services/paymentService.js"),
@@ -44,10 +65,14 @@ if (!databaseUrl) {
   before(async () => {
     await prisma.$connect();
   });
-  beforeEach(clearDatabase);
+  beforeEach(async () => {
+    await clearDatabase();
+    fakePawaPay.deposits = [];
+  });
   after(async () => {
     await clearDatabase();
     await prisma.$disconnect();
+    pawaPayServer.close();
   });
 
   describe("authentication", () => {
@@ -118,6 +143,63 @@ if (!databaseUrl) {
       assert.ok(response.body.users.every((entry) => entry.password === undefined));
       const stats = await request(app).get("/api/v1/admin/fetch/dashboard-stats").set("Cookie", cookieFor(admin));
       assert.equal(stats.status, 200);
+    });
+  });
+
+  describe("duplicate checkout protection", () => {
+    const checkout = async () => {
+      const buyer = await createUser({ email: "double-pay@example.test" });
+      const seller = await createUser({ email: "double-pay-seller@example.test", role: "Admin" });
+      const product = await prisma.product.create({
+        data: { name: "Shoes", description: "Shoes", price: 20, category: "Fashion", stock: 10, created_by: seller.id },
+      });
+      const body = {
+        full_name: "Buyer", state: "HK", city: "Lubumbashi", country: "CD",
+        address: "Address", pincode: "0000", phone: "243990000000", provider: "AIRTEL_COD",
+        orderedItems: [{ product: { id: product.id }, quantity: 2 }],
+      };
+      const place = (key) => {
+        const call = request(app).post("/api/v1/order/new").set("Cookie", cookieFor(buyer));
+        return (key ? call.set("Idempotency-Key", key) : call).send(body);
+      };
+      const stockOf = async () => (await prisma.product.findUnique({ where: { id: product.id } })).stock;
+      return { buyer, place, stockOf };
+    };
+
+    test("a retried checkout with the same key returns the first order and charges once", async () => {
+      const { buyer, place, stockOf } = await checkout();
+      const key = crypto.randomUUID();
+      const first = await place(key);
+      const retry = await place(key);
+      assert.equal(first.status, 201);
+      assert.equal(retry.status, 200);
+      assert.equal(retry.body.orderId, first.body.orderId);
+      assert.equal(await prisma.order.count({ where: { buyer_id: buyer.id } }), 1);
+      assert.equal(fakePawaPay.deposits.length, 1);
+      assert.equal(await stockOf(), 8);
+    });
+
+    test("simultaneous submissions with the same key create a single order", async () => {
+      const { buyer, place, stockOf } = await checkout();
+      const key = crypto.randomUUID();
+      const responses = await Promise.all([place(key), place(key), place(key)]);
+      assert.ok(responses.every((response) => response.status < 300), responses.map((r) => r.status).join(","));
+      assert.equal(new Set(responses.map((response) => response.body.orderId)).size, 1);
+      assert.equal(await prisma.order.count({ where: { buyer_id: buyer.id } }), 1);
+      assert.equal(fakePawaPay.deposits.length, 1);
+      assert.equal(await stockOf(), 8);
+    });
+
+    test("a new checkout is refused while a previous payment awaits PIN confirmation", async () => {
+      const { buyer, place, stockOf } = await checkout();
+      const first = await place(crypto.randomUUID());
+      const second = await place(crypto.randomUUID());
+      assert.equal(second.status, 409);
+      assert.equal(second.body.code, "PAYMENT_PENDING");
+      assert.equal(second.body.orderId, first.body.orderId);
+      assert.equal(await prisma.order.count({ where: { buyer_id: buyer.id } }), 1);
+      assert.equal(fakePawaPay.deposits.length, 1);
+      assert.equal(await stockOf(), 8);
     });
   });
 

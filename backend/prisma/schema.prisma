@@ -78,20 +78,22 @@ model Review {
 }
 
 model Order {
-  id             String        @id @default(uuid()) @db.Uuid
-  buyer_id       String        @db.Uuid
-  total_price    Decimal       @db.Decimal(10, 2)
-  tax_price      Decimal       @db.Decimal(10, 2)
-  shipping_price Decimal       @db.Decimal(10, 2)
-  order_status   String        @default("Processing") @db.VarChar(50)
-  paid_at        DateTime?
-  stock_reserved Boolean       @default(true)
-  created_at     DateTime      @default(now())
-  buyer          User          @relation(fields: [buyer_id], references: [id], onDelete: Restrict)
-  order_items    OrderItem[]
-  shipping_info  ShippingInfo?
-  payment        Payment?
+  id              String        @id @default(uuid()) @db.Uuid
+  buyer_id        String        @db.Uuid
+  total_price     Decimal       @db.Decimal(10, 2)
+  tax_price       Decimal       @db.Decimal(10, 2)
+  shipping_price  Decimal       @db.Decimal(10, 2)
+  order_status    String        @default("Processing") @db.VarChar(50)
+  paid_at         DateTime?
+  stock_reserved  Boolean       @default(true)
+  idempotency_key String?       @db.VarChar(64)
+  created_at      DateTime      @default(now())
+  buyer           User          @relation(fields: [buyer_id], references: [id], onDelete: Restrict)
+  order_items     OrderItem[]
+  shipping_info   ShippingInfo?
+  payment         Payment?
 
+  @@unique([buyer_id, idempotency_key])
   @@index([buyer_id, created_at])
   @@map("orders")
 }

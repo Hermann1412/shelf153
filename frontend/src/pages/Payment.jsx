@@ -47,6 +47,7 @@ const Payment = () => {
 
   const handleShippingSubmit = (e) => {
     e.preventDefault();
+    if (placingOrder) return;
     const nextErrors = {};
     Object.entries(shipping).forEach(([key, value]) => {
       if (!value.trim()) nextErrors[key] = t("validation.required");
@@ -316,7 +317,7 @@ const Payment = () => {
         {/* Step 3 - Payment */}
         {orderStep === 3 && orderId && (
           <div className="max-w-2xl mx-auto">
-            <PawaPayPayment phone={shipping.phone} provider={shipping.provider} />
+            <PawaPayPayment />
           </div>
         )}
       </div>

@@ -14,6 +14,33 @@ const configuredProviders = () => new Set(
     .split(",").map((provider) => provider.trim()).filter(Boolean),
 );
 
+const PENDING_ORDER_WINDOW_MS = 10 * 60 * 1000;
+const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9_-]{16,64}$/;
+
+// Asks pawaPay for the latest status of a pending payment and persists a final result.
+const refreshPaymentStatus = async (payment) => {
+  if (payment.payment_status !== "Pending") return payment.payment_status;
+  try {
+    const providerPayload = await getPawaPayDepositStatus(payment.transaction_id);
+    const providerStatus = extractPawaPayStatus(providerPayload);
+    const status = providerStatus === "COMPLETED" ? "Paid" : providerStatus === "FAILED" ? "Failed" : "Pending";
+    if (status !== "Pending") await transitionPayment(payment.order_id, status, providerPayload);
+    return status;
+  } catch (error) {
+    console.error("pawaPay status check failed:", error.response?.data || error.message);
+    return "Pending";
+  }
+};
+
+const existingOrderResponse = (res, order, statusCode, extra = {}) => res.status(statusCode).json({
+  success: true,
+  orderId: order.id,
+  transactionId: order.payment?.transaction_id || order.id,
+  total_price: Number(order.total_price),
+  paymentStatus: order.payment?.payment_status || "Pending",
+  ...extra,
+});
+
 const parseItems = (orderedItems) => {
   const raw = Array.isArray(orderedItems) ? orderedItems : JSON.parse(orderedItems || "[]");
   const quantities = new Map();
@@ -48,6 +75,37 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Phone number must use international format, for example 243XXXXXXXXX.", 400));
   }
 
+  // A retried checkout attempt (same key) gets the original order back instead of a second charge.
+  const idempotencyKey = req.get("Idempotency-Key") || null;
+  if (idempotencyKey && !IDEMPOTENCY_KEY_PATTERN.test(idempotencyKey)) {
+    return next(new ErrorHandler("Invalid Idempotency-Key header.", 400));
+  }
+  const findByKey = () => prisma.order.findUnique({
+    where: { buyer_id_idempotency_key: { buyer_id: req.user.id, idempotency_key: idempotencyKey } },
+    include: { payment: true },
+  });
+  if (idempotencyKey) {
+    const existing = await findByKey();
+    if (existing) return existingOrderResponse(res, existing, 200, { message: "This order was already placed." });
+  }
+
+  // Another checkout (other tab or device) is still waiting for its PIN confirmation.
+  const pendingOrder = await prisma.order.findFirst({
+    where: {
+      buyer_id: req.user.id,
+      created_at: { gte: new Date(Date.now() - PENDING_ORDER_WINDOW_MS) },
+      payment: { payment_status: "Pending" },
+    },
+    include: { payment: true },
+    orderBy: { created_at: "desc" },
+  });
+  if (pendingOrder && await refreshPaymentStatus(pendingOrder.payment) === "Pending") {
+    return existingOrderResponse(res, pendingOrder, 409, {
+      code: "PAYMENT_PENDING",
+      message: "A payment for a previous order is still awaiting confirmation on your phone.",
+    });
+  }
+
   const products = await prisma.product.findMany({ where: { id: { in: items.map((item) => item.productId) } } });
   if (products.length !== items.length) return next(new ErrorHandler("One or more products no longer exist.", 404));
   const pricedItems = items.map((item) => ({
@@ -60,38 +118,49 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
   const total_price = Math.round((subtotal + tax_price + shipping_price) * 100) / 100;
 
   const orderId = randomUUID();
-  const order = await prisma.$transaction(async (tx) => {
-    for (const item of pricedItems) {
-      const reserved = await tx.product.updateMany({
-        where: { id: item.product.id, stock: { gte: item.quantity } },
-        data: { stock: { decrement: item.quantity } },
-      });
-      if (reserved.count !== 1) throw new ErrorHandler(`Only limited stock is available for ${item.product.name}.`, 409);
-    }
+  let order;
+  try {
+    order = await prisma.$transaction(async (tx) => {
+      for (const item of pricedItems) {
+        const reserved = await tx.product.updateMany({
+          where: { id: item.product.id, stock: { gte: item.quantity } },
+          data: { stock: { decrement: item.quantity } },
+        });
+        if (reserved.count !== 1) throw new ErrorHandler(`Only limited stock is available for ${item.product.name}.`, 409);
+      }
 
-    return tx.order.create({
-      data: {
-        id: orderId,
-        buyer_id: req.user.id,
-        total_price,
-        tax_price,
-        shipping_price,
-        order_items: {
-          create: pricedItems.map(({ product, quantity }) => ({
-            product_id: product.id,
-            seller_id: product.created_by,
-            quantity,
-            price: product.price,
-            image: product.images?.[0]?.url || "",
-            title: product.name,
-          })),
+      return tx.order.create({
+        data: {
+          id: orderId,
+          buyer_id: req.user.id,
+          idempotency_key: idempotencyKey,
+          total_price,
+          tax_price,
+          shipping_price,
+          order_items: {
+            create: pricedItems.map(({ product, quantity }) => ({
+              product_id: product.id,
+              seller_id: product.created_by,
+              quantity,
+              price: product.price,
+              image: product.images?.[0]?.url || "",
+              title: product.name,
+            })),
+          },
+          shipping_info: { create: { full_name, state, city, country, address, pincode, phone } },
+          payment: { create: { transaction_id: orderId, provider, currency } },
         },
-        shipping_info: { create: { full_name, state, city, country, address, pincode, phone } },
-        payment: { create: { transaction_id: orderId, provider, currency } },
-      },
-      include: { payment: true },
-    });
-  }, { isolationLevel: "Serializable" });
+        include: { payment: true },
+      });
+    }, { isolationLevel: "Serializable" });
+  } catch (error) {
+    // Two requests with the same key raced: the loser's transaction rolled back, so return the winner's order.
+    if (idempotencyKey && ["P2002", "P2034"].includes(error.code)) {
+      const existing = await findByKey();
+      if (existing) return existingOrderResponse(res, existing, 200, { message: "This order was already placed." });
+    }
+    throw error;
+  }
 
   const paymentResponse = await initiatePayment(order.id, total_price, phone, provider, currency);
   if (!paymentResponse.success) {
@@ -125,19 +194,7 @@ export const checkPaymentStatus = catchAsyncErrors(async (req, res, next) => {
   if (!payment) return next(new ErrorHandler("Payment not found.", 404));
   if (req.user.role !== "Admin" && payment.order.buyer_id !== req.user.id) return next(new ErrorHandler("Access denied.", 403));
 
-  let status = payment.payment_status;
-  if (status === "Pending") {
-    try {
-      const providerPayload = await getPawaPayDepositStatus(payment.transaction_id);
-      const providerStatus = extractPawaPayStatus(providerPayload);
-      if (providerStatus === "COMPLETED") status = "Paid";
-      if (providerStatus === "FAILED") status = "Failed";
-      if (status !== "Pending") await transitionPayment(payment.order_id, status, providerPayload);
-    } catch (error) {
-      console.error("pawaPay status check failed:", error.response?.data || error.message);
-    }
-  }
-  res.status(200).json({ success: true, paymentStatus: status });
+  res.status(200).json({ success: true, paymentStatus: await refreshPaymentStatus(payment) });
 });
 
 export const fetchSingleOrder = catchAsyncErrors(async (req, res, next) => {
