@@ -74,9 +74,23 @@ export const fetchShops = createAsyncThunk(
   }
 );
 
+// Only categories that currently have products on sale ({ name, count, image }).
+export const fetchCategories = createAsyncThunk(
+  "product/fetchCategories",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get("/product/categories");
+      return data.categories;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 const productSlice = createSlice({
   name: "product",
   initialState: {
+    categories: [],
     loading: false,
     products: [],
     productDetails: null,
@@ -131,6 +145,9 @@ const productSlice = createSlice({
       })
       .addCase(deleteProductReview.rejected, (state) => {
         state.isReviewDeleting = false;
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.categories = action.payload || [];
       })
       .addCase(fetchShops.fulfilled, (state, action) => {
         state.shops = action.payload.shops || [];

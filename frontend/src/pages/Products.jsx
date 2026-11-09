@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Search, Star, Filter, X, Loader } from "lucide-react";
-import { categories, categoryLabel } from "../data/products";
+import { categoryLabel } from "../data/products";
 import ProductCard from "../components/Products/ProductCard";
 import Pagination from "../components/Products/Pagination";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +12,7 @@ const Products = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { products, totalProducts, loading, shops } = useSelector(
+  const { products, totalProducts, loading, shops, categories } = useSelector(
     (state) => state.product
   );
 
@@ -175,8 +175,8 @@ const Products = () => {
                 >
                   <option value="">{t('products.allCategories')}</option>
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.name}>
-                      {t(`categories.${cat.key}`)}
+                    <option key={cat.name} value={cat.name}>
+                      {categoryLabel(cat.name, t)} ({cat.count})
                     </option>
                   ))}
                 </select>

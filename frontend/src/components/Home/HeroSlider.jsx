@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 
 const HeroSlider = () => {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = [
+  const { categories } = useSelector((state) => state.product);
+
+  const allSlides = [
     {
       id: 1,
       title: t("home.hero.slide1Title"),
@@ -15,6 +18,7 @@ const HeroSlider = () => {
       description: t("home.hero.slide1Description"),
       image: "/electronics.jpg",
       cta: t("home.hero.slide1Cta"),
+      category: "Electronics",
       url: "/products?category=Electronics",
     },
     {
@@ -24,6 +28,7 @@ const HeroSlider = () => {
       description: t("home.hero.slide2Description"),
       image: "/fashion.jpg",
       cta: t("home.hero.slide2Cta"),
+      category: "Fashion",
       url: "/products?category=Fashion",
     },
     {
@@ -33,9 +38,14 @@ const HeroSlider = () => {
       description: t("home.hero.slide3Description"),
       image: "/furniture.jpg",
       cta: t("home.hero.slide3Cta"),
+      category: "Home & Garden",
       url: `/products?category=${encodeURIComponent("Home & Garden")}`,
     },
   ];
+
+  // Never advertise an empty category: keep slides whose category has products on sale.
+  const available = allSlides.filter((s) => categories.some((c) => c.name === s.category));
+  const slides = available.length > 0 ? available : allSlides;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -45,7 +55,9 @@ const HeroSlider = () => {
   }, [slides.length]);
 
   const go = (step) => setCurrentSlide((prev) => (prev + step + slides.length) % slides.length);
-  const slide = slides[currentSlide];
+  // The list can shrink once categories load; keep the index in range.
+  const activeIndex = currentSlide % slides.length;
+  const slide = slides[activeIndex];
 
   return (
     <section className="relative h-[22rem] sm:h-[24rem] lg:h-[26rem] overflow-hidden rounded-2xl bg-secondary">
@@ -54,7 +66,7 @@ const HeroSlider = () => {
           key={s.id}
           src={s.image}
           alt=""
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${index === currentSlide ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${index === activeIndex ? "opacity-100" : "opacity-0"}`}
         />
       ))}
       {/* Left-to-right scrim keeps white text readable on any photo. */}
@@ -84,12 +96,12 @@ const HeroSlider = () => {
             key={index}
             onClick={() => setCurrentSlide(index)}
             aria-label={`${t("home.hero.goToSlide")} ${index + 1}`}
-            aria-current={index === currentSlide}
+            aria-current={index === activeIndex}
             className="py-2"
           >
             <span
               className={`block h-1.5 rounded-full transition-all duration-300 ${
-                index === currentSlide ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
+                index === activeIndex ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
               }`}
             />
           </button>

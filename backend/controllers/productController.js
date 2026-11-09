@@ -26,6 +26,34 @@ const attachSeller = ({ creator, _count, ...product }) => ({
     : { id: null, name: "Shelf153" },
 });
 
+// Categories are whatever products use: only those with at least one product on sale are listed,
+// with a count and a product photo for the storefront tiles. A new category appears as soon as
+// a product is created with it.
+export const fetchCategories = catchAsyncErrors(async (_req, res) => {
+  const [counts, samples] = await Promise.all([
+    prisma.product.groupBy({ by: ["category"], where: activeProductWhere, _count: { _all: true } }),
+    prisma.product.findMany({
+      where: activeProductWhere, distinct: ["category"], orderBy: { created_at: "desc" },
+      select: { category: true, images: true },
+    }),
+  ]);
+  const imageOf = new Map(samples.map((product) => [product.category, product.images?.[0]?.url || null]));
+  const categories = counts
+    .map((row) => ({ name: row.category, count: row._count._all, image: imageOf.get(row.category) || null }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  res.status(200).json({ success: true, categories });
+});
+
+// Admins and sellers type category names freely: reuse an existing spelling when only the
+// case differs ("mode" → "Mode") so the same category is never listed twice.
+const canonicalCategory = async (category) => {
+  const existing = await prisma.product.findFirst({
+    where: { category: { equals: category, mode: "insensitive" } },
+    select: { category: true },
+  });
+  return existing?.category || category;
+};
+
 const parseProductInput = (body) => {
   const price = Number(body.price);
   const stock = Number(body.stock);
@@ -35,8 +63,10 @@ const parseProductInput = (body) => {
   if (!Number.isFinite(price) || price <= 0 || !Number.isInteger(stock) || stock < 0) {
     throw new ErrorHandler("Price must be positive and stock must be a non-negative integer.", 400);
   }
+  const category = body.category.trim().replace(/\s+/g, " ");
+  if (category.length > 100) throw new ErrorHandler("Category name is too long (100 characters max).", 400);
   return {
-    name: body.name.trim(), description: body.description.trim(), category: body.category.trim(),
+    name: body.name.trim(), description: body.description.trim(), category,
     price: Math.round((price / PRICE_INPUT_DIVISOR) * 100) / 100, stock,
   };
 };
@@ -44,6 +74,7 @@ const parseProductInput = (body) => {
 export const createProduct = catchAsyncErrors(async (req, res, next) => {
   let input;
   try { input = parseProductInput(req.body); } catch (error) { return next(error); }
+  input.category = await canonicalCategory(input.category);
 
   const uploadedImages = [];
   if (req.files?.images) {
@@ -100,6 +131,7 @@ export const fetchAllProducts = catchAsyncErrors(async (req, res) => {
 export const updateProduct = catchAsyncErrors(async (req, res, next) => {
   let input;
   try { input = parseProductInput(req.body); } catch (error) { return next(error); }
+  input.category = await canonicalCategory(input.category);
   const product = await prisma.product.findUnique({ where: { id: req.params.productId } });
   if (!product) return next(new ErrorHandler("Product not found.", 404));
   if (req.user.role === "Seller" && product.created_by !== req.user.id) return next(new ErrorHandler("You can only manage your own products.", 403));

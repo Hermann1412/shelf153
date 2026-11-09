@@ -114,7 +114,9 @@
     "browseAllSubtitle": "See everything we have for sale in one place.",
     "browseAllProducts": "See All Products",
     "viewAll": "View all",
-    "latestProducts": "Latest products"
+    "latestProducts": "Latest products",
+    "categoryCount_one": "{{count}} product",
+    "categoryCount_other": "{{count}} products"
   },
   "products": {
     "title": "Products",

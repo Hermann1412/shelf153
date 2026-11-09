@@ -17,7 +17,7 @@ const CreateProductModal = () => {
     name: "",
     description: "",
     price: "",
-    category: "Electronics",
+    category: "",
     stock: "",
     images: [],
   });

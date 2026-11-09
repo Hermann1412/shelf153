@@ -17,7 +17,7 @@ const UpdateProductModal = ({ selectedProduct }) => {
     name: "",
     description: "",
     price: "",
-    category: "Electronics",
+    category: "",
     stock: "",
   });
 
@@ -29,7 +29,7 @@ const UpdateProductModal = ({ selectedProduct }) => {
       name: selectedProduct.name ?? "",
       description: selectedProduct.description ?? "",
       price: String(Math.round(Number(selectedProduct.price) * divisor)),
-      category: selectedProduct.category || "Electronics",
+      category: selectedProduct.category || "",
       stock: String(selectedProduct.stock ?? ""),
     });
   }, [selectedProduct, divisor]);

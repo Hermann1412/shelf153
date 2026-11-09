@@ -7,6 +7,7 @@ import {
   fetchSingleProduct,
   postProductReview,
   deleteReview,
+  fetchCategories,
 } from "../controllers/productController.js";
 import {
   authorizedRoles,
@@ -22,6 +23,7 @@ router.post(
   createProduct
 );
 router.get("/", fetchAllProducts);
+router.get("/categories", fetchCategories);
 router.get("/singleProduct/:productId", fetchSingleProduct);
 router.put("/post-new/review/:productId", isAuthenticated, postProductReview);
 router.delete("/delete/review/:productId", isAuthenticated, deleteReview);

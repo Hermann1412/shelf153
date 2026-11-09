@@ -1,15 +1,9 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { axiosInstance } from "../lib/axios";
+import { categoryLabel } from "../lib/categories";
 
-const CATEGORY_VALUES = [
-  ["Electronics", "electronics"],
-  ["Fashion", "fashion"],
-  ["Home & Garden", "homeGarden"],
-  ["Sports", "sports"],
-  ["Books", "books"],
-  ["Beauty", "beauty"],
-  ["Automotive", "automotive"],
-  ["Kids & Baby", "kidsBaby"],
-];
+const NEW_CATEGORY = "__new__";
 
 const inputClass =
   "w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent";
@@ -28,6 +22,28 @@ const ProductFormFields = ({ formData, setFormData, divisor, withImages = false 
     ? (Math.round((Number(formData.price) / divisor) * 100) / 100).toFixed(2)
     : null;
 
+  // Categories in use on the storefront; a new one is created simply by typing its name.
+  const [categories, setCategories] = useState([]);
+  const [typingNew, setTypingNew] = useState(false);
+  useEffect(() => {
+    axiosInstance
+      .get("/product/categories")
+      .then(({ data }) => setCategories((data.categories || []).map((c) => c.name)))
+      .catch(() => {});
+  }, []);
+  // Keep the product's current category selectable even if it is not listed (e.g. its last product).
+  const options = formData.category && !categories.includes(formData.category)
+    ? [...categories, formData.category]
+    : categories;
+  const handleCategorySelect = (e) => {
+    if (e.target.value === NEW_CATEGORY) {
+      setTypingNew(true);
+      setFormData({ ...formData, category: "" });
+    } else {
+      setFormData({ ...formData, category: e.target.value });
+    }
+  };
+
   return (
     <>
       <div className="md:col-span-2">
@@ -37,13 +53,45 @@ const ProductFormFields = ({ formData, setFormData, divisor, withImages = false 
 
       <div>
         <Label htmlFor="product-category">{t("products.colCategory", "Catégorie")}</Label>
-        <select id="product-category" value={formData.category} onChange={set("category")} className={inputClass} required>
-          {CATEGORY_VALUES.map(([value, key]) => (
-            <option key={value} value={value}>
-              {t(`categories.${key}`)}
+        {typingNew ? (
+          <div className="flex gap-2">
+            <input
+              id="product-category"
+              type="text"
+              value={formData.category}
+              onChange={set("category")}
+              placeholder={t("modals.newCategoryPlaceholder", "Nom de la nouvelle catégorie")}
+              maxLength={100}
+              autoFocus
+              required
+              className={inputClass}
+            />
+            {categories.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setTypingNew(false);
+                  setFormData({ ...formData, category: "" });
+                }}
+                className="shrink-0 px-3 rounded-lg border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                {t("modals.chooseExisting", "Liste")}
+              </button>
+            )}
+          </div>
+        ) : (
+          <select id="product-category" value={formData.category} onChange={handleCategorySelect} className={inputClass} required>
+            <option value="" disabled>
+              {t("modals.chooseCategory", "Choisir une catégorie")}
             </option>
-          ))}
-        </select>
+            {options.map((name) => (
+              <option key={name} value={name}>
+                {categoryLabel(name, t)}
+              </option>
+            ))}
+            <option value={NEW_CATEGORY}>+ {t("modals.newCategory", "Nouvelle catégorie…")}</option>
+          </select>
+        )}
       </div>
 
       <div>

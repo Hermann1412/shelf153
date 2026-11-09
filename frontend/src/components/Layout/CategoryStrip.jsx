@@ -1,10 +1,13 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { categories } from "../../data/products";
+import { categoryLabel } from "../../data/products";
 
 const CategoryStrip = () => {
   const { t } = useTranslation();
   const { pathname, search } = useLocation();
+  // Only categories that have products on sale (loaded once in App).
+  const { categories } = useSelector((state) => state.product);
   const activeCategory = pathname === "/products" ? new URLSearchParams(search).get("category") : null;
 
   const itemClass = (active) =>
@@ -23,11 +26,11 @@ const CategoryStrip = () => {
           </NavLink>
           {categories.map((category) => (
             <NavLink
-              key={category.id}
+              key={category.name}
               to={`/products?category=${encodeURIComponent(category.name)}`}
               className={() => itemClass(activeCategory === category.name)}
             >
-              {t(`categories.${category.key}`)}
+              {categoryLabel(category.name, t)}
             </NavLink>
           ))}
         </div>

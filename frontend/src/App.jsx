@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import { lazy, Suspense, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getUser } from "./store/slices/authSlice";
-import { fetchAllProducts } from "./store/slices/productSlice";
+import { fetchAllProducts, fetchCategories } from "./store/slices/productSlice";
 
 // Layout Components
 import Navbar from "./components/Layout/Navbar";
@@ -35,6 +35,7 @@ const AppContent = () => {
   useEffect(() => {
     dispatch(getUser());
     dispatch(fetchAllProducts());
+    dispatch(fetchCategories());
   }, [dispatch]);
 
   return (

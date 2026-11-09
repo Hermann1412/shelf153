@@ -392,6 +392,24 @@ if (!databaseUrl) {
     });
   });
 
+  describe("product categories", () => {
+    test("only categories with products are listed, and a new category is created by using it", async () => {
+      const admin = await createUser({ email: "categories-admin@example.test", role: "Admin" });
+      await prisma.product.create({
+        data: { name: "Dress", description: "d", price: 10, category: "Mode", stock: 2, created_by: admin.id },
+      });
+      const list = async () => (await request(app).get("/api/v1/product/categories")).body.categories.map((c) => `${c.name}:${c.count}`);
+      assert.deepEqual(await list(), ["Mode:1"]);
+
+      const create = (category) => request(app).post("/api/v1/product/admin/create").set("Cookie", cookieFor(admin))
+        .send({ name: "Item", description: "d", price: "2830", category, stock: "1" });
+      // Different case and spacing reuse the existing spelling instead of adding a duplicate.
+      assert.equal((await create("  mode ")).body.product.category, "Mode");
+      assert.equal((await create("Artisanat local")).status, 201);
+      assert.deepEqual(await list(), ["Mode:2", "Artisanat local:1"]);
+    });
+  });
+
   describe("platform-owned products", () => {
     test("Shelf153's own products keep 100% for the platform and create no seller payable", async () => {
       const buyer = await createUser({ email: "mixed-buyer@example.test" });

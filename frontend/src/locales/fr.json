@@ -114,7 +114,9 @@
     "browseAllSubtitle": "Voyez tout ce que nous vendons au même endroit.",
     "browseAllProducts": "Voir tous les produits",
     "viewAll": "Voir tout",
-    "latestProducts": "Derniers produits"
+    "latestProducts": "Derniers produits",
+    "categoryCount_one": "{{count}} produit",
+    "categoryCount_other": "{{count}} produits"
   },
   "products": {
     "title": "Produits",
