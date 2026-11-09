@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { LoaderCircle, Plus, Eye, Pencil, Trash2, Search } from "lucide-react";
+import { categoryLabel } from "../lib/categories";
 import CreateProductModal from "../modals/CreateProductModal";
 import { useDispatch, useSelector } from "react-redux";
 import UpdateProductModal from "../modals/UpdateProductModal";
@@ -31,17 +32,23 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const totalPages = Math.ceil(totalProducts / 10);
 
+  // Search on the server so it covers every page, after a short pause in typing.
   useEffect(() => {
-    dispatch(fetchAllProducts(page));
-  }, [dispatch, page]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  const filteredProducts = useMemo(() => {
-    if (!search.trim()) return products;
-    const q = search.trim().toLowerCase();
-    return products.filter((p) => p.name?.toLowerCase().includes(q));
-  }, [products, search]);
+  useEffect(() => {
+    dispatch(fetchAllProducts({ page, search: debouncedSearch }));
+  }, [dispatch, page, debouncedSearch]);
+
+  const filteredProducts = products;
 
   const handleView = (product) => {
     setSelectedProduct(product);
@@ -108,6 +115,13 @@ const Products = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
+                {filteredProducts.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
+                      {t("products.noProducts", "Aucun produit trouvé.")}
+                    </td>
+                  </tr>
+                )}
                 {filteredProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
@@ -121,7 +135,7 @@ const Products = () => {
                       {product.name}
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {product.category}
+                      {categoryLabel(product.category, t)}
                     </td>
                     <td className="px-4 py-3 text-gray-800">
                       ${Number(product.price).toFixed(2)}

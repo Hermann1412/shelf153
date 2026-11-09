@@ -29,7 +29,9 @@ import { getUser } from "./store/slices/authSlice";
 function AppContent() {
   const dispatch = useDispatch();
   const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
-  const { openedComponent } = useSelector((state) => state.extra);
+  const { openedComponent, viewingStore } = useSelector((state) => state.extra);
+  // The main admin sees a store's seller space when one is open in the store switcher.
+  const viewingAsAdmin = user?.role === "Admin" && Boolean(viewingStore);
 
   useEffect(() => {
     dispatch(getUser());
@@ -39,7 +41,7 @@ function AppContent() {
     // A plain User has no store yet — send them straight to the apply form.
     if (user?.role === "User") return <StoreProfile />;
 
-    if (user?.role === "Seller") {
+    if (user?.role === "Seller" || viewingAsAdmin) {
       switch (openedComponent) {
         case "Products":
           return <SellerProducts />;
@@ -92,6 +94,8 @@ function AppContent() {
     <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading…</div>}>
     <Routes>
       <Route path="/login" element={<Login />} />
+      {/* A store's own login link: same form, branded with the store's name and logo. */}
+      <Route path="/boutique/:slug" element={<Login />} />
       <Route path="/password/forgot" element={<ForgotPassword />} />
       <Route path="/password/reset/:token" element={<ResetPassword />} />
 
@@ -103,10 +107,20 @@ function AppContent() {
           ["Admin", "Seller", "User"].includes(user?.role) ? (
             <div className="flex min-h-screen bg-gray-100">
               <SideBar />
-              <div className="flex-1 flex flex-col">
+              <div className="flex-1 min-w-0 flex flex-col">
                 <Header />
-                <main className="flex-1 p-6 overflow-y-auto">
-                  {renderDashboardContent()}
+                <main className="flex-1 p-4 sm:p-6 min-w-0">
+                  {/* Sections load on demand; keep the sidebar and header on screen meanwhile. */}
+                  <Suspense
+                    fallback={
+                      <div className="flex justify-center py-24">
+                        <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    }
+                  >
+                    {/* Remount on store change so every screen reloads that store's data. */}
+                    <div key={viewingStore?.id || "platform-admin"}>{renderDashboardContent()}</div>
+                  </Suspense>
                 </main>
               </div>
             </div>

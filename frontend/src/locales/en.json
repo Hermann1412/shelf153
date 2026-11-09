@@ -8,7 +8,6 @@
   "errors": {
     "postReviewFailed": "Failed to post review",
     "deleteReviewFailed": "Failed to delete review",
-    "aiSearchFailed": "AI search failed",
     "registrationFailed": "Registration failed",
     "loginFailed": "Login failed",
     "logoutFailed": "Logout failed",
@@ -44,7 +43,8 @@
     "about": "About",
     "faq": "FAQ",
     "contact": "Contact",
-    "login": "Login"
+    "login": "Login",
+    "allProducts": "All products"
   },
   "footer": {
     "description": "Your online store based in Lubumbashi, delivering to Lubumbashi, Kipushi, Likasi and Kolwezi. Discover quality products, delivered near you.",
@@ -68,14 +68,15 @@
     "newsletterText": "Subscribe to our newsletter for exclusive offers and updates",
     "emailPlaceholder": "Enter your email",
     "subscribe": "Subscribe",
-    "copyright": "© 2024 Shelf153. All rights reserved."
+    "copyright": "© 2024 Shelf153. All rights reserved.",
+    "sell": "Sell on Shelf153"
   },
   "home": {
     "categoryTitle": "Shop by Category",
     "categorySubtitle": "Discover our wide range of products across different categories",
     "features": {
       "shippingTitle": "Free Shipping",
-      "shippingDesc": "Free shipping on orders over $50 worldwide",
+      "shippingDesc": "Free delivery on orders over $50 in Lubumbashi, Kipushi, Likasi and Kolwezi",
       "paymentTitle": "Secure Payment",
       "paymentDesc": "100% secure payment with SSL encryption",
       "supportTitle": "24/7 Support",
@@ -111,7 +112,9 @@
     "dealsBadge": "Deal",
     "browseAllTitle": "Looking for something specific?",
     "browseAllSubtitle": "See everything we have for sale in one place.",
-    "browseAllProducts": "See All Products"
+    "browseAllProducts": "See All Products",
+    "viewAll": "View all",
+    "latestProducts": "Latest products"
   },
   "products": {
     "title": "Products",
@@ -120,7 +123,6 @@
     "sortPriceAsc": "Price: Low to High",
     "sortPriceDesc": "Price: High to Low",
     "sortTopRated": "Top Rated",
-    "aiSearch": "AI Search",
     "filters": "Filters",
     "clearAll": "Clear all",
     "search": "Search",
@@ -151,7 +153,8 @@
     "soldBy": "Sold by {{name}}",
     "addedToCart": "Added to cart",
     "wishlist": "Add to wishlist",
-    "freeShipping": "Free Shipping"
+    "freeShipping": "Free Shipping",
+    "add": "Add"
   },
   "productDetail": {
     "backToProducts": "Back to Products",
@@ -176,7 +179,7 @@
     "subtotal": "Subtotal",
     "shipping": "Shipping",
     "free": "Free",
-    "tax": "Tax (8%)",
+    "tax": "Tax (18%)",
     "total": "Total",
     "freeShippingRemaining": "Add ${{amount}} more for free shipping",
     "proceedToCheckout": "Proceed to Checkout",
@@ -204,7 +207,8 @@
     "orderSummary": "Order Summary ({{count}} items)",
     "placingOrder": "Placing Order...",
     "placeOrder": "Place Order & Proceed to Payment",
-    "fillAllFields": "Please fill in all shipping fields"
+    "fillAllFields": "Please fill in all shipping fields",
+    "phoneHint": "International format, for example 243 81 234 5678"
   },
   "pawaPayPayment": {
     "title": "Mobile Money via pawaPay Payment",
@@ -230,7 +234,8 @@
     "noOrdersYet": "You haven't placed any orders yet.",
     "noFilterOrders": "No {{filter}} orders.",
     "orderNumber": "Order #{{id}}",
-    "qty": "Qty: {{quantity}} × ${{price}}"
+    "qty": "Qty: {{quantity}} × ${{price}}",
+    "date": "Date"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -300,13 +305,16 @@
     "email": "Email",
     "phone": "Phone",
     "address": "Address",
-    "addressLine": "123 Shop Street, City, ST 12345",
     "namePlaceholder": "Your Name",
     "emailPlaceholder": "Your Email",
     "subjectPlaceholder": "Subject",
     "messagePlaceholder": "Your Message",
     "sendMessage": "Send Message",
-    "successMessage": "Message sent successfully!"
+    "successMessage": "Message sent successfully!",
+    "chatTitle": "Quick question?",
+    "chatText": "Write to us in the chat: our team answers you right here on the site.",
+    "chatCta": "Open chat",
+    "formNote": "The button opens your email app with the message ready to send."
   },
   "faq": {
     "title": "Frequently Asked Questions",
@@ -314,11 +322,12 @@
     "q1": "How do I place an order?",
     "a1": "Simply browse our products, add items to your cart, and proceed to checkout. Follow the prompts to complete your order.",
     "q2": "What payment methods do you accept?",
-    "a2": "We accept all major credit cards, PayPal, and other secure payment methods.",
+    "a2": "Payment is made by Mobile Money through pawaPay: Airtel Money, Vodacom M-Pesa or Orange Money. You confirm the payment with your PIN on your phone.",
     "q3": "How long does shipping take?",
-    "a3": "Standard shipping takes 3-5 business days. Express shipping options are available at checkout.",
+    "a3": "Standard delivery takes 3 to 5 business days in Lubumbashi, Kipushi, Likasi and Kolwezi.",
     "q4": "What is your return policy?",
-    "a4": "We offer a 30-day return policy for most items. Items must be in original condition with tags attached."
+    "a4": "We offer a 30-day return policy for most items. Items must be in original condition with tags attached.",
+    "moreQuestions": "Can’t find your answer?"
   },
   "notFound": {
     "title": "404",
@@ -329,13 +338,6 @@
   },
   "search": {
     "placeholder": "Search products..."
-  },
-  "aiSearch": {
-    "title": "AI Product Search",
-    "placeholder": "Describe what you're looking for...",
-    "searching": "Searching...",
-    "search": "Search",
-    "prompt": "Ask AI to find the perfect products for you"
   },
   "reviews": {
     "title": "Customer Reviews",
@@ -349,5 +351,27 @@
   },
   "language": {
     "label": "Language"
+  },
+  "sell": {
+    "eyebrow": "Sell on Shelf153",
+    "title": "Open your store on Shelf153",
+    "subtitle": "Reach customers in Lubumbashi, Kipushi, Likasi and Kolwezi. You manage your products, Shelf153 handles Mobile Money payments.",
+    "ctaSignup": "Create an account to start",
+    "ctaApply": "Apply for my store",
+    "ctaManage": "Open my seller space",
+    "howTitle": "How it works",
+    "step1Title": "Create an account",
+    "step1Text": "Sign up for free as a customer on Shelf153.",
+    "step2Title": "Apply for your store",
+    "step2Text": "From your profile, click “Become a seller” and describe your store, with your Mobile Money number.",
+    "step3Title": "Review by Shelf153",
+    "step3Text": "Our team reviews your application. You get seller access as soon as it is approved.",
+    "step4Title": "Sell",
+    "step4Text": "Add your products, follow your orders and receive your payouts from your seller space.",
+    "conditionsTitle": "Conditions",
+    "conditionCommission": "Shelf153 takes a {{rate}}% commission on each sale. The rest is yours.",
+    "conditionPayout": "You are paid by Mobile Money (Airtel Money, Vodacom M-Pesa or Orange Money) once the order is delivered and paid.",
+    "conditionManage": "You manage your own products, stock and order shipping.",
+    "conditionRules": "Shelf153 may suspend a store that breaks the platform rules or misleads customers."
   }
 }

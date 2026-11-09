@@ -35,6 +35,10 @@ const chatSlice = createSlice({
       state.conversation = action.payload;
       state.isClosed = false;
     },
+    // An admin picked up the conversation: keep it (and its id) and only add the admin's name.
+    setConversationAdmin: (state, action) => {
+      if (state.conversation) state.conversation.admin_name = action.payload;
+    },
     addMessage: (state, action) => {
       state.messages.push(action.payload);
       if (!state.isOpen) state.unreadCount += 1;
@@ -77,6 +81,7 @@ const chatSlice = createSlice({
 export const {
   toggleChat,
   setConversation,
+  setConversationAdmin,
   addMessage,
   setTyping,
   clearTyping,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Star, Trash2 } from "lucide-react";
@@ -35,106 +35,126 @@ const ReviewsContainer = ({ product, productReviews }) => {
     });
   };
 
+  const average = productReviews?.length
+    ? productReviews.reduce((sum, review) => sum + Number(review.rating), 0) / productReviews.length
+    : 0;
+
   return (
-    <div className="mt-12">
-      <h2 className="text-2xl font-bold text-foreground mb-6">
-        {t('reviews.title')}
-      </h2>
-
-      {authUser && (
-        <form
-          onSubmit={handleSubmitReview}
-          className="glass-panel mb-8 space-y-4"
-        >
-          <h3 className="font-semibold text-foreground">{t('reviews.writeReview')}</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">{t('reviews.rating')}</span>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => setRating(star)}
-                className="focus:outline-none"
-              >
+    <section className="mt-12 pt-10 border-t border-border grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+      <div className="lg:col-span-4">
+        <h2 className="section-title">{t("reviews.title")}</h2>
+        <div className="mt-3 flex items-center gap-3">
+          <span className="text-4xl font-extrabold text-foreground tabular-nums">{average.toFixed(1)}</span>
+          <div>
+            <div className="flex items-center gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => (
                 <Star
-                  className={`w-5 h-5 ${
-                    star <= rating
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-muted-foreground"
-                  }`}
+                  key={star}
+                  className={`w-4 h-4 ${star <= Math.round(average) ? "fill-amber-400 text-amber-400" : "fill-border text-border"}`}
                 />
-              </button>
-            ))}
-          </div>
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder={t('reviews.placeholder')}
-            rows={3}
-            className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-            required
-          />
-          <button
-            type="submit"
-            disabled={isPostingReview}
-            className="px-6 py-2 gradient-primary text-primary-foreground rounded-lg font-semibold disabled:opacity-50"
-          >
-            {isPostingReview ? t('reviews.posting') : t('reviews.submit')}
-          </button>
-        </form>
-      )}
-
-      <div className="space-y-4">
-        {productReviews && productReviews.length > 0 ? (
-          productReviews.map((review) => (
-            <div key={review.review_id} className="glass-panel">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={
-                      review.reviewer?.avatar?.url || "/avatar-holder.avif"
-                    }
-                    alt="reviewer"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <div>
-                    <h4 className="font-medium text-foreground">
-                      {review.reviewer?.name || t('reviews.anonymous')}
-                    </h4>
-                    <div className="flex items-center gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-3 h-3 ${
-                            star <= review.rating
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-muted-foreground"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                {authUser && authUser.id === review.reviewer?.id && (
-                  <button
-                    onClick={handleDeleteReview}
-                    disabled={isReviewDeleting}
-                    className="p-2 hover:bg-destructive/20 rounded-lg text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-              <p className="mt-3 text-muted-foreground">{review.comment}</p>
+              ))}
             </div>
-          ))
-        ) : (
-          <p className="text-center text-muted-foreground py-8">
-            {t('reviews.empty')}
-          </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t("productDetail.reviews", { count: productReviews?.length || 0 })}
+            </p>
+          </div>
+        </div>
+
+        {authUser && (
+          <form onSubmit={handleSubmitReview} className="surface p-5 mt-6 space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">{t("reviews.writeReview")}</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">{t("reviews.rating")}</span>
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    aria-label={`${star}/5`}
+                    aria-pressed={star === rating}
+                    className="p-1 rounded"
+                  >
+                    <Star
+                      className={`w-5 h-5 ${star <= rating ? "fill-amber-400 text-amber-400" : "fill-border text-border"}`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder={t("reviews.placeholder")}
+              rows={4}
+              className="field h-auto py-3 resize-none"
+              required
+            />
+            <button type="submit" disabled={isPostingReview} className="btn-primary w-full">
+              {isPostingReview ? t("reviews.posting") : t("reviews.submit")}
+            </button>
+          </form>
         )}
       </div>
-    </div>
+
+      <div className="lg:col-span-8">
+        {productReviews && productReviews.length > 0 ? (
+          <ul className="divide-y divide-border surface">
+            {productReviews.map((review) => (
+              <li key={review.review_id} className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={review.reviewer?.avatar?.url || "/avatar-holder.avif"}
+                      alt=""
+                      className="w-10 h-10 rounded-full object-cover bg-secondary shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {review.reviewer?.name || t("reviews.anonymous")}
+                      </p>
+                      <div className="mt-0.5 flex items-center gap-2">
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`w-3.5 h-3.5 ${star <= review.rating ? "fill-amber-400 text-amber-400" : "fill-border text-border"}`}
+                            />
+                          ))}
+                        </div>
+                        {review.created_at && (
+                          <time className="text-xs text-muted-foreground" dateTime={review.created_at}>
+                            {new Date(review.created_at).toLocaleDateString()}
+                          </time>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {authUser && authUser.id === review.reviewer?.id && (
+                    <button
+                      onClick={handleDeleteReview}
+                      disabled={isReviewDeleting}
+                      aria-label={t("reviews.delete", { defaultValue: "Supprimer" })}
+                      className="icon-btn w-9 h-9 text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-foreground/85">{review.comment}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="surface px-6 py-12 text-center">
+            <span className="mx-auto w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
+              <Star className="w-5 h-5 text-muted-foreground" />
+            </span>
+            <p className="mt-4 text-sm text-muted-foreground">{t("reviews.empty")}</p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 };
 

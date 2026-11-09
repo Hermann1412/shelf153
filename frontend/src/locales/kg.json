@@ -8,7 +8,6 @@
   "errors": {
     "postReviewFailed": "Kutinda avis kuvondisa ve",
     "deleteReviewFailed": "Kukatula avis kuvondisa ve",
-    "aiSearchFailed": "Kuvava na AI kuvondisa ve",
     "registrationFailed": "Kusonika kuvondisa ve",
     "loginFailed": "Kukota kuvondisa ve",
     "logoutFailed": "Kubasika kuvondisa ve",
@@ -75,7 +74,6 @@
     "categorySubtitle": "Bakula bima yeto ya nkaka-nkaka mu ba Catégorie ya nswaswana",
     "features": {
       "shippingTitle": "Livraison ya Kondwa Ntalu",
-      "shippingDesc": "Livraison ya kondwa ntalu mu bikomanda bileka $50 va nza yamvimba",
       "paymentTitle": "Mfutu wa Nlundulu",
       "paymentDesc": "Mfutu wa nlundulu na 100%, ye SSL encryption",
       "supportTitle": "Lusadusu 24/7",
@@ -120,7 +118,6 @@
     "sortPriceAsc": "Ntalu: Fioti tii Nene",
     "sortPriceDesc": "Ntalu: Nene tii Fioti",
     "sortTopRated": "ya Ntalu ya Zulu",
-    "aiSearch": "Recherche na AI",
     "filters": "Ba Filtre",
     "clearAll": "Katula Yonso",
     "search": "Vava",
@@ -176,7 +173,7 @@
     "subtotal": "Sous-total",
     "shipping": "Livraison",
     "free": "Kondwa Ntalu",
-    "tax": "Mpaku (8%)",
+    "tax": "Mpaku (18%)",
     "total": "Ntalu Yonso",
     "freeShippingRemaining": "Yika ${{amount}} diaka mu baka livraison ya kondwa ntalu",
     "proceedToCheckout": "Kwenda kwa Checkout",
@@ -311,9 +308,7 @@
     "q1": "Buevi mfweti tuma komanda?",
     "a1": "Kaka tala bima yeto, yika bima mu Panier aku, ye kwenda kwa Checkout. Landa malongi mu manisa komanda aku.",
     "q2": "Nki ba mfutu beno ke tambula?",
-    "a2": "Beto ke tambula ba carte ya crédit yonso ya nene, PayPal, ye bankaka ba mfutu ya nlundulu.",
     "q3": "Ntangu nki livraison ke bonga?",
-    "a3": "Livraison ya kimenga ke bonga bilumbu 3 nate 5 ya kisalu. Ba option ya livraison ya nsualu zena mu Checkout.",
     "q4": "Nki nsiku beno mu kuvutula bima?",
     "a4": "Beto ke pesa nsiku ya kuvutula bima mu bilumbu 30 mu bima ke wombo. Bima fweti vwanda mu mbandu ya ntete ye ba étiquette kangama."
   },
@@ -326,13 +321,6 @@
   },
   "search": {
     "placeholder": "Vava bima..."
-  },
-  "aiSearch": {
-    "title": "Recherche ya Bima na AI",
-    "placeholder": "Songa mambu odi ke vava...",
-    "searching": "Ke Vava...",
-    "search": "Vava",
-    "prompt": "Yuvula AI mu vava bima ya mbote-mbote mu nge"
   },
   "reviews": {
     "title": "Ba Avis ya Basumbi",

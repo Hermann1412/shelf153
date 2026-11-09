@@ -3,6 +3,7 @@ import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
 import i18n from "../../lib/i18n";
 import { getUser } from "./authSlice";
+import { withStore } from "../../lib/storeScope";
 
 export const applyToBecomeSeller = createAsyncThunk(
   "seller/apply",
@@ -23,9 +24,9 @@ export const applyToBecomeSeller = createAsyncThunk(
 
 export const fetchStoreProfile = createAsyncThunk(
   "seller/fetchStoreProfile",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const { data } = await axiosInstance.get("/seller/store-profile");
+      const { data } = await axiosInstance.get(withStore("/seller/store-profile", getState));
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
@@ -51,9 +52,9 @@ export const updateStoreProfile = createAsyncThunk(
 
 export const fetchSellerProducts = createAsyncThunk(
   "seller/fetchProducts",
-  async (page = 1, { rejectWithValue }) => {
+  async (page = 1, { rejectWithValue, getState }) => {
     try {
-      const { data } = await axiosInstance.get(`/seller/products?page=${page}`);
+      const { data } = await axiosInstance.get(withStore(`/seller/products?page=${page}`, getState));
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
@@ -63,9 +64,9 @@ export const fetchSellerProducts = createAsyncThunk(
 
 export const fetchSellerOrders = createAsyncThunk(
   "seller/fetchOrders",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const { data } = await axiosInstance.get("/seller/orders");
+      const { data } = await axiosInstance.get(withStore("/seller/orders", getState));
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
@@ -92,9 +93,9 @@ export const updateOrderItemStatus = createAsyncThunk(
 
 export const fetchSellerDashboardStats = createAsyncThunk(
   "seller/dashboardStats",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const { data } = await axiosInstance.get("/seller/dashboard-stats");
+      const { data } = await axiosInstance.get(withStore("/seller/dashboard-stats", getState));
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);

@@ -17,11 +17,12 @@ export const fetchDashboardStats = createAsyncThunk(
 
 export const getAllUsers = createAsyncThunk(
   "admin/getAllUsers",
-  async (page = 1, { rejectWithValue }) => {
+  async ({ page = 1, role = "", search = "" } = {}, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.get(
-        `/admin/getallusers?page=${page}`
-      );
+      const params = new URLSearchParams({ page: String(page) });
+      if (role) params.set("role", role);
+      if (search.trim()) params.set("search", search.trim());
+      const { data } = await axiosInstance.get(`/admin/getallusers?${params}`);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
@@ -66,6 +67,7 @@ export const adminSlice = createSlice({
     loading: false,
     totalUsers: 0,
     users: [],
+    pendingApplications: 0,
     totalRevenueAllTime: 0,
     todayRevenue: 0,
     yesterdayRevenue: 0,
@@ -110,6 +112,7 @@ export const adminSlice = createSlice({
         state.loading = false;
         state.users = action.payload.users;
         state.totalUsers = action.payload.totalUsers;
+        state.pendingApplications = action.payload.pendingApplications || 0;
       })
       .addCase(getAllUsers.rejected, (state) => {
         state.loading = false;

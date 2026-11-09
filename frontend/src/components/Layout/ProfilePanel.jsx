@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { X, LogOut, Upload, Eye, EyeOff, Store } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { toggleProfilePanel } from "../../store/slices/popupSlice";
+import { Link } from "react-router-dom";
+import { toggleProfilePanel, toggleAuthPopup } from "../../store/slices/popupSlice";
 import {
   logout,
   updateProfile,
@@ -70,7 +71,7 @@ const ProfilePanel = () => {
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/50 z-50"
+        className="fixed inset-0 bg-black/40 z-50"
         onClick={() => dispatch(toggleProfilePanel())}
       />
       <div className="fixed top-0 right-0 h-full w-96 max-w-full bg-background border-l border-border z-50 flex flex-col overflow-y-auto">
@@ -224,20 +225,34 @@ const ProfilePanel = () => {
             </form>
           )}
 
-          <a
-            href={import.meta.env.VITE_DASHBOARD_URL || "http://localhost:5174"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full mt-6 py-3 bg-secondary text-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-secondary/80"
-          >
-            <Store className="w-5 h-5" />
-            {authUser.role === "Seller" ? t("profile.manageMyStore") : t("profile.becomeSeller")}
-          </a>
+          {/* Customers first see the selling conditions; sellers and the admin go straight to the dashboard. */}
+          {authUser.role === "User" ? (
+            <Link
+              to="/vendre"
+              onClick={() => dispatch(toggleProfilePanel())}
+              className="w-full mt-6 py-3 bg-secondary text-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-secondary/80"
+            >
+              <Store className="w-5 h-5" />
+              {t("profile.becomeSeller")}
+            </Link>
+          ) : (
+            <a
+              href={import.meta.env.VITE_DASHBOARD_URL || "http://localhost:5174"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full mt-6 py-3 bg-secondary text-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-secondary/80"
+            >
+              <Store className="w-5 h-5" />
+              {authUser.role === "Seller" ? t("profile.manageMyStore") : t("profile.openDashboard", "Ouvrir le dashboard")}
+            </a>
+          )}
 
           <button
-            onClick={() => {
-              dispatch(logout());
+            onClick={async () => {
               dispatch(toggleProfilePanel());
+              // Show the Shelf153 sign-in screen once the session is really closed.
+              await dispatch(logout());
+              dispatch(toggleAuthPopup());
             }}
             className="w-full mt-3 py-3 bg-destructive/10 text-destructive rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-destructive/20"
           >

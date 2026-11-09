@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { LoaderCircle, Plus, Eye, Pencil, Trash2, Search } from "lucide-react";
+import { categoryLabel } from "../lib/categories";
+import { PLATFORM_STORE } from "../lib/storeScope";
 import CreateProductModal from "../modals/CreateProductModal";
 import { useDispatch, useSelector } from "react-redux";
 import UpdateProductModal from "../modals/UpdateProductModal";
@@ -24,7 +26,9 @@ const SellerProducts = () => {
     isCreateProductModalOpened,
     isViewProductModalOpened,
     isUpdateProductModalOpened,
+    viewingStore,
   } = useSelector((state) => state.extra);
+  const canCreate = !viewingStore || viewingStore.id === PLATFORM_STORE;
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [page, setPage] = useState(1);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
@@ -90,13 +94,16 @@ const SellerProducts = () => {
               className="pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
-          <button
-            onClick={() => dispatch(toggleCreateProductModal())}
-            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            {t("products.addProduct")}
-          </button>
+          {/* A product the admin creates belongs to Shelf153, so only offer it in Shelf153's own view. */}
+          {canCreate && (
+            <button
+              onClick={() => dispatch(toggleCreateProductModal())}
+              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              {t("products.addProduct")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -136,7 +143,7 @@ const SellerProducts = () => {
                       {product.name}
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {product.category}
+                      {categoryLabel(product.category, t)}
                     </td>
                     <td className="px-4 py-3 text-gray-800">
                       ${Number(product.price).toFixed(2)}

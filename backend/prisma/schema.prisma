@@ -33,6 +33,8 @@ model SellerProfile {
   id                String   @id @default(uuid()) @db.Uuid
   user_id           String   @unique @db.Uuid
   store_name        String   @db.VarChar(150)
+  // Short, stable address of the store's own login page (/boutique/<slug>).
+  slug              String?  @unique @db.VarChar(80)
   store_description String?
   store_logo        Json?
   payout_phone      String?  @db.VarChar(20)

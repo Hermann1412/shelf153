@@ -9,16 +9,19 @@ import {
 } from "../store/slices/payoutSlice";
 
 const Payouts = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const viewingStore = useSelector((state) => state.extra?.viewingStore);
+  // Paying sellers is an admin-wide action; inside one store's view the admin sees its history only.
+  const adminView = user?.role === "Admin" && !viewingStore;
   const { payouts, summaries, loading, payingSellerId } = useSelector((state) => state.payout);
   const [currencies, setCurrencies] = useState({});
 
   useEffect(() => {
     dispatch(fetchPayouts());
-    if (user?.role === "Admin") dispatch(fetchPayoutSummary());
-  }, [dispatch, user?.role]);
+    if (adminView) dispatch(fetchPayoutSummary());
+  }, [dispatch, adminView]);
 
   const paySeller = async (sellerId) => {
     const currency = currencies[sellerId] || "USD";
@@ -39,7 +42,7 @@ const Payouts = () => {
         </div>
       </div>
 
-      {user?.role === "Admin" && (
+      {adminView && (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {summaries.map((summary) => (
             <div key={summary.seller_id} className="bg-white rounded-xl shadow-sm p-5 space-y-3">
@@ -108,7 +111,7 @@ const Payouts = () => {
                     <td className="px-4 py-3 font-semibold">{payout.currency} {Number(payout.amount).toFixed(2)}</td>
                     <td className="px-4 py-3">{payout.provider}</td>
                     <td className="px-4 py-3">{payout.status}</td>
-                    <td className="px-4 py-3">{new Date(payout.created_at).toLocaleDateString()}</td>
+                    <td className="px-4 py-3">{new Date(payout.created_at).toLocaleDateString(i18n?.language)}</td>
                   </tr>
                 ))}
                 {!payouts.length && <tr><td colSpan={5} className="px-4 py-10 text-center text-gray-500">{t("payouts.empty")}</td></tr>}

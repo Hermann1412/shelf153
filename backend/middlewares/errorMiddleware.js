@@ -36,11 +36,17 @@ export const errorMiddleware = (err, req, res, _next) => {
     err = new ErrorHandler(message, 400);
   }
 
-  const errorMessage = err.errors
+  let errorMessage = err.errors
     ? Object.values(err.errors)
         .map((error) => error.message)
         .join(" ")
     : err.message;
+
+  // Unexpected failures may carry database or library internals: log them, send a generic message.
+  if (err.statusCode >= 500 && !(err instanceof ErrorHandler)) {
+    console.error(`[${req.method} ${req.originalUrl}]`, err);
+    errorMessage = "Internal Server Error";
+  }
 
   return res.status(err.statusCode).json({
     success: false,

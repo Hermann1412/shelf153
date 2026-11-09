@@ -1,12 +1,13 @@
 import React from "react";
 import { formatNumber } from "../../lib/helper";
 import { useSelector } from "react-redux";
+import { selectSellerMode } from "../../lib/storeScope";
 import { useTranslation } from "react-i18next";
 
 const Stats = () => {
   const { t } = useTranslation();
   const { todayRevenue, yesterdayRevenue, currentMonthSales } = useSelector(
-    (state) => (state.auth.user?.role === "Seller" ? state.seller : state.admin)
+    (state) => (selectSellerMode(state) ? state.seller : state.admin)
   );
 
   const cards = [

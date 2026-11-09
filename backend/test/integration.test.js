@@ -294,6 +294,150 @@ if (!databaseUrl) {
     });
   });
 
+  describe("seller applications", () => {
+    const apply = (user, storeName) => request(app).post("/api/v1/seller/apply")
+      .set("Cookie", cookieFor(user)).field("store_name", storeName);
+
+    test("an application waits for admin approval before granting seller access", async () => {
+      const applicant = await createUser({ email: "applicant@example.test" });
+      const admin = await createUser({ email: "reviewer@example.test", role: "Admin" });
+
+      const sent = await apply(applicant, "Lubumbashi Crafts");
+      assert.equal(sent.status, 201);
+      assert.equal((await prisma.user.findUnique({ where: { id: applicant.id } })).role, "User");
+      assert.equal(sent.body.storeProfile.status, "Pending");
+      assert.equal((await apply(applicant, "Again")).status, 409);
+
+      // Still a buyer: no seller routes, but it can read its own application.
+      assert.equal((await request(app).get("/api/v1/seller/products").set("Cookie", cookieFor(applicant))).status, 403);
+      const own = await request(app).get("/api/v1/seller/store-profile").set("Cookie", cookieFor(applicant));
+      assert.equal(own.body.storeProfile.status, "Pending");
+      const shops = await request(app).get("/api/v1/seller/all");
+      assert.ok(!shops.body.shops.some((shop) => shop.id === applicant.id));
+
+      const pending = await request(app).get("/api/v1/admin/getallusers?role=Pending").set("Cookie", cookieFor(admin));
+      assert.equal(pending.body.pendingApplications, 1);
+      assert.deepEqual(pending.body.users.map((user) => user.id), [applicant.id]);
+
+      const approved = await request(app).patch(`/api/v1/admin/seller/${applicant.id}/status`)
+        .set("Cookie", cookieFor(admin)).send({ status: "Approved" });
+      assert.equal(approved.status, 200);
+      const seller = await prisma.user.findUnique({ where: { id: applicant.id } });
+      assert.equal(seller.role, "Seller");
+      assert.equal((await request(app).get("/api/v1/seller/products").set("Cookie", cookieFor(seller))).status, 200);
+      // A seller never reaches the main admin's tools.
+      for (const path of ["/api/v1/admin/getallusers", "/api/v1/admin/finance", "/api/v1/order/admin/getall", "/api/v1/chat/conversations"]) {
+        assert.equal((await request(app).get(path).set("Cookie", cookieFor(seller))).status, 403, path);
+      }
+    });
+
+    test("a refused application can be corrected and sent again", async () => {
+      const applicant = await createUser({ email: "refused@example.test" });
+      const admin = await createUser({ email: "reviewer2@example.test", role: "Admin" });
+      await apply(applicant, "First try");
+      const refused = await request(app).patch(`/api/v1/admin/seller/${applicant.id}/status`)
+        .set("Cookie", cookieFor(admin)).send({ status: "Rejected" });
+      assert.equal(refused.status, 200);
+      assert.equal((await prisma.user.findUnique({ where: { id: applicant.id } })).role, "User");
+      // A refused store cannot be "suspended" or approved without a new application.
+      assert.equal((await request(app).patch(`/api/v1/admin/seller/${applicant.id}/status`)
+        .set("Cookie", cookieFor(admin)).send({ status: "Approved" })).status, 409);
+      const resent = await apply(applicant, "Second try");
+      assert.equal(resent.status, 201);
+      assert.equal(resent.body.storeProfile.status, "Pending");
+      assert.equal(resent.body.storeProfile.store_name, "Second try");
+    });
+  });
+
+  describe("store links and admin store access", () => {
+    test("each approved store gets a login link and the admin can open any store's space", async () => {
+      const admin = await createUser({ email: "store-admin@example.test", role: "Admin" });
+      const applicant = await createUser({ email: "store-owner@example.test" });
+      const other = await createUser({ email: "other-seller@example.test" });
+
+      const sent = await request(app).post("/api/v1/seller/apply").set("Cookie", cookieFor(applicant)).field("store_name", "Mama Crochet Élégance");
+      assert.equal(sent.body.storeProfile.slug, "mama-crochet-elegance");
+      // Not public until approved.
+      assert.equal((await request(app).get("/api/v1/seller/public/mama-crochet-elegance")).status, 404);
+      await request(app).patch(`/api/v1/admin/seller/${applicant.id}/status`).set("Cookie", cookieFor(admin)).send({ status: "Approved" });
+      const page = await request(app).get("/api/v1/seller/public/mama-crochet-elegance");
+      assert.equal(page.status, 200);
+      assert.equal(page.body.store.store_name, "Mama Crochet Élégance");
+      assert.equal(page.body.store.id, applicant.id);
+
+      await request(app).post("/api/v1/seller/apply").set("Cookie", cookieFor(other)).field("store_name", "Other");
+      await request(app).patch(`/api/v1/admin/seller/${other.id}/status`).set("Cookie", cookieFor(admin)).send({ status: "Approved" });
+      await prisma.product.createMany({
+        data: [
+          { name: "Mama item", description: "d", price: 10, category: "Test", stock: 3, created_by: applicant.id },
+          { name: "Other item", description: "d", price: 10, category: "Test", stock: 3, created_by: other.id },
+          { name: "Shelf153 item", description: "d", price: 10, category: "Test", stock: 3, created_by: admin.id },
+        ],
+      });
+
+      const stores = await request(app).get("/api/v1/seller/stores").set("Cookie", cookieFor(admin));
+      assert.equal(stores.body.stores[0].id, "platform");
+      assert.ok(stores.body.stores.some((store) => store.id === applicant.id));
+
+      const names = async (cookie, query = "") => (await request(app).get(`/api/v1/seller/products${query}`).set("Cookie", cookie))
+        .body.products?.map((product) => product.name);
+      assert.deepEqual(await names(cookieFor(admin), `?store=${applicant.id}`), ["Mama item"]);
+      assert.deepEqual(await names(cookieFor(admin), "?store=platform"), ["Shelf153 item"]);
+      assert.equal((await request(app).get("/api/v1/seller/products").set("Cookie", cookieFor(admin))).status, 400);
+
+      // A seller stays in their own store whatever ?store= says, and cannot list stores.
+      const seller = await prisma.user.findUnique({ where: { id: applicant.id } });
+      assert.deepEqual(await names(cookieFor(seller), `?store=${other.id}`), ["Mama item"]);
+      assert.equal((await request(app).get("/api/v1/seller/stores").set("Cookie", cookieFor(seller))).status, 403);
+    });
+  });
+
+  describe("platform-owned products", () => {
+    test("Shelf153's own products keep 100% for the platform and create no seller payable", async () => {
+      const buyer = await createUser({ email: "mixed-buyer@example.test" });
+      const admin = await createUser({ email: "platform-admin@example.test", role: "Admin" });
+      const seller = await createUser({ email: "mixed-seller@example.test", role: "Seller" });
+      const ownProduct = await prisma.product.create({
+        data: { name: "Shelf153 item", description: "Own stock", price: 30, category: "Test", stock: 5, created_by: admin.id },
+      });
+      const sellerProduct = await prisma.product.create({
+        data: { name: "Seller item", description: "Marketplace", price: 20, category: "Test", stock: 5, created_by: seller.id },
+      });
+      const { createPlaceNewOrderHandler } = await import("../controllers/orderController.js");
+      const handler = createPlaceNewOrderHandler({ startPayment: async (depositId) => ({ success: true, transactionId: depositId }) });
+      const response = { statusCode: 200, body: null };
+      response.status = (code) => { response.statusCode = code; return response; };
+      response.json = (body) => { response.body = body; return response; };
+      await handler({
+        user: buyer,
+        headers: {},
+        body: {
+          full_name: "Buyer", state: "HK", city: "Lubumbashi", country: "CD",
+          address: "Address", pincode: "0000", phone: "243990000000", provider: "AIRTEL_COD",
+          orderedItems: [{ product: { id: ownProduct.id }, quantity: 1 }, { product: { id: sellerProduct.id }, quantity: 1 }],
+        },
+      }, response, (error) => { throw error; });
+      assert.equal(response.statusCode, 201);
+
+      const items = await prisma.orderItem.findMany({ where: { order_id: response.body.orderId } });
+      const own = items.find((item) => item.product_id === ownProduct.id);
+      const sold = items.find((item) => item.product_id === sellerProduct.id);
+      assert.equal(own.seller_id, null);
+      assert.equal(Number(own.platform_commission), 30);
+      assert.equal(Number(own.seller_net_amount), 0);
+      assert.equal(sold.seller_id, seller.id);
+      assert.equal(Number(sold.platform_commission), 1.4);
+      assert.equal(Number(sold.seller_net_amount), 18.6);
+
+      await paymentService.transitionPayment(response.body.orderId, "Paid", { status: "COMPLETED" });
+      const payables = await prisma.financialLedgerEntry.findMany({
+        where: { order_id: response.body.orderId, type: "SELLER_PAYABLE" },
+      });
+      assert.equal(payables.length, 1);
+      assert.equal(payables[0].seller_id, seller.id);
+    });
+  });
+
   describe("payment transitions", () => {
     test("creates a CDF deposit using the configured rate and stores the conversion", async () => {
       const buyer = await createUser({ email: "cdf-buyer@example.test" });

@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { selectSellerMode } from "../../lib/storeScope";
 import { useTranslation } from "react-i18next";
 import {
   BarChart,
@@ -15,7 +16,7 @@ const COLORS = ["#25D366", "#128C7E", "#f59e0b", "#ef4444", "#8b5cf6"];
 const TopProductsChart = () => {
   const { t } = useTranslation();
   const { topSellingProducts } = useSelector((state) =>
-    state.auth.user?.role === "Seller" ? state.seller : state.admin
+    selectSellerMode(state) ? state.seller : state.admin
   );
 
   const data = topSellingProducts.map((p) => ({

@@ -26,7 +26,7 @@ const SearchOverlay = () => {
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-32"
+        className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center pt-32"
         onClick={() => dispatch(toggleSearchBar())}
       >
         <div

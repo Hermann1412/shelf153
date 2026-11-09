@@ -48,10 +48,6 @@ services:
       - key: SMTP_PORT
         value: "465"
 
-      # Optional: leave unset in the Render dashboard to disable the AI search feature.
-      - key: GEMINI_API_KEY
-        sync: false
-
       - key: CLOUDINARY_CLIENT_NAME
         sync: false
       - key: CLOUDINARY_CLIENT_API

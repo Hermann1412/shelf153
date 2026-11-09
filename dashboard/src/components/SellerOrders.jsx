@@ -15,7 +15,7 @@ const statusColors = {
 };
 
 const SellerOrders = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { orderItems, loading } = useSelector((state) => state.seller);
   const [filter, setFilter] = useState("All");
@@ -150,7 +150,7 @@ const SellerOrders = () => {
                       </select>
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {new Date(item.order_created_at).toLocaleDateString()}
+                      {new Date(item.order_created_at).toLocaleDateString(i18n?.language)}
                     </td>
                   </tr>
                 ))}

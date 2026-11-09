@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { selectSellerMode } from "../../lib/storeScope";
 import { useTranslation } from "react-i18next";
 import {
   XAxis,
@@ -13,7 +14,7 @@ import {
 const MonthlySalesChart = () => {
   const { t } = useTranslation();
   const { monthlySales } = useSelector((state) =>
-    state.auth.user?.role === "Seller" ? state.seller : state.admin
+    selectSellerMode(state) ? state.seller : state.admin
   );
 
   return (

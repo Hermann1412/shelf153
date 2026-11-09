@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   ListOrdered,
@@ -17,14 +17,17 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { setOpenedComponent, toggleNavbar } from "../store/slices/extraSlice";
+import { setOpenedComponent, toggleNavbar, setViewingStore } from "../store/slices/extraSlice";
+import { axiosInstance } from "../lib/axios";
+import { PLATFORM_STORE } from "../lib/storeScope";
+import Logo from "./Logo";
 import { logout } from "../store/slices/authSlice";
 
 const SideBar = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { openedComponent, isNavbarOpened } = useSelector(
+  const { openedComponent, isNavbarOpened, viewingStore } = useSelector(
     (state) => state.extra
   );
   const { user } = useSelector((state) => state.auth);
@@ -60,7 +63,27 @@ const SideBar = () => {
     ],
   };
 
-  const navItems = navItemsByRole[user?.role] || [];
+  // The main admin can open any store from the switcher and then sees that store's seller menu.
+  // Shelf153 itself pays no seller, so its store view has no Payouts entry.
+  const isAdmin = user?.role === "Admin";
+  const [stores, setStores] = useState([]);
+  useEffect(() => {
+    if (!isAdmin) return;
+    axiosInstance
+      .get("/seller/stores")
+      .then(({ data }) => setStores(data.stores || []))
+      .catch(() => {});
+  }, [isAdmin]);
+
+  const storeItems = navItemsByRole.Seller
+    .filter((item) => !(viewingStore?.id === PLATFORM_STORE && item.label === "Payouts"))
+    .filter((item) => item.label !== "Profile");
+  const navItems = isAdmin && viewingStore ? storeItems : navItemsByRole[user?.role] || [];
+
+  const handleStoreChange = (event) => {
+    const store = stores.find((entry) => entry.id === event.target.value) || null;
+    dispatch(setViewingStore(store));
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -77,20 +100,25 @@ const SideBar = () => {
       )}
 
       <aside
-        className={`fixed lg:static z-40 top-0 left-0 h-full w-64 bg-white shadow-lg transform transition-all duration-300 ease-in-out ${
+        // Sticky full-height column on desktop: long pages scroll past it and Logout stays in view.
+        className={`fixed lg:sticky z-40 top-0 left-0 h-screen shrink-0 w-64 bg-white shadow-lg transform transition-all duration-300 ease-in-out ${
           isNavbarOpened ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 ${isCollapsed ? "lg:w-20" : "lg:w-64"}`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b">
-            <h1
-              className={`text-xl font-bold text-green-600 ${
-                isCollapsed ? "lg:hidden" : ""
-              }`}
-            >
-              {t("sidebar.brand")}
-            </h1>
+            <div className={`min-w-0 ${isCollapsed ? "lg:hidden" : ""}`}>
+              <Logo size="sm" />
+              <p className="mt-1 text-[0.6875rem] font-semibold uppercase tracking-wider text-gray-400">
+                {isAdmin ? t("sidebar.adminSpace", "Administration") : t("sidebar.sellerBrand", "Espace vendeur")}
+              </p>
+            </div>
+            {isCollapsed && (
+              <span className="hidden lg:block">
+                <Logo size="sm" showText={false} />
+              </span>
+            )}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               aria-label={isCollapsed ? t("sidebar.expand") : t("sidebar.collapse")}
@@ -111,12 +139,42 @@ const SideBar = () => {
             </button>
           </div>
 
+          {/* Store switcher (main admin only) */}
+          {isAdmin && !isCollapsed && (
+            <div className="px-4 pt-4">
+              <label htmlFor="store-switcher" className="block mb-1.5 text-xs font-medium text-gray-500">
+                {t("sidebar.viewing", "Vous gérez")}
+              </label>
+              <select
+                id="store-switcher"
+                value={viewingStore?.id || ""}
+                onChange={handleStoreChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">{t("sidebar.platformAdmin", "Administration Shelf153")}</option>
+                <optgroup label={t("sidebar.stores", "Boutiques")}>
+                  {stores.map((store) => (
+                    <option key={store.id} value={store.id}>
+                      {store.store_name}
+                      {store.status === "Suspended" ? ` (${t("users.suspendedSeller")})` : ""}
+                    </option>
+                  ))}
+                </optgroup>
+              </select>
+            </div>
+          )}
+
           {/* Nav Items */}
-          <nav className="flex-1 p-4 space-y-1">
+          <nav className="flex-1 min-h-0 overflow-y-auto p-4 space-y-1">
             {navItems.map((item) => (
               <button
                 key={item.label}
-                onClick={() => dispatch(setOpenedComponent(item.label))}
+                onClick={() => {
+                  dispatch(setOpenedComponent(item.label));
+                  // On phones the sidebar is a drawer: close it once a section is picked.
+                  if (isNavbarOpened) dispatch(toggleNavbar());
+                }}
+                aria-current={openedComponent === item.label ? "page" : undefined}
                 title={isCollapsed ? item.display || t(`sidebar.${item.label.charAt(0).toLowerCase()}${item.label.slice(1)}`, item.label) : undefined}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                   openedComponent === item.label

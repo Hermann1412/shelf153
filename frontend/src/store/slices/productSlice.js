@@ -74,21 +74,6 @@ export const fetchShops = createAsyncThunk(
   }
 );
 
-export const fetchAIProducts = createAsyncThunk(
-  "product/aiSearch",
-  async (userPrompt, { rejectWithValue }) => {
-    try {
-      const { data } = await axiosInstance.post("/product/ai-search", {
-        userPrompt,
-      });
-      return data;
-    } catch (error) {
-      toast.error(error.response?.data?.message || i18n.t("errors.aiSearchFailed"));
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
-
 const productSlice = createSlice({
   name: "product",
   initialState: {
@@ -98,8 +83,6 @@ const productSlice = createSlice({
     totalProducts: 0,
     topRatedProducts: [],
     newProducts: [],
-    aiSearching: false,
-    aiProducts: [],
     isReviewDeleting: false,
     isPostingReview: false,
     productReviews: [],
@@ -151,16 +134,6 @@ const productSlice = createSlice({
       })
       .addCase(fetchShops.fulfilled, (state, action) => {
         state.shops = action.payload.shops || [];
-      })
-      .addCase(fetchAIProducts.pending, (state) => {
-        state.aiSearching = true;
-      })
-      .addCase(fetchAIProducts.fulfilled, (state, action) => {
-        state.aiSearching = false;
-        state.aiProducts = action.payload.products || [];
-      })
-      .addCase(fetchAIProducts.rejected, (state) => {
-        state.aiSearching = false;
       });
   },
 });

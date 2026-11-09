@@ -26,6 +26,7 @@ const Payment = lazy(() => import("./pages/Payment"));
 const About = lazy(() => import("./pages/About"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Sell = lazy(() => import("./pages/Sell"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const AppContent = () => {
@@ -45,7 +46,7 @@ const AppContent = () => {
       <ProfilePanel />
       <LoginModal />
       <ChatWidget />
-      <Suspense fallback={<div className="min-h-screen pt-32 text-center text-muted-foreground">Loading…</div>}>
+      <Suspense fallback={<div className="min-h-[60vh] pt-16 text-center text-muted-foreground">Loading…</div>}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/password/reset/:token" element={<Index />} />
@@ -57,6 +58,7 @@ const AppContent = () => {
         <Route path="/about" element={<About />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/vendre" element={<Sell />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </Suspense>

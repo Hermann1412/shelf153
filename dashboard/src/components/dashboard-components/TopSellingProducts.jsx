@@ -1,12 +1,13 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { selectSellerMode } from "../../lib/storeScope";
 import { useTranslation } from "react-i18next";
 import { Star } from "lucide-react";
 
 const TopSellingProducts = () => {
   const { t } = useTranslation();
   const { topSellingProducts } = useSelector((state) =>
-    state.auth.user?.role === "Seller" ? state.seller : state.admin
+    selectSellerMode(state) ? state.seller : state.admin
   );
 
   return (

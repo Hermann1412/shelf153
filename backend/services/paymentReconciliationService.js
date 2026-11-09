@@ -202,7 +202,8 @@ export const startPaymentReconciliation = () => {
     try {
       await Promise.all([reconcilePendingPayments(), reconcilePendingPayouts(), reconcilePendingRefunds()]);
     } catch (error) {
-      financialLog("error", "pawapay.reconciliation_cycle_failed", { error: error.message });
+      // Prisma connection errors have an empty message; the code (e.g. ECONNREFUSED) is the useful part.
+      financialLog("error", "pawapay.reconciliation_cycle_failed", { code: error.code, error: error.message.trim() });
     } finally {
       running = false;
     }

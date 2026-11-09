@@ -25,13 +25,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const pages = getPages();
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-8">
+    <nav aria-label="Pagination" className="flex items-center justify-center gap-1.5">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-lg bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground disabled:opacity-50 transition-colors"
+        aria-label="Previous page"
+        className="icon-btn border border-border bg-card disabled:opacity-40 disabled:pointer-events-none"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-4 h-4" />
       </button>
       {pages.map((page, i) =>
         page === "..." ? (
@@ -42,10 +43,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+            aria-current={currentPage === page ? "page" : undefined}
+            className={`min-w-10 h-10 px-3 rounded-lg text-sm font-semibold tabular-nums transition-colors ${
               currentPage === page
-                ? "gradient-primary text-primary-foreground"
-                : "bg-secondary text-foreground hover:bg-primary/20"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card border border-border text-foreground hover:border-primary/50"
             }`}
           >
             {page}
@@ -55,11 +57,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-lg bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground disabled:opacity-50 transition-colors"
+        aria-label="Next page"
+        className="icon-btn border border-border bg-card disabled:opacity-40 disabled:pointer-events-none"
       >
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="w-4 h-4" />
       </button>
-    </div>
+    </nav>
   );
 };
 

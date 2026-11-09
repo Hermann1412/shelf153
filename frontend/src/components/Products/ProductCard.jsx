@@ -1,23 +1,24 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cartSlice";
 import { toast } from "react-toastify";
-
-const FREE_SHIPPING_THRESHOLD = 100;
+import { categoryLabel, FREE_SHIPPING_THRESHOLD } from "../../data/products";
 
 const ProductCard = ({ product }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [wishlisted, setWishlisted] = useState(false);
+  const outOfStock = product.stock === 0;
+  const reviewCount = Number(product.review_count || 0);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     dispatch(addToCart({ product, quantity: 1 }));
-    toast.success(t('productCard.addedToCart'));
+    toast.success(t("productCard.addedToCart"));
   };
 
   const handleToggleWishlist = (e) => {
@@ -34,70 +35,79 @@ const ProductCard = ({ product }) => {
   return (
     <Link
       to={`/product/${product.id}`}
-      className="mp-card mp-card-hover group overflow-hidden animate-smooth"
+      className="mp-card mp-card-hover group flex flex-col h-full"
     >
-      <div className="relative overflow-hidden">
+      <div className="relative aspect-square overflow-hidden bg-secondary">
         <img
           src={product.images?.[0]?.url || "/avatar-holder.avif"}
           alt={product.name}
-          className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+          className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03] ${outOfStock ? "opacity-60" : ""}`}
         />
-        {product.stock === 0 && (
-          <span className="absolute top-2 left-2 px-2 py-1 bg-destructive text-destructive-foreground text-xs rounded-md font-medium">
-            {t('productCard.outOfStock')}
+        {outOfStock && (
+          <span className="absolute top-2.5 left-2.5 max-w-[calc(100%-3.75rem)] truncate px-2 py-1 bg-foreground/85 text-background text-xs rounded-md font-semibold">
+            {t("productCard.outOfStock")}
           </span>
         )}
         {product.stock > 0 && product.stock <= 5 && (
-          <span className="absolute top-2 left-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded-md font-medium">
-            {t('productCard.onlyLeft', { count: product.stock })}
+          <span className="absolute top-2.5 left-2.5 max-w-[calc(100%-3.75rem)] truncate px-2 py-1 bg-warning text-warning-foreground text-xs rounded-md font-semibold">
+            {t("productCard.onlyLeft", { count: product.stock })}
           </span>
         )}
         <button
           onClick={handleToggleWishlist}
-          aria-label={t('productCard.wishlist')}
-          className="absolute top-2 right-2 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors"
+          aria-label={t("productCard.wishlist")}
+          aria-pressed={wishlisted}
+          className="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-card/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-card transition-colors"
         >
           <Heart
-            className={`w-5 h-5 ${wishlisted ? "fill-destructive text-destructive" : "text-foreground"}`}
+            className={`w-[1.125rem] h-[1.125rem] ${wishlisted ? "fill-destructive text-destructive" : "text-foreground"}`}
           />
         </button>
       </div>
-      <div className="p-4">
-        <p className="text-sm text-muted-foreground mb-1">{product.category}</p>
-        <h3 className="text-base font-semibold text-foreground truncate mb-1">
+
+      <div className="flex flex-col flex-1 p-3 sm:p-4">
+        <p className="text-xs font-medium text-muted-foreground truncate">
+          {categoryLabel(product.category, t)}
+        </p>
+        {/* Two lines reserved so prices and buttons line up across a row. */}
+        <h3 className="mt-1 text-sm sm:text-[0.9375rem] font-semibold leading-snug text-foreground line-clamp-2 min-h-[2.5rem] sm:min-h-[2.625rem] group-hover:text-primary transition-colors">
           {product.name}
         </h3>
         <p
           onClick={handleSellerClick}
-          className={`text-sm text-muted-foreground/80 mb-1 truncate ${product.seller?.id ? "hover:text-primary hover:underline w-fit" : ""}`}
+          className={`mt-1 text-xs text-muted-foreground truncate ${product.seller?.id ? "hover:text-primary hover:underline" : ""}`}
         >
-          {t('productCard.soldBy', { name: product.seller?.name || "Shelf153" })}
+          {t("productCard.soldBy", { name: product.seller?.name || "Shelf153" })}
         </p>
-        <div className="flex items-center gap-1 mb-2">
-          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-          <span className="text-sm text-muted-foreground">
-            {Number(product.ratings).toFixed(1)}
-            {product.review_count !== undefined && ` (${product.review_count})`}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <p className="text-xl font-bold text-primary">
+
+        <div className="mt-2.5 flex items-center justify-between gap-2">
+          <p className="text-base sm:text-lg font-bold text-foreground tabular-nums">
             ${Number(product.price).toFixed(2)}
           </p>
-          {Number(product.price) >= FREE_SHIPPING_THRESHOLD && (
-            <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
-              {t('productCard.freeShipping')}
+          {reviewCount > 0 && (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              <span className="font-medium text-foreground">{Number(product.ratings).toFixed(1)}</span>
+              <span>({reviewCount})</span>
             </span>
           )}
         </div>
-        <button
-          onClick={handleAddToCart}
-          disabled={product.stock === 0}
-          className="w-full flex items-center justify-center gap-2 py-2.5 gradient-primary text-primary-foreground rounded-lg font-semibold text-sm hover:glow-on-hover animate-smooth disabled:opacity-50"
-        >
-          <ShoppingCart className="w-4 h-4" />
-          {t('productDetail.addToCart')}
-        </button>
+        <p className="h-4 text-xs font-medium text-primary truncate">
+          {Number(product.price) >= FREE_SHIPPING_THRESHOLD ? t("productCard.freeShipping") : ""}
+        </p>
+
+        <div className="mt-auto pt-3">
+          <button
+            onClick={handleAddToCart}
+            disabled={outOfStock}
+            className="btn-outline w-full group-hover:border-primary group-hover:text-primary"
+          >
+            <ShoppingCart className="w-4 h-4 shrink-0" />
+            <span className="truncate sm:hidden">{t("productCard.add")}</span>
+            <span className="truncate hidden sm:inline">{t("productDetail.addToCart")}</span>
+          </button>
+        </div>
       </div>
     </Link>
   );

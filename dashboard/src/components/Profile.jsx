@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Mail, Calendar, Shield } from "lucide-react";
 
 const Profile = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useSelector((state) => state.auth);
 
   if (!user) return null;
@@ -50,7 +50,7 @@ const Profile = () => {
             <div>
               <p className="text-xs text-gray-400">{t("profile.joined")}</p>
               <p className="text-sm font-medium text-gray-700">
-                {new Date(user.created_at).toLocaleDateString("en-US", {
+                {new Date(user.created_at).toLocaleDateString(i18n?.language, {
                   year: "numeric",
                   month: "long",
                   day: "numeric",

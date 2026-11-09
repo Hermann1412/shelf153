@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import avatar from "../assets/avatar.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { LoaderCircle, Trash2, Ban, RotateCcw, Search } from "lucide-react";
+import { LoaderCircle, Trash2, Ban, RotateCcw, Search, Check, X, Store } from "lucide-react";
+import { setViewingStore } from "../store/slices/extraSlice";
 import ConfirmDialog from "./ConfirmDialog";
 import {
   getAllUsers,
@@ -11,27 +12,30 @@ import {
 } from "../store/slices/adminSlice";
 
 const Users = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
-  const { users, totalUsers, loading } = useSelector((state) => state.admin);
+  const { users, totalUsers, loading, pendingApplications } = useSelector((state) => state.admin);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState("All");
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const totalPages = Math.ceil(totalUsers / 10);
 
+  // Wait for a pause in typing before asking the server.
   useEffect(() => {
-    dispatch(getAllUsers(page));
-  }, [dispatch, page]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  const filtered = users
-    .filter((u) => filter === "All" || u.role === filter)
-    .filter(
-      (u) =>
-        !search.trim() ||
-        u.name?.toLowerCase().includes(search.trim().toLowerCase()) ||
-        u.email?.toLowerCase().includes(search.trim().toLowerCase())
-    );
+  useEffect(() => {
+    dispatch(getAllUsers({ page, role: filter === "All" ? "" : filter, search: debouncedSearch }));
+  }, [dispatch, page, filter, debouncedSearch]);
+
+  const filtered = users;
 
   const handleDelete = (userId) => {
     setPendingDeleteId(userId);
@@ -46,11 +50,25 @@ const Users = () => {
     All: t("users.all"),
     User: t("users.user"),
     Seller: t("users.seller"),
+    Pending: t("users.applications", "Demandes"),
   };
+
+  const refresh = () =>
+    dispatch(getAllUsers({ page, role: filter === "All" ? "" : filter, search: debouncedSearch }));
 
   const handleToggleSuspend = (user) => {
     const nextStatus = user.seller_status === "Suspended" ? "Approved" : "Suspended";
     dispatch(updateSellerStatus({ userId: user.id, status: nextStatus }));
+  };
+
+  // Approving turns the applicant into a seller; refusing lets them correct and resend.
+  const handleReview = async (user, status) => {
+    const question = status === "Approved"
+      ? t("users.confirmApprove", { store: user.store_name, defaultValue: "Approuver la boutique « {{store}} » ? Elle pourra vendre sur Shelf153." })
+      : t("users.confirmReject", { store: user.store_name, defaultValue: "Refuser la boutique « {{store}} » ?" });
+    if (!window.confirm(question)) return;
+    const result = await dispatch(updateSellerStatus({ userId: user.id, status }));
+    if (updateSellerStatus.fulfilled.match(result)) refresh();
   };
 
   return (
@@ -71,10 +89,14 @@ const Users = () => {
             />
           </div>
           <div className="flex gap-2">
-            {["All", "User", "Seller"].map((f) => (
+            {["All", "User", "Seller", "Pending"].map((f) => (
               <button
                 key={f}
-                onClick={() => setFilter(f)}
+                onClick={() => {
+                  setFilter(f);
+                  setPage(1);
+                }}
+                aria-pressed={filter === f}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   filter === f
                     ? "bg-green-600 text-white"
@@ -82,6 +104,13 @@ const Users = () => {
                 }`}
               >
                 {filterLabels[f]}
+                {f === "Pending" && pendingApplications > 0 && (
+                  <span className={`ml-1.5 inline-flex min-w-[1.25rem] h-5 px-1 items-center justify-center rounded-full text-xs font-bold ${
+                    filter === f ? "bg-white text-green-700" : "bg-amber-500 text-white"
+                  }`}>
+                    {pendingApplications}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -106,6 +135,13 @@ const Users = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-12 text-center text-gray-500">
+                      {t("users.noUsersFound", "Aucun utilisateur trouvé.")}
+                    </td>
+                  </tr>
+                )}
                 {filtered.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
@@ -119,9 +155,14 @@ const Users = () => {
                           <span className="font-medium text-gray-800 block">
                             {user.name}
                           </span>
-                          {user.role === "Seller" && user.store_name && (
-                            <span className="text-xs text-gray-400">
+                          {user.store_name && (
+                            <span className="text-xs text-gray-400 block">
                               {user.store_name}
+                            </span>
+                          )}
+                          {user.seller_status === "Pending" && (
+                            <span className="text-xs text-gray-400 block">
+                              {[user.payout_provider, user.payout_phone].filter(Boolean).join(" · ")}
                             </span>
                           )}
                         </div>
@@ -131,14 +172,18 @@ const Users = () => {
                     <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          user.role === "Seller"
+                          user.seller_status === "Pending"
+                            ? "bg-amber-100 text-amber-800"
+                            : user.role === "Seller"
                             ? user.seller_status === "Suspended"
                               ? "bg-red-100 text-red-700"
                               : "bg-purple-100 text-purple-700"
                             : "bg-gray-100 text-gray-600"
                         }`}
                       >
-                        {user.role === "Seller" && user.seller_status === "Suspended"
+                        {user.seller_status === "Pending"
+                          ? t("users.pendingApplication", "Demande vendeur")
+                          : user.role === "Seller" && user.seller_status === "Suspended"
                           ? t("users.suspendedSeller")
                           : user.role === "Seller"
                           ? t("users.seller")
@@ -146,10 +191,38 @@ const Users = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {new Date(user.created_at).toLocaleDateString()}
+                      {new Date(user.created_at).toLocaleDateString(i18n?.language)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
+                        {user.seller_status === "Pending" && (
+                          <>
+                            <button
+                              onClick={() => handleReview(user, "Approved")}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-green-600 text-white hover:bg-green-700"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              {t("users.approve", "Approuver")}
+                            </button>
+                            <button
+                              onClick={() => handleReview(user, "Rejected")}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold border text-gray-700 hover:bg-gray-50"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                              {t("users.reject", "Refuser")}
+                            </button>
+                          </>
+                        )}
+                        {user.role === "Seller" && (
+                          <button
+                            onClick={() => dispatch(setViewingStore({ id: user.id, store_name: user.store_name, slug: user.store_slug }))}
+                            title={t("users.openStore", "Ouvrir la boutique")}
+                            aria-label={t("users.openStore", "Ouvrir la boutique")}
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-green-700 hover:bg-green-50"
+                          >
+                            <Store className="w-4 h-4" />
+                          </button>
+                        )}
                         {user.role === "Seller" && (
                           <button
                             onClick={() => handleToggleSuspend(user)}

@@ -24,6 +24,7 @@ const Footer = () => {
 
   const footerLinks = {
     company: [
+      { name: t("footer.sell"), path: "/vendre" },
       { name: t("footer.aboutUs"), path: "/about" },
       { name: t("footer.careers"), path: "#" },
       { name: t("footer.press"), path: "#" },
@@ -49,140 +50,79 @@ const Footer = () => {
     { icon: Facebook, href: "#", label: "Facebook" },
   ];
 
+  const columns = [
+    { title: t("footer.company"), links: footerLinks.company },
+    { title: t("footer.customerService"), links: footerLinks.customer },
+    { title: t("footer.legal"), links: footerLinks.legal },
+  ];
+
   return (
-    <footer className="glass border-t border-[hsla(var(--glass-border))] mt-16">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+    <footer className="mt-8 bg-card border-t border-border">
+      <div className="container mx-auto px-4 sm:px-6 pt-12 pb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-10">
           {/* Brand & Contact */}
-          <div className="lg:col-span-1">
-            <Logo className="mb-4" />
-            <p className="text-muted-foreground mb-6">
+          <div className="col-span-2 md:col-span-4 lg:col-span-2 lg:pr-10">
+            <Logo textClassName="text-xl" />
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground max-w-sm">
               {t("footer.description")}
             </p>
-            <div className="space-y-3">
-              {settings?.contact_email && (
-                <div className="flex items-center space-x-3 text-muted-foreground">
-                  <Mail className="w-5 h-5 text-primary" />
-                  <span>{settings.contact_email}</span>
-                </div>
-              )}
-              {settings?.contact_phone && (
-                <div className="flex items-center space-x-3 text-muted-foreground">
-                  <Phone className="w-5 h-5 text-primary" />
-                  <span>{settings.contact_phone}</span>
-                </div>
-              )}
-              {settings?.address && (
-                <div className="flex items-center space-x-3 text-muted-foreground">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  <span>{settings.address}</span>
-                </div>
-              )}
+            {(settings?.contact_email || settings?.contact_phone || settings?.address) && (
+              <ul className="mt-5 space-y-2.5 text-sm text-muted-foreground">
+                {settings?.contact_email && (
+                  <li className="flex items-center gap-2.5">
+                    <Mail className="w-4 h-4 shrink-0 text-primary" />
+                    <a href={`mailto:${settings.contact_email}`} className="hover:text-foreground transition-colors break-all">
+                      {settings.contact_email}
+                    </a>
+                  </li>
+                )}
+                {settings?.contact_phone && (
+                  <li className="flex items-center gap-2.5">
+                    <Phone className="w-4 h-4 shrink-0 text-primary" />
+                    <a href={`tel:${settings.contact_phone}`} className="hover:text-foreground transition-colors">
+                      {settings.contact_phone}
+                    </a>
+                  </li>
+                )}
+                {settings?.address && (
+                  <li className="flex items-start gap-2.5">
+                    <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
+                    <span>{settings.address}</span>
+                  </li>
+                )}
+              </ul>
+            )}
+          </div>
+
+          {columns.map((column) => (
+            <div key={column.title}>
+              <h3 className="text-sm font-semibold text-foreground">{column.title}</h3>
+              <ul className="mt-4 space-y-3">
+                {column.links.map((link) => (
+                  <li key={link.name}>
+                    <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-
-          {/* Company Links */}
-          <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              {t("footer.company")}
-            </h3>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Customer Service */}
-          <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              {t("footer.customerService")}
-            </h3>
-            <ul className="space-y-2">
-              {footerLinks.customer.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              {t("footer.legal")}
-            </h3>
-            <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          ))}
         </div>
 
-        {/* Newsletter Signup */}
-        <div className="glass-panel mb-12">
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-semibold text-foreground mb-2">
-              {t("footer.stayConnected")}
-            </h3>
-            <p className="text-muted-foreground">
-              {t("footer.newsletterText")}
-            </p>
-          </div>
-          <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder={t("footer.emailPlaceholder")}
-              className="flex-1 px-4 py-3 bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder-muted-foreground"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 gradient-primary text-primary-foreground rounded-lg hover:glow-on-hover animate-smooth font-semibold"
-            >
-              {t("footer.subscribe")}
-            </button>
-          </form>
-        </div>
-
-        {/* Social Links & Copyright */}
-        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-[hsla(var(--glass-border))]">
-          <div className="flex items-center space-x-4 mb-4 md:mb-0">
+        <div className="mt-12 pt-6 border-t border-border flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-muted-foreground">{t("footer.copyright")}</p>
+          <div className="flex items-center gap-2">
             {socialLinks.map((social) => (
               <a
                 key={social.label}
                 href={social.href}
                 aria-label={social.label}
-                className="p-2 glass-card hover:glow-on-hover animate-smooth"
+                className="icon-btn w-9 h-9 border border-border text-muted-foreground hover:text-primary hover:border-primary/40"
               >
-                <social.icon className="w-5 h-5 text-primary" />
+                <social.icon className="w-4 h-4" />
               </a>
             ))}
-          </div>
-
-          <div className="text-center md:text-right">
-            <p className="text-muted-foreground text-sm">
-              {t("footer.copyright")}
-            </p>
           </div>
         </div>
       </div>

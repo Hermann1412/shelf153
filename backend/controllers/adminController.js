@@ -10,27 +10,65 @@ const dayStart = (date) => new Date(date.getFullYear(), date.getMonth(), date.ge
 
 export const getAllUsers = catchAsyncErrors(async (req, res) => {
   const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
-  const where = { role: { in: ["User", "Seller"] } };
-  const [totalUsers, rows] = await Promise.all([
+  // Filter server-side so search and role tabs cover every page, not just the 10 rows loaded.
+  // role=Pending lists store applications awaiting review (still "User" accounts).
+  const pendingOnly = req.query.role === "Pending";
+  const role = ["User", "Seller"].includes(req.query.role) ? req.query.role : null;
+  const search = String(req.query.search || "").trim().slice(0, 100);
+  const where = {
+    role: pendingOnly ? "User" : role || { in: ["User", "Seller"] },
+    ...(pendingOnly && { seller_profile: { status: "Pending" } }),
+    ...(search && {
+      OR: [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+      ],
+    }),
+  };
+  const [totalUsers, rows, pendingApplications] = await Promise.all([
     prisma.user.count({ where }),
     prisma.user.findMany({
       where,
-      select: { ...PUBLIC_USER_SELECT, seller_profile: { select: { store_name: true, status: true } } },
+      select: {
+        ...PUBLIC_USER_SELECT,
+        seller_profile: { select: { store_name: true, slug: true, store_description: true, payout_phone: true, payout_provider: true, status: true } },
+      },
       orderBy: { created_at: "desc" }, take: 10, skip: (page - 1) * 10,
     }),
+    prisma.sellerProfile.count({ where: { status: "Pending" } }),
   ]);
   const users = rows.map(({ seller_profile, ...user }) => ({
-    ...user, store_name: seller_profile?.store_name || null, seller_status: seller_profile?.status || null,
+    ...user,
+    store_name: seller_profile?.store_name || null,
+    store_slug: seller_profile?.slug || null,
+    store_description: seller_profile?.store_description || null,
+    payout_phone: seller_profile?.payout_phone || null,
+    payout_provider: seller_profile?.payout_provider || null,
+    seller_status: seller_profile?.status || null,
   }));
-  res.status(200).json({ success: true, totalUsers, currentPage: page, users });
+  res.status(200).json({ success: true, totalUsers, currentPage: page, users, pendingApplications });
 });
 
+// Allowed moves: Pending → Approved | Rejected, Approved ⇄ Suspended.
+// Approving is what grants the "Seller" role; until then the account has no seller access.
+const SELLER_TRANSITIONS = { Pending: ["Approved", "Rejected"], Approved: ["Suspended"], Suspended: ["Approved"], Rejected: [] };
+
 export const updateSellerStatus = catchAsyncErrors(async (req, res, next) => {
-  if (!["Approved", "Suspended"].includes(req.body.status)) return next(new ErrorHandler("Provide a valid status.", 400));
-  const existing = await prisma.sellerProfile.findUnique({ where: { user_id: req.params.id }, select: { id: true } });
+  const nextStatus = req.body.status;
+  if (!["Approved", "Suspended", "Rejected"].includes(nextStatus)) return next(new ErrorHandler("Provide a valid status.", 400));
+  const existing = await prisma.sellerProfile.findUnique({ where: { user_id: req.params.id }, select: { status: true } });
   if (!existing) return next(new ErrorHandler("Seller profile not found.", 404));
-  const storeProfile = await prisma.sellerProfile.update({ where: { user_id: req.params.id }, data: { status: req.body.status } });
-  res.status(200).json({ success: true, message: `Seller ${req.body.status.toLowerCase()}.`, storeProfile });
+  if (!SELLER_TRANSITIONS[existing.status]?.includes(nextStatus)) {
+    return next(new ErrorHandler(`A ${existing.status.toLowerCase()} store cannot become ${nextStatus.toLowerCase()}.`, 409));
+  }
+  const storeProfile = await prisma.$transaction(async (tx) => {
+    const profile = await tx.sellerProfile.update({ where: { user_id: req.params.id }, data: { status: nextStatus } });
+    if (existing.status === "Pending" && nextStatus === "Approved") {
+      await tx.user.update({ where: { id: req.params.id }, data: { role: "Seller" } });
+    }
+    return profile;
+  });
+  res.status(200).json({ success: true, message: `Seller ${nextStatus.toLowerCase()}.`, storeProfile });
 });
 
 export const deleteUser = catchAsyncErrors(async (req, res, next) => {

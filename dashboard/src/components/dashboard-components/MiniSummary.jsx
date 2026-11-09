@@ -10,10 +10,11 @@ import {
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { formatNumber } from "../../lib/helper";
+import { selectSellerMode } from "../../lib/storeScope";
 
 const MiniSummary = () => {
   const { t } = useTranslation();
-  const isSeller = useSelector((state) => state.auth.user?.role === "Seller");
+  const isSeller = useSelector(selectSellerMode);
   const {
     totalRevenueAllTime,
     totalUsersCount,

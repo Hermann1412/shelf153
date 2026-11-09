@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { createNewProduct } from "../store/slices/productsSlice";
 import { toggleCreateProductModal } from "../store/slices/extraSlice";
 import { LoaderCircle, X } from "lucide-react";
+import ProductFormFields from "./ProductFormFields";
+import { usePriceDivisor } from "../lib/usePriceDivisor";
 
 const CreateProductModal = () => {
   const { t } = useTranslation();
   const { loading } = useSelector((state) => state.product);
   const dispatch = useDispatch();
+  const divisor = usePriceDivisor();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -19,145 +22,61 @@ const CreateProductModal = () => {
     images: [],
   });
 
-  const categoryOptions = [
-    { value: "Electronics", label: t("categories.electronics") },
-    { value: "Fashion", label: t("categories.fashion") },
-    { value: "Home & Garden", label: t("categories.homeGarden") },
-    { value: "Sports", label: t("categories.sports") },
-    { value: "Books", label: t("categories.books") },
-    { value: "Beauty", label: t("categories.beauty") },
-    { value: "Automotive", label: t("categories.automotive") },
-    { value: "Kids & Baby", label: t("categories.kidsBaby") },
-  ];
-
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (loading) return;
     const data = new FormData();
     data.append("name", formData.name);
     data.append("description", formData.description);
     data.append("price", formData.price);
     data.append("category", formData.category);
     data.append("stock", formData.stock);
-
-    for (let i = 0; i < formData.images.length; i++) {
-      data.append("images", formData.images[i]);
-    }
-
+    for (const image of formData.images) data.append("images", image);
     dispatch(createNewProduct(data));
   };
 
   return (
-    <>
-      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center p-4">
-        <div className="bg-white rounded-xl w-full max-w-2xl p-6 relative">
-          <button
-            onClick={() => dispatch(toggleCreateProductModal())}
-            className="absolute top-4 right-4 text-gray-500 hover:text-red-500 p-1 rounded-lg hover:bg-red-50"
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <h2 className="text-2xl font-bold mb-4 text-center">
-            {t("modals.createProduct")}
-          </h2>
+    <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center p-4">
+      <div role="dialog" aria-modal="true" aria-labelledby="create-product-title" className="bg-white rounded-xl w-full max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto p-6 relative">
+        <button
+          onClick={() => dispatch(toggleCreateProductModal())}
+          aria-label={t("aria.close")}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 p-1.5 rounded-lg hover:bg-gray-100"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        <h2 id="create-product-title" className="text-xl font-bold text-gray-900 mb-5 pr-10">
+          {t("modals.createProduct")}
+        </h2>
 
-          <form
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            onSubmit={handleSubmit}
-          >
-            <input
-              type="text"
-              placeholder={t("modals.titlePlaceholder")}
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  name: e.target.value,
-                })
-              }
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-            <select
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              value={formData.category}
-              onChange={(e) =>
-                setFormData({ ...formData, category: e.target.value })
-              }
-              required
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
+          <ProductFormFields formData={formData} setFormData={setFormData} divisor={divisor} withImages />
+          <div className="md:col-span-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => dispatch(toggleCreateProductModal())}
+              className="py-2.5 px-5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50"
             >
-              {categoryOptions.map((cat, idx) => (
-                <option key={idx} value={cat.value}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-            <input
-              type="number"
-              placeholder={t("modals.pricePlaceholder")}
-              value={formData.price}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  price: e.target.value,
-                })
-              }
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-            <input
-              type="number"
-              placeholder={t("modals.stockPlaceholder")}
-              value={formData.stock}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  stock: e.target.value,
-                })
-              }
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  images: Array.from(e.target.files),
-                })
-              }
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent col-span-1 md:col-span-2"
-            />
-
-            <textarea
-              placeholder={t("modals.descriptionPlaceholder")}
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  description: e.target.value,
-                })
-              }
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent col-span-1 md:col-span-2"
-              rows={4}
-            />
-
+              {t("common.cancel", "Annuler")}
+            </button>
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2.5 px-6 rounded-lg col-span-1 md:col-span-2"
+              disabled={loading}
+              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-lg disabled:opacity-60"
             >
               {loading ? (
                 <>
-                  <LoaderCircle className="w-6 h-6 animate-spin" />
+                  <LoaderCircle className="w-5 h-5 animate-spin" />
                   {t("modals.creating")}
                 </>
               ) : (
                 t("modals.addNewProduct")
               )}
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 

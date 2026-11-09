@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Send } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const NewsletterSection = () => {
@@ -7,45 +7,36 @@ const NewsletterSection = () => {
   const [email, setEmail] = useState("");
 
   return (
-    <section className="py-16">
-      <div className="glass-panel text-center">
-        <div className="max-w-2xl mx-auto">
-          <div className="w-16 h-16 mx-auto mb-6 gradient-primary rounded-full flex items-center justify-center">
-            <Mail className="w-8 h-8 text-primary-foreground" />
+    <section className="section">
+      <div className="surface px-5 py-8 sm:px-10 sm:py-10 flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
+        <div className="flex items-start gap-4 lg:flex-1">
+          <span className="w-12 h-12 shrink-0 rounded-xl bg-accent text-accent-foreground flex items-center justify-center">
+            <Mail className="w-6 h-6" />
+          </span>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground">{t("home.newsletter.title")}</h2>
+            <p className="mt-1 text-sm sm:text-base text-muted-foreground max-w-lg">{t("home.newsletter.text")}</p>
           </div>
-
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            {t('home.newsletter.title')}
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            {t('home.newsletter.text')}
-          </p>
-
-          <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <div className="relative flex-1">
-              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="email"
-                placeholder={t('home.newsletter.placeholder')}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder-muted-foreground"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="px-8 py-4 gradient-primary text-primary-foreground rounded-lg hover:glow-on-hover animate-smooth font-semibold flex items-center justify-center space-x-2"
-            >
-              <Send className="w-5 h-5" />
-              <span>{t('home.newsletter.button')}</span>
-            </button>
-          </form>
-
-          <p className="text-sm text-muted-foreground mt-4">
-            {t('home.newsletter.privacy')}
-          </p>
         </div>
+
+        {/* Not connected to a mailing service yet: keep the page from reloading on submit. */}
+        <form onSubmit={(e) => e.preventDefault()} className="w-full lg:w-auto lg:min-w-[26rem]">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="email"
+              placeholder={t("home.newsletter.placeholder")}
+              aria-label={t("home.newsletter.placeholder")}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="field flex-1"
+              required
+            />
+            <button type="submit" className="btn-primary h-11 px-6">
+              {t("home.newsletter.button")}
+            </button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">{t("home.newsletter.privacy")}</p>
+        </form>
       </div>
     </section>
   );

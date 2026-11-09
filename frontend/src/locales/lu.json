@@ -8,7 +8,6 @@
   "errors": {
     "postReviewFailed": "Kutuma avis kakuenzeka to",
     "deleteReviewFailed": "Kumbusha avis kakuenzeka to",
-    "aiSearchFailed": "Dikeba dia AI kadienzeki to",
     "registrationFailed": "Kudienzeja kakuenzeki to",
     "loginFailed": "Kubuela kakuenzeki to",
     "logoutFailed": "Kupatuka kakuenzeki to",
@@ -75,7 +74,6 @@
     "categorySubtitle": "Tana bintu bietu bia mishindu mishilashilangana mu Catégories mishilashilangana",
     "features": {
       "shippingTitle": "Kutuma kwa Gratuit",
-      "shippingDesc": "Kutuma kwa gratuit bua makomanda a pombolo ku $50 pa buloba bujima",
       "paymentTitle": "Difutu dia Lulamatu",
       "paymentDesc": "Difutu dia lulamatu 100% ne SSL encryption",
       "supportTitle": "Diambuluisha dia 24/7",
@@ -120,7 +118,6 @@
     "sortPriceAsc": "Mushinga: Mikese ku Minene",
     "sortPriceDesc": "Mushinga: Minene ku Mikese",
     "sortTopRated": "Bimpe Bikole",
-    "aiSearch": "Dikeba dia AI",
     "filters": "Filtres",
     "clearAll": "Ipatula Byonso",
     "search": "Kukeba",
@@ -176,7 +173,7 @@
     "subtotal": "Sous-total",
     "shipping": "Kutuma",
     "free": "Gratuit",
-    "tax": "Taxe (8%)",
+    "tax": "Taxe (18%)",
     "total": "Total",
     "freeShippingRemaining": "Bueja ${{amount}} kabidi bua kutuma pa mpiya",
     "proceedToCheckout": "Ya ku Checkout",
@@ -311,9 +308,7 @@
     "q1": "Ndenga naminyi bua kwenza commande?",
     "a1": "Anu tangila bintu bietu, bueja bintu mu panier webe, kabidi uye ku checkout. Landa malongesha bua kujikija commande yebe.",
     "q2": "Mishindu kayi ya difutu inudi bitaba?",
-    "a2": "Tudi twitaba ma carte a crédit onso manene, PayPal, ne mishindu mikuabu ya difutu ya lulamatu.",
     "q3": "Kutuma bintu kukuata tshikondo tshinga?",
-    "a3": "Kutuma kwa mpindieu kukuata matuku 3 ku 5 a mudimu. Mishindu ya kutuma lukasa idi ne pa checkout.",
     "q4": "Mikenji yenu ya kupingaja bintu idi bushuwa?",
     "a4": "Tudi tufila mikenji ya kupingaja bintu mu matuku 30 bua bintu bivule. Bintu abi ne bua kuikala mu ndamu yabi ya kumpala ne ma étiquette abi pambele."
   },
@@ -326,13 +321,6 @@
   },
   "search": {
     "placeholder": "Keba bintu..."
-  },
-  "aiSearch": {
-    "title": "Dikeba dia AI dia Bintu",
-    "placeholder": "Leja tshintu tshiudi ukeba...",
-    "searching": "Bidi Bikeba...",
-    "search": "Kukeba",
-    "prompt": "Lomba AI bua kukukeba bintu bimpe"
   },
   "reviews": {
     "title": "Ma Avis a Baklienti",

@@ -7,17 +7,21 @@ import {
   ShoppingCart,
   List,
   Phone,
+  Sun,
+  Moon,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { toggleSidebar } from "../../store/slices/popupSlice";
+import { useTheme } from "../../contexts/theme-context";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Logo from "./Logo";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const { isSidebarOpen } = useSelector((state) => state.popup);
 
   const links = [
@@ -35,37 +39,45 @@ const Sidebar = () => {
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/50 z-50 lg:hidden"
+        className="fixed inset-0 bg-black/40 z-50 lg:hidden"
         onClick={() => dispatch(toggleSidebar())}
       />
-      <div className="fixed top-0 left-0 h-full w-72 bg-background border-r border-border z-50 p-6 lg:hidden">
-        <div className="flex items-center justify-between mb-8">
-          <Logo textClassName="text-xl" />
+      <aside className="fixed top-0 left-0 h-full w-[18rem] max-w-[85vw] bg-card border-r border-border z-50 flex flex-col lg:hidden animate-slide-in-left">
+        <div className="h-16 px-4 flex items-center justify-between border-b border-border">
+          <Logo textClassName="text-lg" />
           <button
             onClick={() => dispatch(toggleSidebar())}
             aria-label={t("aria.close")}
-            className="p-2 hover:bg-secondary rounded-lg"
+            className="icon-btn -mr-2"
           >
-            <X className="w-5 h-5 text-foreground" />
+            <X className="w-5 h-5" />
           </button>
         </div>
-        <nav className="space-y-2">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
           {links.map((link) => (
-            <Link
+            <NavLink
               key={link.to}
               to={link.to}
+              end={link.to === "/"}
               onClick={() => dispatch(toggleSidebar())}
-              className="flex items-center gap-3 px-4 py-3 text-foreground hover:bg-secondary rounded-lg transition-colors"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 h-11 rounded-lg text-sm font-medium transition-colors ${
+                  isActive ? "bg-accent text-accent-foreground" : "text-foreground hover:bg-secondary"
+                }`
+              }
             >
-              <link.icon className="w-5 h-5" />
+              <link.icon className="w-5 h-5 shrink-0" />
               <span>{link.label}</span>
-            </Link>
+            </NavLink>
           ))}
         </nav>
-        <div className="mt-6 pt-6 border-t border-border">
-          <LanguageSwitcher />
+        <div className="p-3 border-t border-border flex items-center justify-between gap-2">
+          <LanguageSwitcher placement="top" />
+          <button onClick={toggleTheme} aria-label={t("aria.toggleTheme")} className="icon-btn">
+            {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
         </div>
-      </div>
+      </aside>
     </>
   );
 };

@@ -108,7 +108,11 @@ export const fetchPayoutSummary = catchAsyncErrors(async (_req, res) => {
 });
 
 export const fetchPayouts = catchAsyncErrors(async (req, res) => {
-  const where = req.user.role === "Seller" ? { seller_id: req.user.id } : {};
+  // A seller sees only their payouts; the admin sees all, or one store's with ?store=<sellerId>.
+  const storeFilter = req.user.role === "Admin" && /^[0-9a-f-]{36}$/i.test(String(req.query.store || ""))
+    ? { seller_id: req.query.store }
+    : {};
+  const where = req.user.role === "Seller" ? { seller_id: req.user.id } : storeFilter;
   const payouts = await prisma.sellerPayout.findMany({
     where, select: publicPayoutSelect, orderBy: { created_at: "desc" }, take: 100,
   });

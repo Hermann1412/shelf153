@@ -6,9 +6,13 @@ import { toggleCreateProductModal, toggleUpdateProductModal } from "./extraSlice
 
 export const fetchAllProducts = createAsyncThunk(
   "product/fetchAll",
-  async (page = 1, { rejectWithValue }) => {
+  // Accepts a page number (older callers) or { page, search }.
+  async (arg = 1, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.get(`/product?page=${page}`);
+      const { page = 1, search = "" } = typeof arg === "object" ? arg : { page: arg };
+      const params = new URLSearchParams({ page: String(page) });
+      if (search.trim()) params.set("search", search.trim());
+      const { data } = await axiosInstance.get(`/product?${params}`);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);

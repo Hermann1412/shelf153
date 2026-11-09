@@ -63,11 +63,12 @@ export const calculateLineFinancials = ({ unitPrice, quantity, commissionRate })
   };
 };
 
+// An item may carry its own `commissionRate` (e.g. "1" for the platform's own products).
 export const calculateOrderFinancials = (items, commissionRate) => {
   const lines = items.map((item) => calculateLineFinancials({
     unitPrice: item.product.price,
     quantity: item.quantity,
-    commissionRate,
+    commissionRate: item.commissionRate ?? commissionRate,
   }));
   const totals = lines.reduce((sum, line) => ({
     grossMinor: sum.grossMinor + line.grossMinor,
@@ -76,7 +77,8 @@ export const calculateOrderFinancials = (items, commissionRate) => {
   }), { grossMinor: 0n, commissionMinor: 0n, sellerMinor: 0n });
   return {
     lines,
-    commissionRate: lines[0]?.commissionRate || parseCommissionRate(commissionRate).decimal,
+    // The marketplace rate; per-line rates (which may differ) are stored on each order item.
+    commissionRate: parseCommissionRate(commissionRate).decimal,
     grossSalesAmount: minorUnitsToDecimal(totals.grossMinor),
     grossCommission: minorUnitsToDecimal(totals.commissionMinor),
     sellerNetAmount: minorUnitsToDecimal(totals.sellerMinor),

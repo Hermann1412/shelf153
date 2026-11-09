@@ -8,7 +8,6 @@
   "errors": {
     "postReviewFailed": "Kutuma avis kakuenzeki to",
     "deleteReviewFailed": "Kumbusha avis kakuenzeki to",
-    "aiSearchFailed": "Dikeba dia IA kadienzeki to",
     "registrationFailed": "Kudienzeja kakuenzeki to",
     "loginFailed": "Kubuela kakuenzeki to",
     "logoutFailed": "Kupatuka kakuenzeki to",
@@ -75,7 +74,6 @@
     "categorySubtitle": "Tanga bintu bietu bia bungi mu mishindu mishilashilangane",
     "features": {
       "shippingTitle": "Kutuma kwa Yebele",
-      "shippingDesc": "Kutuma kwa yebele bua malombolo apitshila $50 pa buloba bujima",
       "paymentTitle": "Difuta dia Lulamatu",
       "paymentDesc": "Difuta dia lulamatu lujima 100% ne SSL",
       "supportTitle": "Buambuluishi 24/7",
@@ -120,7 +118,6 @@
     "sortPriceAsc": "Mushinga: Panshi ku Diulu",
     "sortPriceDesc": "Mushinga: Diulu ku Panshi",
     "sortTopRated": "Bidi Bela Diyi Dinene",
-    "aiSearch": "Kukeba kua IA",
     "filters": "Bikengeshi",
     "clearAll": "Umusha bionso",
     "search": "Kukeba",
@@ -176,7 +173,7 @@
     "subtotal": "Mushinga wa Kumpala",
     "shipping": "Kutuma",
     "free": "Yebele",
-    "tax": "Mpaku (8%)",
+    "tax": "Mpaku (18%)",
     "total": "Yonso",
     "freeShippingRemaining": "Buela ${{amount}} bikuabu bua kupeta kutuma kwa yebele",
     "proceedToCheckout": "Ndaku ku Difuta",
@@ -311,9 +308,7 @@
     "q1": "Ndomba malombolo munyi?",
     "a1": "Tangila bintu bietu, buela bintu mu mukoba, ne uye ku difuta. Landa malongoluelu bua kujikija dilombo diebe.",
     "q2": "Mmiaba kayi ya difuta idi nuitaba?",
-    "a2": "Tudi tuitaba makalata onso manene a difuta, PayPal, ne mishindu mikuabu ya difuta ya lulamatu.",
     "q3": "Kutuma kudi kufika mu matuku kayi?",
-    "a3": "Kutuma kwa bulele kudi kufika mu matuku 3-5 a mudimu. Mishindu ya kutuma lubilu idi ikupeta ku dîba dia difuta.",
     "q4": "Mukenji webe wa kupingaja bintu udi munyi?",
     "a4": "Tudi tupesha mukenji wa kupingaja bintu mu matuku 30 bua bintu bia bungi. Bintu bikale mu bwikadilu bua kumpala ne ma étiquette adi anasa."
   },
@@ -326,13 +321,6 @@
   },
   "search": {
     "placeholder": "Keba bintu..."
-  },
-  "aiSearch": {
-    "title": "Kukeba kwa Bintu ne IA",
-    "placeholder": "Leja tshidi ukeba...",
-    "searching": "Tudi Tukeba...",
-    "search": "Kukeba",
-    "prompt": "Lomba IA bua kukukebela bintu bilenga bua wewe"
   },
   "reviews": {
     "title": "Biambilu bia Bakuli",

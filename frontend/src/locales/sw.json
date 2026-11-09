@@ -8,7 +8,6 @@
   "errors": {
     "postReviewFailed": "Imeshindwa kutuma tathmini",
     "deleteReviewFailed": "Imeshindwa kufuta tathmini",
-    "aiSearchFailed": "Utafutaji wa AI umeshindwa",
     "registrationFailed": "Usajili umeshindwa",
     "loginFailed": "Kuingia kumeshindwa",
     "logoutFailed": "Kutoka kumeshindwa",
@@ -75,7 +74,6 @@
     "categorySubtitle": "Gundua aina mbalimbali za bidhaa zetu katika kategoria tofauti",
     "features": {
       "shippingTitle": "Usafirishaji wa Bure",
-      "shippingDesc": "Usafirishaji wa bure kwa maagizo zaidi ya $50 duniani kote",
       "paymentTitle": "Malipo Salama",
       "paymentDesc": "Malipo salama 100% kwa usimbaji wa SSL",
       "supportTitle": "Msaada Saa 24/7",
@@ -120,7 +118,6 @@
     "sortPriceAsc": "Bei: Chini hadi Juu",
     "sortPriceDesc": "Bei: Juu hadi Chini",
     "sortTopRated": "Zenye Ukadiriaji wa Juu",
-    "aiSearch": "Utafutaji wa AI",
     "filters": "Vichujio",
     "clearAll": "Futa vyote",
     "search": "Tafuta",
@@ -176,7 +173,7 @@
     "subtotal": "Jumla Ndogo",
     "shipping": "Usafirishaji",
     "free": "Bure",
-    "tax": "Kodi (8%)",
+    "tax": "Kodi (18%)",
     "total": "Jumla",
     "freeShippingRemaining": "Ongeza ${{amount}} zaidi upate usafirishaji wa bure",
     "proceedToCheckout": "Endelea kwenye Malipo",
@@ -311,9 +308,7 @@
     "q1": "Nawezaje kuweka agizo?",
     "a1": "Vinjari tu bidhaa zetu, ongeza bidhaa kwenye kikapu chako, kisha uendelee kwenye malipo. Fuata maelekezo ili kukamilisha agizo lako.",
     "q2": "Ni njia gani za malipo mnazokubali?",
-    "a2": "Tunakubali kadi zote kuu za mkopo, PayPal, na njia nyingine salama za malipo.",
     "q3": "Usafirishaji unachukua muda gani?",
-    "a3": "Usafirishaji wa kawaida unachukua siku 3-5 za kazi. Chaguo za usafirishaji wa haraka zinapatikana wakati wa malipo.",
     "q4": "Sera yenu ya kurejesha bidhaa ni ipi?",
     "a4": "Tunatoa sera ya kurejesha bidhaa ndani ya siku 30 kwa bidhaa nyingi. Bidhaa lazima ziwe katika hali yake ya awali na lebo zikiwa zimeambatanishwa."
   },
@@ -326,13 +321,6 @@
   },
   "search": {
     "placeholder": "Tafuta bidhaa..."
-  },
-  "aiSearch": {
-    "title": "Utafutaji wa Bidhaa wa AI",
-    "placeholder": "Eleza unachotafuta...",
-    "searching": "Inatafuta...",
-    "search": "Tafuta",
-    "prompt": "Muulize AI akutafutie bidhaa zinazokufaa"
   },
   "reviews": {
     "title": "Maoni ya Wateja",

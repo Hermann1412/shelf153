@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { axiosInstance } from "../../lib/axios";
+import { withStore } from "../../lib/storeScope";
 
-export const fetchPayouts = createAsyncThunk("payout/fetch", async (_, { rejectWithValue }) => {
+export const fetchPayouts = createAsyncThunk("payout/fetch", async (_, { rejectWithValue, getState }) => {
   try {
-    return (await axiosInstance.get("/payout")).data;
+    return (await axiosInstance.get(withStore("/payout", getState))).data;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message);
   }

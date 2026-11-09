@@ -1,14 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Search, Sparkles, Star, Filter, X, Loader } from "lucide-react";
-import { categories } from "../data/products";
+import { Search, Star, Filter, X, Loader } from "lucide-react";
+import { categories, categoryLabel } from "../data/products";
 import ProductCard from "../components/Products/ProductCard";
 import Pagination from "../components/Products/Pagination";
-import AISearchModal from "../components/Products/AISearchModal";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { fetchAllProducts, fetchShops } from "../store/slices/productSlice";
-import { toggleAIModal } from "../store/slices/popupSlice";
 
 const Products = () => {
   const { t } = useTranslation();
@@ -17,7 +15,6 @@ const Products = () => {
   const { products, totalProducts, loading, shops } = useSelector(
     (state) => state.product
   );
-  const { isAIModalOpen } = useSelector((state) => state.popup);
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -46,9 +43,11 @@ const Products = () => {
     const q = params.get("search");
     const cat = params.get("category");
     const sel = params.get("seller");
-    if (q) setSearch(q);
-    if (cat) setCategory(cat);
-    if (sel) setSeller(sel);
+    // The URL is the source of truth when it changes (category strip, navbar search, "Sold by" link).
+    setSearch(q || "");
+    setCategory(cat || "");
+    setSeller(sel || "");
+    setPage(1);
   }, [location.search]);
 
   useEffect(() => {
@@ -85,21 +84,24 @@ const Products = () => {
   const selectedShop = seller ? shops.find((s) => s.id === seller) : null;
 
   return (
-    <div className="min-h-screen pt-32 pb-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen">
+      <div className="page">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">{t('products.title')}</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="page-title">
+              {category ? categoryLabel(category, t) : t('products.title')}
+            </h1>
+            <p className="page-subtitle">
               {t('products.productsFound', { count: totalProducts })}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 bg-secondary border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label={t('products.sortNewest')}
+              className="field h-10 flex-1 sm:flex-none sm:w-auto pr-8"
             >
               <option value="">{t('products.sortNewest')}</option>
               <option value="price-asc">{t('products.sortPriceAsc')}</option>
@@ -107,36 +109,31 @@ const Products = () => {
               <option value="top-rated">{t('products.sortTopRated')}</option>
             </select>
             <button
-              onClick={() => dispatch(toggleAIModal())}
-              className="flex items-center gap-2 px-4 py-2 gradient-primary text-primary-foreground rounded-lg font-medium hover:glow-on-hover animate-smooth"
-            >
-              <Sparkles className="w-4 h-4" />
-              {t('products.aiSearch')}
-            </button>
-            <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-accent animate-smooth lg:hidden"
+              aria-expanded={showFilters}
+              className={`btn-outline shrink-0 lg:hidden ${showFilters ? "border-primary text-primary" : ""}`}
             >
               <Filter className="w-4 h-4" />
               {t('products.filters')}
+              {hasFilters && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
             </button>
           </div>
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Sidebar Filters */}
           <aside
             className={`${
               showFilters ? "block" : "hidden"
-            } lg:block w-full lg:w-64 shrink-0`}
+            } lg:block w-full lg:w-60 shrink-0`}
           >
-            <div className="mp-card p-4 space-y-6 sticky top-32">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">{t('products.filters')}</h3>
+            <div className="surface p-5 space-y-5 lg:sticky lg:top-[8.5rem]">
+              <div className="flex items-center justify-between h-6">
+                <h2 className="text-sm font-semibold text-foreground">{t('products.filters')}</h2>
                 {hasFilters && (
                   <button
                     onClick={clearFilters}
-                    className="text-sm text-primary hover:underline"
+                    className="text-xs font-medium text-primary hover:underline"
                   >
                     {t('products.clearAll')}
                   </button>
@@ -145,7 +142,7 @@ const Products = () => {
 
               {/* Search */}
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">
+                <label className="field-label text-muted-foreground">
                   {t('products.search')}
                 </label>
                 <div className="relative">
@@ -158,14 +155,14 @@ const Products = () => {
                       setPage(1);
                     }}
                     placeholder={t('products.searchPlaceholder')}
-                    className="w-full pl-10 pr-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="field h-10 pl-9"
                   />
                 </div>
               </div>
 
               {/* Category */}
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">
+                <label className="field-label text-muted-foreground">
                   {t('products.category')}
                 </label>
                 <select
@@ -174,7 +171,7 @@ const Products = () => {
                     setCategory(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="field h-10"
                 >
                   <option value="">{t('products.allCategories')}</option>
                   {categories.map((cat) => (
@@ -188,7 +185,7 @@ const Products = () => {
               {/* Shop */}
               {shops.length > 0 && (
                 <div>
-                  <label className="text-sm text-muted-foreground mb-2 block">
+                  <label className="field-label text-muted-foreground">
                     {t('products.shop')}
                   </label>
                   <select
@@ -197,7 +194,7 @@ const Products = () => {
                       setSeller(e.target.value);
                       setPage(1);
                     }}
-                    className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="field h-10"
                   >
                     <option value="">{t('products.allShops')}</option>
                     {shops.map((shop) => (
@@ -211,7 +208,7 @@ const Products = () => {
 
               {/* Price Range */}
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">
+                <label className="field-label text-muted-foreground">
                   {t('products.priceRange')}
                 </label>
                 <select
@@ -220,7 +217,7 @@ const Products = () => {
                     setPrice(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="field h-10"
                 >
                   <option value="">{t('products.anyPrice')}</option>
                   <option value="0-25">{t('products.under25')}</option>
@@ -233,7 +230,7 @@ const Products = () => {
 
               {/* Availability */}
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">
+                <label className="field-label text-muted-foreground">
                   {t('products.availability')}
                 </label>
                 <select
@@ -242,7 +239,7 @@ const Products = () => {
                     setAvailability(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="field h-10"
                 >
                   <option value="">{t('products.all')}</option>
                   <option value="in-stock">{t('products.inStock')}</option>
@@ -253,10 +250,10 @@ const Products = () => {
 
               {/* Ratings */}
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">
+                <label className="field-label text-muted-foreground">
                   {t('products.minRating')}
                 </label>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-4 gap-1.5">
                   {[4, 3, 2, 1].map((r) => (
                     <button
                       key={r}
@@ -264,14 +261,15 @@ const Products = () => {
                         setRatings(ratings === String(r) ? "" : String(r));
                         setPage(1);
                       }}
-                      className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm border animate-smooth ${
+                      aria-pressed={ratings === String(r)}
+                      className={`h-9 flex items-center justify-center gap-1 rounded-lg text-sm font-medium border transition-colors ${
                         ratings === String(r)
-                          ? "border-primary bg-primary/20 text-primary"
-                          : "border-border text-muted-foreground hover:border-primary"
+                          ? "border-primary bg-accent text-accent-foreground"
+                          : "border-input text-foreground hover:border-primary/50"
                       }`}
                     >
                       {r}
-                      <Star className="w-3 h-3 fill-current" />
+                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                     </button>
                   ))}
                 </div>
@@ -280,9 +278,9 @@ const Products = () => {
           </aside>
 
           {/* Product Grid */}
-          <main className="flex-1">
+          <main className="flex-1 min-w-0">
             {selectedShop && (
-              <div className="mp-card p-4 mb-6 flex items-center justify-between gap-4">
+              <div className="surface p-4 mb-5 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <img
                     src={selectedShop.store_logo?.url || "/avatar-holder.avif"}
@@ -300,9 +298,9 @@ const Products = () => {
                     setPage(1);
                   }}
                   aria-label={t('aria.close')}
-                  className="p-2 hover:bg-secondary rounded-lg transition-colors"
+                  className="icon-btn"
                 >
-                  <X className="w-4 h-4 text-foreground" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             )}
@@ -311,14 +309,17 @@ const Products = () => {
                 <Loader className="w-8 h-8 animate-spin text-primary" />
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-32">
-                <p className="text-xl text-muted-foreground">
+              <div className="surface text-center px-6 py-20">
+                <span className="mx-auto w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
+                  <Search className="w-5 h-5 text-muted-foreground" />
+                </span>
+                <p className="mt-4 text-base font-medium text-foreground">
                   {t('products.noProductsFound')}
                 </p>
                 {hasFilters && (
                   <button
                     onClick={clearFilters}
-                    className="mt-4 text-primary hover:underline"
+                    className="btn-outline mt-5"
                   >
                     {t('products.clearFilters')}
                   </button>
@@ -326,7 +327,7 @@ const Products = () => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
                   {sortedProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
@@ -336,7 +337,10 @@ const Products = () => {
                     <Pagination
                       currentPage={page}
                       totalPages={totalPages}
-                      onPageChange={setPage}
+                      onPageChange={(next) => {
+                        setPage(next);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
                     />
                   </div>
                 )}
@@ -346,7 +350,6 @@ const Products = () => {
         </div>
       </div>
 
-      {isAIModalOpen && <AISearchModal />}
     </div>
   );
 };

@@ -3,17 +3,36 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import avatar from "../assets/avatar.jpg";
 import { Menu } from "lucide-react";
-import { toggleNavbar } from "../store/slices/extraSlice";
+import { toggleNavbar, setViewingStore } from "../store/slices/extraSlice";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 const Header = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { openedComponent } = useSelector((state) => state.extra);
+  const { openedComponent, viewingStore } = useSelector((state) => state.extra);
   const { user } = useSelector((state) => state.auth);
+  const viewingAsAdmin = user?.role === "Admin" && viewingStore;
 
   return (
-    <header className="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+    <>
+    {/* Reminds the main admin they are inside a store's space, with a way back. */}
+    {viewingAsAdmin && (
+      <div className="bg-amber-50 border-b border-amber-200 px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 text-sm text-amber-900">
+        <span>
+          {t("header.viewingStore", {
+            store: viewingStore.store_name,
+            defaultValue: "Vous consultez la boutique « {{store}} » en tant qu'administrateur.",
+          })}
+        </span>
+        <button
+          onClick={() => dispatch(setViewingStore(null))}
+          className="font-semibold underline underline-offset-2 hover:text-amber-700"
+        >
+          {t("header.backToAdmin", "Revenir à l'administration")}
+        </button>
+      </div>
+    )}
+    <header className="bg-white shadow-sm px-4 sm:px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
         <button
           onClick={() => dispatch(toggleNavbar())}
@@ -24,7 +43,7 @@ const Header = () => {
         </button>
         <div>
           <p className="text-xs text-gray-400">
-            {t("sidebar.dashboard")}
+            {viewingAsAdmin ? viewingStore.store_name : t("sidebar.dashboard")}
           </p>
           <h2 className="text-xl font-semibold text-gray-800">
             {t(`sidebar.${openedComponent?.charAt(0).toLowerCase()}${openedComponent?.slice(1)}`, openedComponent)}
@@ -44,6 +63,7 @@ const Header = () => {
         />
       </div>
     </header>
+    </>
   );
 };
 

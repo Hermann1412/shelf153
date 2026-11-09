@@ -48,3 +48,23 @@ export const categories = [
     image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=300",
   },
 ];
+
+// Products store the English category name; show the translated label when we know it.
+export const categoryLabel = (name, t) => {
+  const category = categories.find((entry) => entry.name === name);
+  return category ? t(`categories.${category.key}`) : name;
+};
+
+// Mirrors the pricing in backend/controllers/orderController.js (placeNewOrder);
+// keep both in sync so the cart shows exactly what checkout charges.
+export const FREE_SHIPPING_THRESHOLD = 50;
+const TAX_RATE = 0.18;
+const SHIPPING_FEE = 2;
+
+export const orderTotals = (cart) => {
+  const subtotal = cart.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0);
+  const tax = Math.round(subtotal * TAX_RATE * 100) / 100;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const total = Math.round((subtotal + tax + shipping) * 100) / 100;
+  return { subtotal, tax, shipping, total };
+};

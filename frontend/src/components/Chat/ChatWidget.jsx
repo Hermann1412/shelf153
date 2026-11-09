@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { MessageCircle, X, Send, Loader2, HeadphonesIcon } from "lucide-react";
 import { socket } from "../../lib/socket";
+import { toggleAuthPopup } from "../../store/slices/popupSlice";
 import {
   toggleChat,
   setConversation,
+  setConversationAdmin,
   addMessage,
   setTyping,
   clearTyping,
@@ -49,9 +51,14 @@ const ChatWidget = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingInfo]);
 
+  // The server opens no customer conversation for admins (they answer from the dashboard).
+  const isAdmin = authUser?.role === "Admin";
+  const [chatError, setChatError] = useState(null);
+
   // Socket setup — connect when widget opens, disconnect on logout
   useEffect(() => {
-    if (!authUser || !isOpen) return;
+    if (!authUser || !isOpen || isAdmin) return;
+    setChatError(null);
 
     setConnecting(true);
     socket.connect();
@@ -81,8 +88,10 @@ const ChatWidget = () => {
       if (info.role === "Admin") dispatch(clearTyping());
     });
 
+    // Replacing the conversation here (from a stale closure) used to drop its id, so the
+    // customer could no longer send anything once an admin had answered.
     socket.on("conversation:assigned", ({ admin_name }) => {
-      dispatch(setConversation({ ...conversation, admin_name }));
+      dispatch(setConversationAdmin(admin_name));
     });
 
     socket.on("conversation:closed", () => {
@@ -93,7 +102,18 @@ const ChatWidget = () => {
       setConnected(false);
     });
 
+    // Without these the input just stayed greyed out with no explanation.
+    socket.on("connect_error", () => {
+      setConnecting(false);
+      setChatError(t("chat.connectError", "Impossible de joindre le support pour le moment. Réessayez dans un instant."));
+    });
+    socket.on("error", (payload) => {
+      setChatError(payload?.message || t("chat.connectError", "Impossible de joindre le support pour le moment. Réessayez dans un instant."));
+    });
+
     return () => {
+      socket.off("connect_error");
+      socket.off("error");
       socket.off("connect");
       socket.off("conversation:started");
       socket.off("message:new");
@@ -148,8 +168,12 @@ const ChatWidget = () => {
     }, TYPING_TIMEOUT);
   };
 
+  // Chat needs an account: a signed-out visitor gets the sign-in screen instead of nothing.
   const handleOpen = () => {
-    if (!authUser) return;
+    if (!authUser) {
+      dispatch(toggleAuthPopup());
+      return;
+    }
     dispatch(toggleChat());
   };
 
@@ -159,7 +183,7 @@ const ChatWidget = () => {
       <button
         onClick={handleOpen}
         title={authUser ? t('chat.chatWithUs') : t('chat.loginToChat')}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full gradient-primary text-primary-foreground shadow-xl flex items-center justify-center hover:scale-110 transition-transform animate-smooth"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
       >
         <MessageCircle className="w-6 h-6" />
         {unreadCount > 0 && (
@@ -184,7 +208,9 @@ const ChatWidget = () => {
             {t('chat.customerSupport')}
           </p>
           <p className="text-xs text-primary-foreground/80 truncate">
-            {connecting
+            {isAdmin
+              ? t("chat.customersOnly", "Réservé aux clients")
+              : connecting
               ? t('chat.connecting')
               : connected
               ? conversation?.admin_name
@@ -220,6 +246,31 @@ const ChatWidget = () => {
           </div>
         )}
 
+        {/* Admins answer customers from the dashboard, not from the storefront widget */}
+        {isAdmin && (
+          <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-4">
+            <HeadphonesIcon className="w-10 h-10 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              {t("chat.adminNotice", "Vous êtes connecté en tant qu'administrateur : les conversations avec les clients se gèrent depuis le dashboard.")}
+            </p>
+            <a
+              href={import.meta.env.VITE_DASHBOARD_URL || "http://localhost:5174"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary btn-sm"
+            >
+              {t("chat.openDashboardChat", "Ouvrir le chat du dashboard")}
+            </a>
+          </div>
+        )}
+
+        {/* Could not reach the chat server */}
+        {chatError && !isAdmin && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {chatError}
+          </div>
+        )}
+
         {/* Conversation closed */}
         {isClosed && (
           <div className="flex flex-col items-center justify-center h-full gap-2 text-center">
@@ -237,7 +288,7 @@ const ChatWidget = () => {
         )}
 
         {/* Welcome message */}
-        {!isLoadingMessages && messages.length === 0 && !isClosed && connected && (
+        {!isLoadingMessages && messages.length === 0 && !isClosed && connected && !isAdmin && (
           <div className="flex gap-2">
             <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
               <HeadphonesIcon className="w-4 h-4 text-primary" />
@@ -295,7 +346,7 @@ const ChatWidget = () => {
       </div>
 
       {/* Input */}
-      {authUser && !isClosed && (
+      {authUser && !isClosed && !isAdmin && (
         <div className="px-3 py-3 border-t border-border bg-background flex items-end gap-2">
           <textarea
             rows={1}

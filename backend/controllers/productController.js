@@ -2,13 +2,14 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { v2 as cloudinary } from "cloudinary";
 import prisma from "../database/db.js";
-import { getAIRecommendation } from "../utils/getAIRecommendation.js";
 
-const PRICE_INPUT_DIVISOR = Number(process.env.PRICE_INPUT_DIVISOR || 283);
+// Prices are typed in CDF and stored in USD: stored = typed / PRICE_INPUT_DIVISOR.
+// Exposed through GET /settings so the dashboard can label the field and prefill edits in CDF.
+export const PRICE_INPUT_DIVISOR = Number(process.env.PRICE_INPUT_DIVISOR || 283);
 const activeProductWhere = {
   OR: [
     { creator: { role: { not: "Seller" } } },
-    { creator: { seller_profile: { is: { status: { not: "Suspended" } } } } },
+    { creator: { seller_profile: { is: { status: "Approved" } } } },
   ],
 };
 
@@ -170,22 +171,4 @@ export const deleteReview = catchAsyncErrors(async (req, res, next) => {
     return refreshRating(tx, req.params.productId);
   });
   res.status(200).json({ success: true, message: "Your review has been deleted.", review: existing, product: updatedProduct });
-});
-
-export const fetchAIFilteredProducts = catchAsyncErrors(async (req, res, next) => {
-  const userPrompt = req.body.userPrompt?.trim();
-  if (!userPrompt) return next(new ErrorHandler("Provide a valid prompt.", 400));
-  const stopWords = new Set(["the", "they", "them", "then", "i", "we", "you", "he", "she", "it", "is", "a", "an", "of", "and", "or", "to", "for", "from", "on", "with", "this", "that", "in", "at", "by", "be"]);
-  const keywords = userPrompt.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").split(/\s+/).filter((word) => word && !stopWords.has(word)).slice(0, 12);
-  if (!keywords.length) return res.status(200).json({ success: true, message: "No products found.", products: [] });
-  const filteredProducts = await prisma.product.findMany({
-    where: { AND: [activeProductWhere, { OR: keywords.flatMap((keyword) => [
-      { name: { contains: keyword, mode: "insensitive" } },
-      { description: { contains: keyword, mode: "insensitive" } },
-      { category: { contains: keyword, mode: "insensitive" } },
-    ]) }] }, take: 200,
-  });
-  if (!filteredProducts.length) return res.status(200).json({ success: true, message: "No products found matching your prompt.", products: [] });
-  const result = await getAIRecommendation(userPrompt, filteredProducts);
-  res.status(200).json({ success: true, message: "AI filtered products.", products: result });
 });

@@ -18,9 +18,9 @@ services:
 
   backend:
     build: ./backend
+    # Short form on purpose: the `path:`/`required:` form needs Docker Compose 2.24+.
     env_file:
-      - path: ./backend/.env
-        required: false
+      - ./backend/.env
     environment:
       DATABASE_URL: postgresql://shelf153:shelf153-local-only@postgres:5432/shelf153?schema=public
     ports:

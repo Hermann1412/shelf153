@@ -333,7 +333,6 @@ Plusieurs instances backend peuvent fonctionner simultanément : chaque opérati
 | `SMTP_PASSWORD` | Mot de passe d'application SMTP. Secret. |
 | `SMTP_HOST` | Serveur SMTP. |
 | `SMTP_PORT` | Port SMTP, par exemple `465`. |
-| `GEMINI_API_KEY` | Clé de la fonctionnalité de recommandation IA. Optionnelle si cette fonction est désactivée. |
 | `CLOUDINARY_CLIENT_NAME` | Nom du compte Cloudinary. |
 | `CLOUDINARY_CLIENT_API` | Identifiant API Cloudinary. |
 | `CLOUDINARY_CLIENT_SECRET` | Secret Cloudinary. |

@@ -8,10 +8,12 @@ import OrdersChart from "./dashboard-components/OrdersChart";
 import TopProductsChart from "./dashboard-components/TopProductsChart";
 import { fetchDashboardStats } from "../store/slices/adminSlice";
 import { fetchSellerDashboardStats } from "../store/slices/sellerSlice";
+import { selectSellerMode } from "../lib/storeScope";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const isSeller = useSelector((state) => state.auth.user?.role === "Seller");
+  // Seller stats for sellers, and for the main admin while a store is open.
+  const isSeller = useSelector(selectSellerMode);
 
   useEffect(() => {
     dispatch(isSeller ? fetchSellerDashboardStats() : fetchDashboardStats());

@@ -1,6 +1,8 @@
 import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
 import prisma from "../database/db.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
+import { PRICE_INPUT_DIVISOR } from "./productController.js";
+import { parseCommissionRate } from "../services/financialService.js";
 
 const SETTINGS_ID = "singleton";
 
@@ -11,6 +13,9 @@ export const getSiteSettings = catchAsyncErrors(async (req, res) => {
   res.status(200).json({
     success: true,
     settings: settings || { id: SETTINGS_ID, contact_email: null, contact_phone: null, address: null },
+    price_input_divisor: PRICE_INPUT_DIVISOR,
+    // Shown on the storefront "Sell on Shelf153" page so the advertised rate is the one applied.
+    platform_commission_rate: Number(parseCommissionRate().decimal),
   });
 });
 

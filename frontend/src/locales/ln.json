@@ -8,7 +8,6 @@
   "errors": {
     "postReviewFailed": "Kotinda avis elongi te",
     "deleteReviewFailed": "Kolongola avis elongi te",
-    "aiSearchFailed": "Koluka na AI elongi te",
     "registrationFailed": "Kokomisama elongi te",
     "loginFailed": "Kokɔta elongi te",
     "logoutFailed": "Kobima elongi te",
@@ -75,7 +74,6 @@
     "categorySubtitle": "Yeba biloko na biso ya ndenge na ndenge na ba kategori ndenge na ndenge",
     "features": {
       "shippingTitle": "Livraison ya Ofele",
-      "shippingDesc": "Livraison ya ofele mpo na ba commande oyo eleki $50 na mokili mobimba",
       "paymentTitle": "Paiement ya Kimia",
       "paymentDesc": "Paiement ya bokengi na 100% na SSL encryption",
       "supportTitle": "Lisungi 24/7",
@@ -120,7 +118,6 @@
     "sortPriceAsc": "Ntalo: Ya Moke na Monene",
     "sortPriceDesc": "Ntalo: Ya Monene na Moke",
     "sortTopRated": "Oyo Elingami Mingi",
-    "aiSearch": "Koluka na AI",
     "filters": "Ba Filtre",
     "clearAll": "Longola Nyonso",
     "search": "Koluka",
@@ -176,7 +173,7 @@
     "subtotal": "Sous-total",
     "shipping": "Livraison",
     "free": "Ofele",
-    "tax": "Mpaku (8%)",
+    "tax": "Mpaku (18%)",
     "total": "Total",
     "freeShippingRemaining": "Bakisa ${{amount}} mpo na livraison ya ofele",
     "proceedToCheckout": "Kende na Kofuta",
@@ -311,9 +308,7 @@
     "q1": "Ndenge nini nasalaka commande?",
     "a1": "Tala biloko na biso, bakisa biloko na panier na yo, mpe kende na kofuta. Landa ba étape mpo na kosilisa commande na yo.",
     "q2": "Ba méthode nini ya paiement bondimaka?",
-    "a2": "Tondimaka ba carte bancaire ya minene nyonso, PayPal, mpe ba méthode mosusu ya paiement ya bokengi.",
     "q3": "Livraison ezuaka ntango boni?",
-    "a3": "Livraison ya normal ezuaka mikolo 3-5 ya mosala. Ba options ya livraison ya mbangu ezali na ntango ya kofuta.",
     "q4": "Politiki na bino ya kozongisa biloko ezali nini?",
     "a4": "Topesaka politiki ya kozongisa biloko na mikolo 30 mpo na biloko mingi. Biloko esengeli kozala na état ya ebandeli elongo na ba étiquette na yango."
   },
@@ -326,13 +321,6 @@
   },
   "search": {
     "placeholder": "Luka biloko..."
-  },
-  "aiSearch": {
-    "title": "Koluka Biloko na AI",
-    "placeholder": "Limbola oyo ozali koluka...",
-    "searching": "Kozali koluka...",
-    "search": "Koluka",
-    "prompt": "Senga AI eluka biloko ya malamu mpo na yo"
   },
   "reviews": {
     "title": "Ba Avis ya Baklient",

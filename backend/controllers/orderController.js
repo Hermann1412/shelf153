@@ -193,12 +193,23 @@ export const createPlaceNewOrderHandler = ({ startPayment = initiatePayment } = 
     });
   }
 
-  const products = await prisma.product.findMany({ where: { id: { in: items.map((item) => item.productId) } } });
+  const products = await prisma.product.findMany({
+    where: { id: { in: items.map((item) => item.productId) } },
+    include: { creator: { select: { role: true } } },
+  });
   if (products.length !== items.length) return next(new ErrorHandler("One or more products no longer exist.", 404));
-  const pricedItems = items.map((item) => ({
-    product: products.find((product) => product.id === item.productId),
-    quantity: item.quantity,
-  }));
+  const pricedItems = items.map((item) => {
+    const product = products.find((entry) => entry.id === item.productId);
+    // Shelf153's own stock (created by an admin, not a seller) has no seller to pay:
+    // the platform keeps 100% instead of a 7% commission plus a payable to itself.
+    const platformOwned = product.creator?.role !== "Seller";
+    return {
+      product,
+      quantity: item.quantity,
+      sellerId: platformOwned ? null : product.created_by,
+      ...(platformOwned && { commissionRate: "1" }),
+    };
+  });
   let financials;
   try {
     financials = calculateOrderFinancials(pricedItems);
@@ -232,9 +243,9 @@ export const createPlaceNewOrderHandler = ({ startPayment = initiatePayment } = 
           tax_price,
           shipping_price,
           order_items: {
-            create: pricedItems.map(({ product, quantity }, index) => ({
+            create: pricedItems.map(({ product, quantity, sellerId }, index) => ({
               product_id: product.id,
-              seller_id: product.created_by,
+              seller_id: sellerId,
               quantity,
               price: product.price,
               image: product.images?.[0]?.url || "",

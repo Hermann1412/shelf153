@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const ShelfMark = ({ className = "" }) => (
+export const ShelfMark = ({ className = "" }) => (
   <svg
     viewBox="0 0 24 24"
     fill="none"
@@ -23,14 +23,12 @@ const ShelfMark = ({ className = "" }) => (
 );
 
 const Logo = ({ className = "", textClassName = "text-2xl" }) => (
-  <Link to="/" className={`flex items-center gap-2.5 shrink-0 ${className}`}>
-    <span className="flex items-center justify-center w-9 h-9 rounded-xl gradient-primary shadow-[var(--shadow-glow)]">
-      <ShelfMark className="w-5 h-5 text-white" />
+  <Link to="/" aria-label="Shelf153" className={`flex items-center gap-2 shrink-0 ${className}`}>
+    <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground">
+      <ShelfMark className="w-5 h-5" />
     </span>
-    <span
-      className={`${textClassName} font-bold gradient-primary bg-clip-text text-transparent`}
-    >
-      Shelf153
+    <span className={`${textClassName} font-extrabold tracking-tight text-foreground`}>
+      Shelf<span className="text-primary">153</span>
     </span>
   </Link>
 );

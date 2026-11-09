@@ -8,7 +8,7 @@ Documentation détaillée des paiements, remboursements, payouts et variables d'
 
 - Node.js 24
 - PostgreSQL 17 (PostgreSQL 14+ convient également)
-- Comptes pawaPay, Cloudinary, Gemini et SMTP pour les fonctions correspondantes
+- Comptes pawaPay, Cloudinary et SMTP pour les fonctions correspondantes
 
 ## Installation locale
 
@@ -101,5 +101,5 @@ En RDC, la configuration fournie accepte `AIRTEL_COD`, `VODACOM_MPESA_COD` et `O
 - Construire les images frontend avec `VITE_API_URL`, `VITE_SOCKET_URL` et `VITE_DASHBOARD_URL` pointant vers les URL publiques HTTPS.
 - Déclarer ces trois variables dans les paramètres de chaque projet Vercel avant le build ; elles ne sont volontairement pas inscrites dans `vercel.json` car elles dépendent des domaines déployés.
 - Utiliser des domaines HTTPS autorisés dans `FRONTEND_URL` et `DASHBOARD_URL`.
-- Ne jamais partager `DATABASE_URL`, `PAWAPAY_API_TOKEN`, les identifiants Cloudinary, SMTP, Gemini ou le secret JWT.
+- Ne jamais partager `DATABASE_URL`, `PAWAPAY_API_TOKEN`, les identifiants Cloudinary, SMTP ou le secret JWT.
 - Le endpoint de santé est `GET /api/v1/health`.

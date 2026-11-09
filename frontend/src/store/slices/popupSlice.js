@@ -7,7 +7,6 @@ const popupSlice = createSlice({
     isSidebarOpen: false,
     isSearchBarOpen: false,
     isCartOpen: false,
-    isAIPopupOpen: false,
     isProfilePanelOpen: false,
   },
   reducers: {
@@ -23,9 +22,6 @@ const popupSlice = createSlice({
     toggleCart: (state) => {
       state.isCartOpen = !state.isCartOpen;
     },
-    toggleAIModal: (state) => {
-      state.isAIPopupOpen = !state.isAIPopupOpen;
-    },
     toggleProfilePanel: (state) => {
       state.isProfilePanelOpen = !state.isProfilePanelOpen;
     },
@@ -34,7 +30,6 @@ const popupSlice = createSlice({
       state.isSidebarOpen = false;
       state.isSearchBarOpen = false;
       state.isCartOpen = false;
-      state.isAIPopupOpen = false;
       state.isProfilePanelOpen = false;
     },
   },
@@ -45,7 +40,6 @@ export const {
   toggleSidebar,
   toggleSearchBar,
   toggleCart,
-  toggleAIModal,
   toggleProfilePanel,
   closeAll,
 } = popupSlice.actions;

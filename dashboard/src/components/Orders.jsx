@@ -10,14 +10,14 @@ import {
 } from "../store/slices/orderSlice";
 
 const statusColors = {
-  Processing: "bg-yellow-100 text-yellow-700",
-  Shipped: "bg-green-100 text-green-700",
-  Delivered: "bg-green-100 text-green-700",
+  Processing: "bg-amber-100 text-amber-800",
+  Shipped: "bg-sky-100 text-sky-800",
+  Delivered: "bg-green-100 text-green-800",
   Cancelled: "bg-red-100 text-red-700",
 };
 
 const Orders = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { orders, loading } = useSelector((state) => state.order);
   const [filter, setFilter] = useState("All");
@@ -149,15 +149,23 @@ const Orders = () => {
                       </select>
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {new Date(order.created_at).toLocaleDateString()}
+                      {new Date(order.created_at).toLocaleDateString(i18n?.language)}
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => handleDelete(order.id)}
-                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {/* The API refuses to delete paid orders (they must be cancelled or refunded),
+                          so only offer the action where it can succeed. */}
+                      {order.payment?.payment_status !== "Paid" ? (
+                        <button
+                          onClick={() => handleDelete(order.id)}
+                          aria-label={t("common.delete")}
+                          title={t("common.delete")}
+                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
                     </td>
                   </tr>
                 ))}

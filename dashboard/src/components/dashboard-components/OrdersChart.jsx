@@ -1,11 +1,12 @@
 import { useSelector } from "react-redux";
+import { selectSellerMode } from "../../lib/storeScope";
 import { useTranslation } from "react-i18next";
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const OrdersChart = () => {
   const { t } = useTranslation();
   const { orderStatusCounts } = useSelector((state) =>
-    state.auth.user?.role === "Seller" ? state.seller : state.admin
+    selectSellerMode(state) ? state.seller : state.admin
   );
 
   const statusColors = {
