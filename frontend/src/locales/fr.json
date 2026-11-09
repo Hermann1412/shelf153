@@ -2,7 +2,7 @@
   "validation": {
     "required": "Ce champ est obligatoire",
     "emailInvalid": "Veuillez entrer une adresse email valide",
-    "passwordLength": "Le mot de passe doit contenir entre 8 et 16 caractères",
+    "passwordLength": "Le mot de passe doit contenir entre 8 et 64 caractères",
     "passwordMismatch": "Les mots de passe ne correspondent pas"
   },
   "errors": {

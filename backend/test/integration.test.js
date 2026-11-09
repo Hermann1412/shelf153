@@ -392,6 +392,45 @@ if (!databaseUrl) {
     });
   });
 
+  describe("account security", () => {
+    test("changing the password signs out other devices and keeps this one signed in", async () => {
+      const user = await createUser({ email: "revoke@example.test", password: "password123" });
+      // A session issued before the change (iat a few seconds in the past).
+      const oldCookie = `token=${jwt.sign({ id: user.id, iat: Math.floor(Date.now() / 1000) - 10 }, process.env.JWT_SECRET_KEY)}`;
+      assert.equal((await request(app).get("/api/v1/auth/me").set("Cookie", oldCookie)).status, 200);
+
+      const changed = await request(app).put("/api/v1/auth/password/update").set("Cookie", oldCookie)
+        .send({ currentPassword: "password123", newPassword: "a long passphrase over sixteen chars", confirmNewPassword: "a long passphrase over sixteen chars" });
+      assert.equal(changed.status, 200);
+      const freshCookie = changed.headers["set-cookie"][0].split(";")[0];
+
+      assert.equal((await request(app).get("/api/v1/auth/me").set("Cookie", oldCookie)).status, 401);
+      assert.equal((await request(app).get("/api/v1/auth/me").set("Cookie", freshCookie)).status, 200);
+      const relogin = await request(app).post("/api/v1/auth/login").send({ email: "revoke@example.test", password: "a long passphrase over sixteen chars" });
+      assert.equal(relogin.status, 200);
+    });
+
+    test("logout is a POST and page loads do not use up the sign-in limit", async () => {
+      const user = await createUser({ email: "limits@example.test" });
+      assert.equal((await request(app).get("/api/v1/auth/logout").set("Cookie", cookieFor(user))).status, 404);
+      assert.equal((await request(app).post("/api/v1/auth/logout")).status, 200);
+      for (let i = 0; i < 40; i += 1) {
+        await request(app).get("/api/v1/auth/me").set("Cookie", cookieFor(user));
+      }
+      const login = await request(app).post("/api/v1/auth/login").send({ email: "limits@example.test", password: "password123" });
+      assert.equal(login.status, 200);
+    });
+
+    test("an upload that is not really an image is refused", async () => {
+      const admin = await createUser({ email: "upload-admin@example.test", role: "Admin" });
+      const response = await request(app).post("/api/v1/product/admin/create").set("Cookie", cookieFor(admin))
+        .field("name", "Fake").field("description", "d").field("price", "2830").field("category", "Test").field("stock", "1")
+        .attach("images", Buffer.from("<script>alert(1)</script>"), { filename: "photo.png", contentType: "image/png" });
+      assert.equal(response.status, 400);
+      assert.equal(await prisma.product.count({ where: { name: "Fake" } }), 0);
+    });
+  });
+
   describe("product categories", () => {
     test("only categories with products are listed, and a new category is created by using it", async () => {
       const admin = await createUser({ email: "categories-admin@example.test", role: "Admin" });

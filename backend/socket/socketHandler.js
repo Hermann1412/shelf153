@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import prisma from "../database/db.js";
+import { isTokenRevoked } from "../utils/passwordPolicy.js";
 
 const conversationDetails = async (id) => {
   const conversation = await prisma.conversation.findUnique({
@@ -38,9 +39,11 @@ export const initSocket = (httpServer) => {
       if (!cookies.token) return next(new Error("Not authenticated"));
       const decoded = jwt.verify(cookies.token, process.env.JWT_SECRET_KEY);
       const user = await prisma.user.findUnique({
-        where: { id: decoded.id }, select: { id: true, name: true, role: true, avatar: true },
+        where: { id: decoded.id }, select: { id: true, name: true, role: true, avatar: true, password_changed_at: true },
       });
       if (!user) return next(new Error("User not found"));
+      if (isTokenRevoked(user, decoded)) return next(new Error("Session expired"));
+      delete user.password_changed_at;
       socket.user = user;
       next();
     } catch {

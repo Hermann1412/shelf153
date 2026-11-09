@@ -26,7 +26,7 @@ const ResetPassword = () => {
     e.preventDefault();
     const next = {};
     if (!password) next.password = t("validation.required");
-    else if (password.length < 8 || password.length > 16) next.password = t("validation.passwordLength");
+    else if (password.length < 8 || password.length > 64) next.password = t("validation.passwordLength");
     if (!confirmPassword) next.confirmPassword = t("validation.required");
     else if (password !== confirmPassword) next.confirmPassword = t("validation.passwordMismatch");
     setErrors(next);

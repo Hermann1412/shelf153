@@ -4,7 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import helmet from "helmet";
-import { rateLimit } from "express-rate-limit";
+import { paymentLimiter } from "./middlewares/rateLimiters.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 import authRouter from "./router/authRoutes.js";
 import productRouter from "./router/productRoutes.js";
@@ -65,8 +65,6 @@ app.use(
   })
 );
 
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: "draft-8", legacyHeaders: false });
-const paymentLimiter = rateLimit({ windowMs: 60 * 1000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false });
 
 app.use((req, res, next) => {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
@@ -80,7 +78,8 @@ app.use((req, res, next) => {
 
 app.get("/api/v1/health", (_req, res) => res.status(200).json({ success: true }));
 
-app.use("/api/v1/auth", authLimiter, authRouter);
+// Rate limits are set per route in authRoutes (sign-in, sign-up, password reset only).
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/order", orderRouter);

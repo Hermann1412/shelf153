@@ -13,6 +13,7 @@ export const toPublicUser = (user) => {
     password: _password,
     reset_password_token: _resetToken,
     reset_password_expire: _resetExpire,
+    password_changed_at: _passwordChangedAt,
     ...publicUser
   } = user;
   return publicUser;

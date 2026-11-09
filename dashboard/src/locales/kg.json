@@ -10,7 +10,7 @@
   "validation": {
     "required": "Kisika yayi kilombeka",
     "emailInvalid": "Sonika email ya kieleka",
-    "passwordLength": "Mot de passe fwete kuvwanda ye zitumu 8 tii 16",
+    "passwordLength": "Mot de passe fwete kuvwanda ye zitumu 8 tii 64",
     "passwordMismatch": "Ba mots de passe ke fwanana ve"
   },
   "errors": {

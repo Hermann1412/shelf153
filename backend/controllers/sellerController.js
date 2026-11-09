@@ -4,6 +4,7 @@ import prisma from "../database/db.js";
 import { v2 as cloudinary } from "cloudinary";
 import { toPublicUser } from "../utils/publicUser.js";
 import { normalizePhoneNumber } from "../utils/pawaPay.js";
+import { assertImageFile } from "../utils/imageUpload.js";
 
 const ITEM_STATUSES = ["Processing", "Shipped", "Delivered", "Cancelled"];
 const payoutProviders = () => new Set(
@@ -115,6 +116,7 @@ export const applyToBecomeSeller = catchAsyncErrors(async (req, res, next) => {
 
   let storeLogo = existing?.store_logo || null;
   if (req.files?.store_logo) {
+    try { await assertImageFile(req.files.store_logo); } catch (error) { return next(error); }
     const result = await cloudinary.uploader.upload(req.files.store_logo.tempFilePath, {
       folder: "Ecommerce_Store_Logos", width: 300, crop: "scale",
     });
@@ -156,6 +158,7 @@ export const updateStoreProfile = catchAsyncErrors(async (req, res, next) => {
   if (!existing) return next(new ErrorHandler("Store profile not found.", 404));
   let storeLogo = existing.store_logo;
   if (req.files?.store_logo) {
+    try { await assertImageFile(req.files.store_logo); } catch (error) { return next(error); }
     const result = await cloudinary.uploader.upload(req.files.store_logo.tempFilePath, {
       folder: "Ecommerce_Store_Logos", width: 300, crop: "scale",
     });

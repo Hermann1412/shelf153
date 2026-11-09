@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { catchAsyncErrors } from "./catchAsyncError.js";
 import ErrorHandler from "./errorMiddleware.js";
 import prisma from "../database/db.js";
+import { isTokenRevoked } from "../utils/passwordPolicy.js";
 
 export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.cookies;
@@ -13,6 +14,9 @@ export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
   req.user = await prisma.user.findUnique({ where: { id: decoded.id } });
   if (!req.user) {
     return next(new ErrorHandler("The user for this session no longer exists.", 401));
+  }
+  if (isTokenRevoked(req.user, decoded)) {
+    return next(new ErrorHandler("Your password was changed. Please sign in again.", 401));
   }
 
   if (req.user?.role === "Seller") {

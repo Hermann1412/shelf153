@@ -48,7 +48,7 @@ const ProfilePanel = () => {
     const next = {};
     if (!currentPassword) next.currentPassword = t("validation.required");
     if (!newPassword) next.newPassword = t("validation.required");
-    else if (newPassword.length < 8 || newPassword.length > 16) {
+    else if (newPassword.length < 8 || newPassword.length > 64) {
       next.newPassword = t("validation.passwordLength");
     }
     if (!confirmNewPassword) next.confirmNewPassword = t("validation.required");

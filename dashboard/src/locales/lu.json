@@ -10,7 +10,7 @@
   "validation": {
     "required": "Muaba eu udi mua dijadika",
     "emailInvalid": "Longesha email muimpe",
-    "passwordLength": "Mot de passe udi mua kuikala ne ntendu 8 too ne 16",
+    "passwordLength": "Mot de passe udi mua kuikala ne ntendu 8 too ne 64",
     "passwordMismatch": "Ba mots de passe kabena bimue to"
   },
   "errors": {

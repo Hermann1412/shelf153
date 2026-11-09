@@ -2,7 +2,7 @@
   "validation": {
     "required": "Esika oyo esengeli kotondisama",
     "emailInvalid": "Tia email ya solo",
-    "passwordLength": "Mot de passe esengeli kozala na ba lettre 8 kino 16",
+    "passwordLength": "Mot de passe esengeli kozala na ba lettre 8 kino 64",
     "passwordMismatch": "Ba mots de passe ekokani te"
   },
   "errors": {

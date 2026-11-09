@@ -62,7 +62,7 @@ const LoginModal = () => {
     }
     if (mode !== "forgot") {
       if (!formData.password) next.password = t("validation.required");
-      else if (formData.password.length < 8 || formData.password.length > 16) {
+      else if (formData.password.length < 8 || formData.password.length > 64) {
         next.password = t("validation.passwordLength");
       }
     }

@@ -2,7 +2,7 @@
   "validation": {
     "required": "Sehemu hii inahitajika",
     "emailInvalid": "Tafadhali weka barua pepe sahihi",
-    "passwordLength": "Nywila lazima iwe na herufi 8 mpaka 16",
+    "passwordLength": "Nywila lazima iwe na herufi 8 mpaka 64",
     "passwordMismatch": "Nywila hazifanani"
   },
   "errors": {

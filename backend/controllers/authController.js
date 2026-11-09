@@ -9,6 +9,8 @@ import { sendEmail } from "../utils/sendEmail.js";
 import crypto from "crypto";
 import { v2 as cloudinary } from "cloudinary";
 import { toPublicUser } from "../utils/publicUser.js";
+import { isValidPassword, PASSWORD_RULE_MESSAGE } from "../utils/passwordPolicy.js";
+import { assertImageFile } from "../utils/imageUpload.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   const { name, password } = req.body;
@@ -16,10 +18,8 @@ export const register = catchAsyncErrors(async (req, res, next) => {
   if (!name || !email || !password) {
     return next(new ErrorHandler("Please provide all required fields.", 400));
   }
-  if (password.length < 8 || password.length > 16) {
-    return next(
-      new ErrorHandler("Password must be between 8 and 16 characters.", 400)
-    );
+  if (!isValidPassword(password)) {
+    return next(new ErrorHandler(PASSWORD_RULE_MESSAGE, 400));
   }
 
   const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
@@ -115,19 +115,17 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
   if (req.body.password !== req.body.confirmPassword) {
     return next(new ErrorHandler("Passwords do not match.", 400));
   }
-  if (
-    req.body.password?.length < 8 ||
-    req.body.password?.length > 16 ||
-    req.body.confirmPassword?.length < 8 ||
-    req.body.confirmPassword?.length > 16
-  ) {
-    return next(new ErrorHandler("Password must be between 8 and 16 characters.", 400));
+  if (!isValidPassword(req.body.password)) {
+    return next(new ErrorHandler(PASSWORD_RULE_MESSAGE, 400));
   }
 
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   const updated = await prisma.user.update({
     where: { id: user.id },
-    data: { password: hashedPassword, reset_password_token: null, reset_password_expire: null },
+    data: {
+      password: hashedPassword, reset_password_token: null, reset_password_expire: null,
+      password_changed_at: new Date(),
+    },
   });
   sendToken(updated, 200, "Password reset successfully", res);
 });
@@ -144,19 +142,17 @@ export const updatePassword = catchAsyncErrors(async (req, res, next) => {
   if (newPassword !== confirmNewPassword) {
     return next(new ErrorHandler("New passwords do not match.", 400));
   }
-  if (
-    newPassword.length < 8 ||
-    newPassword.length > 16 ||
-    confirmNewPassword.length < 8 ||
-    confirmNewPassword.length > 16
-  ) {
-    return next(new ErrorHandler("Password must be between 8 and 16 characters.", 400));
+  if (!isValidPassword(newPassword)) {
+    return next(new ErrorHandler(PASSWORD_RULE_MESSAGE, 400));
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await prisma.user.update({ where: { id: req.user.id }, data: { password: hashedPassword } });
-
-  res.status(200).json({ success: true, message: "Password updated successfully." });
+  // Marking the change revokes every older session; this device gets a fresh one below.
+  const updated = await prisma.user.update({
+    where: { id: req.user.id },
+    data: { password: hashedPassword, password_changed_at: new Date() },
+  });
+  sendToken(updated, 200, "Password updated successfully.", res);
 });
 
 export const updateProfile = catchAsyncErrors(async (req, res, next) => {
@@ -171,6 +167,8 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
   let avatarData = null;
   if (req.files && req.files.avatar) {
     const { avatar } = req.files;
+    // Check before removing the current avatar, so a rejected file changes nothing.
+    try { await assertImageFile(avatar); } catch (error) { return next(error); }
     if (req.user?.avatar?.public_id) {
       await cloudinary.uploader.destroy(req.user.avatar.public_id);
     }

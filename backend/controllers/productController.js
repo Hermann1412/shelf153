@@ -2,6 +2,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { v2 as cloudinary } from "cloudinary";
 import prisma from "../database/db.js";
+import { assertImageFile, asFileList } from "../utils/imageUpload.js";
 
 // Prices are typed in CDF and stored in USD: stored = typed / PRICE_INPUT_DIVISOR.
 // Exposed through GET /settings so the dashboard can label the field and prefill edits in CDF.
@@ -78,7 +79,9 @@ export const createProduct = catchAsyncErrors(async (req, res, next) => {
 
   const uploadedImages = [];
   if (req.files?.images) {
-    const images = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+    const images = asFileList(req.files.images);
+    // Validate every file first so a bad one does not leave the others uploaded for nothing.
+    try { for (const image of images) await assertImageFile(image); } catch (error) { return next(error); }
     for (const image of images) {
       const result = await cloudinary.uploader.upload(image.tempFilePath, {
         folder: "Ecommerce_Product_Images", width: 1000, crop: "scale",

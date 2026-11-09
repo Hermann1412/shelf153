@@ -15,6 +15,8 @@ model User {
   avatar                 Json?
   reset_password_token   String?
   reset_password_expire  DateTime?
+  // Sessions issued before this moment are rejected (see utils/passwordPolicy.js).
+  password_changed_at    DateTime?
   created_at             DateTime       @default(now())
   products               Product[]
   reviews                Review[]
