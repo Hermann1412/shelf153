@@ -13,6 +13,8 @@ const Settings = () => {
     contact_email: "",
     contact_phone: "",
     address: "",
+    shipping_info: "",
+    returns_policy: "",
   });
 
   useEffect(() => {
@@ -25,6 +27,8 @@ const Settings = () => {
         contact_email: settings.contact_email || "",
         contact_phone: settings.contact_phone || "",
         address: settings.address || "",
+        shipping_info: settings.shipping_info || "",
+        returns_policy: settings.returns_policy || "",
       });
     }
   }, [settings]);
@@ -99,6 +103,46 @@ const Settings = () => {
               rows={2}
               placeholder={t("settings.addressPlaceholder")}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Customer-service pages: each appears in the storefront footer only once it has text. */}
+          <div className="pt-5 mt-2 border-t">
+            <h3 className="text-sm font-semibold text-gray-900">{t("settings.servicePages", "Service client")}</h3>
+            <p className="mt-1 text-xs text-gray-500">
+              {t("settings.servicePagesHint", "Chaque page apparaît dans le pied de page de la boutique dès qu'elle contient du texte. Laissez vide pour la masquer.")}
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="settings-shipping" className="block text-sm font-medium text-gray-700 mb-1">
+              {t("settings.shippingInfo", "Infos livraison")}
+            </label>
+            <textarea
+              id="settings-shipping"
+              name="shipping_info"
+              value={form.shipping_info}
+              onChange={handleChange}
+              rows={6}
+              maxLength={10000}
+              placeholder={t("settings.shippingInfoPlaceholder", "Zones livrées, délais, frais de livraison…")}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-y"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="settings-returns" className="block text-sm font-medium text-gray-700 mb-1">
+              {t("settings.returnsPolicy", "Politique de retour")}
+            </label>
+            <textarea
+              id="settings-returns"
+              name="returns_policy"
+              value={form.returns_policy}
+              onChange={handleChange}
+              rows={6}
+              maxLength={10000}
+              placeholder={t("settings.returnsPolicyPlaceholder", "Délai pour retourner un article, conditions, remboursement…")}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-y"
             />
           </div>
 

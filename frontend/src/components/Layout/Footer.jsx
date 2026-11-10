@@ -26,22 +26,14 @@ const Footer = () => {
     company: [
       { name: t("footer.sell"), path: "/vendre" },
       { name: t("footer.aboutUs"), path: "/about" },
-      { name: t("footer.careers"), path: "#" },
-      { name: t("footer.press"), path: "#" },
-      { name: t("footer.blog"), path: "#" },
     ],
+    // Shipping and returns pages are written by the main admin; link them only once they have text.
     customer: [
       { name: t("footer.contactUs"), path: "/contact" },
       { name: t("footer.faq"), path: "/faq" },
-      { name: t("footer.shippingInfo"), path: "#" },
-      { name: t("footer.returns"), path: "#" },
-    ],
-    legal: [
-      { name: t("footer.privacyPolicy"), path: "#" },
-      { name: t("footer.termsOfService"), path: "#" },
-      { name: t("footer.cookiePolicy"), path: "#" },
-      { name: t("footer.security"), path: "#" },
-    ],
+      settings?.shipping_info && { name: t("footer.shippingInfo"), path: "/livraison" },
+      settings?.returns_policy && { name: t("footer.returns"), path: "/retours" },
+    ].filter(Boolean),
   };
 
   const socialLinks = [
@@ -53,15 +45,14 @@ const Footer = () => {
   const columns = [
     { title: t("footer.company"), links: footerLinks.company },
     { title: t("footer.customerService"), links: footerLinks.customer },
-    { title: t("footer.legal"), links: footerLinks.legal },
   ];
 
   return (
     <footer className="mt-8 bg-card border-t border-border">
       <div className="container mx-auto px-4 sm:px-6 pt-12 pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
           {/* Brand & Contact */}
-          <div className="col-span-2 md:col-span-4 lg:col-span-2 lg:pr-10">
+          <div className="col-span-2 md:pr-10">
             <Logo textClassName="text-xl" />
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground max-w-sm">
               {t("footer.description")}

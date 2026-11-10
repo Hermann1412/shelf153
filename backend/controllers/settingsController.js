@@ -12,7 +12,9 @@ export const getSiteSettings = catchAsyncErrors(async (req, res) => {
   });
   res.status(200).json({
     success: true,
-    settings: settings || { id: SETTINGS_ID, contact_email: null, contact_phone: null, address: null },
+    settings: settings || {
+      id: SETTINGS_ID, contact_email: null, contact_phone: null, address: null, shipping_info: null, returns_policy: null,
+    },
     price_input_divisor: PRICE_INPUT_DIVISOR,
     // Shown on the storefront "Sell on Shelf153" page so the advertised rate is the one applied.
     platform_commission_rate: Number(parseCommissionRate().decimal),
@@ -28,13 +30,15 @@ const optionalText = (value, field, maxLength) => {
 };
 
 export const updateSiteSettings = catchAsyncErrors(async (req, res, next) => {
-  const { contact_email, contact_phone, address } = req.body;
+  const { contact_email, contact_phone, address, shipping_info, returns_policy } = req.body;
   let data;
   try {
     data = {
       contact_email: optionalText(contact_email, "Contact email", 150),
       contact_phone: optionalText(contact_phone, "Contact phone", 20),
       address: optionalText(address, "Address", 500),
+      shipping_info: optionalText(shipping_info, "Shipping information", 10000),
+      returns_policy: optionalText(returns_policy, "Returns policy", 10000),
     };
   } catch (error) {
     return next(error);

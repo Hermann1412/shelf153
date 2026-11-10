@@ -27,6 +27,7 @@ const About = lazy(() => import("./pages/About"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Sell = lazy(() => import("./pages/Sell"));
+const ServicePage = lazy(() => import("./pages/ServicePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const AppContent = () => {
@@ -60,6 +61,8 @@ const AppContent = () => {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/vendre" element={<Sell />} />
+        <Route path="/livraison" element={<ServicePage field="shipping_info" titleKey="footer.shippingInfo" titleDefault="Infos livraison" />} />
+        <Route path="/retours" element={<ServicePage field="returns_policy" titleKey="footer.returns" titleDefault="Retours" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </Suspense>

@@ -42,6 +42,8 @@ describe("Settings", () => {
         contact_email: "new@example.test",
         contact_phone: "+243812345678",
         address: "Lubumbashi",
+        shipping_info: "",
+        returns_policy: "",
       },
     });
   });
