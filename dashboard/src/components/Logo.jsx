@@ -30,9 +30,8 @@ const Logo = ({ size = "md", showText = true, light = false, className = "" }) =
   const s = sizes[size];
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <span className={`${s.box} flex items-center justify-center shrink-0 ${light ? "bg-white text-green-700" : "bg-green-700 text-white"}`}>
-        <ShelfMark className={s.mark} />
-      </span>
+      {/* Tinkli "T" mark next to the Shelf153 name. */}
+      <img src="/tinkli-logo.jpg" alt="" className={`${s.box} shrink-0 object-contain bg-white ${light ? "" : "ring-1 ring-gray-200"}`} />
       {showText && (
         <span className={`${s.text} font-extrabold tracking-tight ${light ? "text-white" : "text-gray-900"}`}>
           Shelf<span className={light ? "text-green-200" : "text-green-700"}>153</span>

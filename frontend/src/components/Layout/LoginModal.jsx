@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Mail, Lock, User, Eye, EyeOff, ShieldCheck } from "lucide-react";
-import { ShelfMark } from "./Logo";
+import { TinkliMark } from "./Logo";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -128,12 +128,12 @@ const LoginModal = () => {
           <span className="absolute -right-24 -top-24 w-80 h-80 rounded-full bg-white/5" aria-hidden="true" />
           <span className="absolute -left-20 -bottom-24 w-72 h-72 rounded-full bg-white/5" aria-hidden="true" />
           <div className="relative flex flex-col items-center">
-            <span className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white text-green-700 flex items-center justify-center shadow-lg">
-              <ShelfMark className="w-11 h-11 sm:w-14 sm:h-14" />
-            </span>
-            <p className="mt-5 text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Shelf<span className="text-green-200">153</span>
-            </p>
+            <div className="flex items-center gap-4">
+              <TinkliMark className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl shadow-lg" />
+              <p className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                Shelf<span className="text-green-200">153</span>
+              </p>
+            </div>
             <p className="mt-3 max-w-sm text-sm sm:text-base text-green-50/90">
               {t("auth.brandText", "Votre boutique en ligne à Lubumbashi, Kipushi, Likasi et Kolwezi.")}
             </p>
