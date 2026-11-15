@@ -56,6 +56,7 @@ if (!databaseUrl) {
   };
 
   const clearDatabase = async () => {
+    await prisma.sellerReport.deleteMany();
     await prisma.sellerDebtRecovery.deleteMany();
     await prisma.sellerDebt.deleteMany();
     await prisma.financialLedgerEntry.deleteMany();
@@ -446,6 +447,67 @@ if (!databaseUrl) {
       assert.equal((await create("  mode ")).body.product.category, "Mode");
       assert.equal((await create("Artisanat local")).status, 201);
       assert.deepEqual(await list(), ["Mode:2", "Artisanat local:1"]);
+    });
+  });
+
+  describe("monthly store reports", () => {
+    // A paid order for one store, paid at the given date.
+    const paidOrder = async ({ buyer, seller, product, quantity, paidAt }) => prisma.order.create({
+      data: {
+        buyer_id: buyer.id, total_price: 0, tax_price: 0, shipping_price: 0, paid_at: paidAt, stock_reserved: false,
+        order_items: {
+          create: {
+            product_id: product.id, seller_id: seller?.id ?? null, quantity, price: product.price, title: product.name,
+            ...lineAccounting(String(product.price), quantity),
+          },
+        },
+      },
+    });
+
+    test("ranks stores, sends a frozen report to a seller, and keeps orders away from sellers", async () => {
+      const admin = await createUser({ email: "report-admin@example.test", role: "Admin" });
+      const buyer = await createUser({ email: "report-buyer@example.test" });
+      const big = await createUser({ email: "big-shop@example.test", role: "Seller" });
+      const small = await createUser({ email: "small-shop@example.test", role: "Seller" });
+      await prisma.sellerProfile.createMany({
+        data: [
+          { user_id: big.id, store_name: "Big Shop", status: "Approved", slug: "big-shop" },
+          { user_id: small.id, store_name: "Small Shop", status: "Approved", slug: "small-shop" },
+        ],
+      });
+      const bigItem = await prisma.product.create({ data: { name: "Bag", description: "d", price: 100, category: "Mode", stock: 50, created_by: big.id } });
+      const smallItem = await prisma.product.create({ data: { name: "Hat", description: "d", price: 10, category: "Mode", stock: 50, created_by: small.id } });
+      const november = new Date(Date.UTC(2026, 10, 10));
+      await paidOrder({ buyer, seller: big, product: bigItem, quantity: 2, paidAt: november });
+      await paidOrder({ buyer, seller: big, product: bigItem, quantity: 1, paidAt: november });
+      await paidOrder({ buyer, seller: small, product: smallItem, quantity: 3, paidAt: november });
+      // Another month must not count.
+      await paidOrder({ buyer, seller: small, product: smallItem, quantity: 9, paidAt: new Date(Date.UTC(2026, 9, 31)) });
+
+      const overview = await request(app).get("/api/v1/admin/reports?month=2026-11").set("Cookie", cookieFor(admin));
+      assert.equal(overview.status, 200);
+      assert.deepEqual(overview.body.shops.map((s) => s.store_name), ["Big Shop", "Small Shop"]);
+      const [first, second] = overview.body.shops;
+      assert.deepEqual([first.items, first.orders, first.gross, first.commission, first.net], [3, 2, 300, 21, 279]);
+      assert.deepEqual([second.items, second.gross, second.net], [3, 30, 27.9]);
+      assert.equal(overview.body.totals.owed_to_sellers, 306.9);
+      assert.equal((await request(app).get("/api/v1/admin/reports?month=2026-13").set("Cookie", cookieFor(admin))).status, 400);
+
+      const sent = await request(app).post(`/api/v1/admin/reports/${big.id}/send`).set("Cookie", cookieFor(admin)).send({ month: "2026-11" });
+      assert.equal(sent.status, 200);
+      const mine = await request(app).get("/api/v1/seller/reports").set("Cookie", cookieFor(big));
+      assert.equal(mine.body.reports.length, 1);
+      assert.equal(mine.body.reports[0].data.totals.net, 279);
+      assert.equal(mine.body.reports[0].data.top_products[0].name, "Bag");
+      // The other store sees nothing it was not sent.
+      assert.equal((await request(app).get("/api/v1/seller/reports").set("Cookie", cookieFor(small))).body.reports.length, 0);
+
+      // Sellers manage products only: orders, customer details and stats stay with the main admin.
+      for (const path of ["/api/v1/seller/orders", "/api/v1/seller/dashboard-stats", "/api/v1/admin/reports?month=2026-11"]) {
+        assert.equal((await request(app).get(path).set("Cookie", cookieFor(big))).status, 403, path);
+      }
+      assert.equal((await request(app).get("/api/v1/seller/products").set("Cookie", cookieFor(big))).status, 200);
+      assert.equal((await request(app).get(`/api/v1/seller/orders?store=${big.id}`).set("Cookie", cookieFor(admin))).status, 200);
     });
   });
 

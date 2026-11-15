@@ -7,12 +7,22 @@ import {
 } from "../controllers/adminController.js";
 import { addExchangeRate, fetchFinanceOperations, importProviderFees } from "../controllers/financeController.js";
 import {
+  fetchMonthlyOverview,
+  fetchSellerReport,
+  sendAllReports,
+  sendSellerReport,
+} from "../controllers/reportController.js";
+import {
   authorizedRoles,
   isAuthenticated,
 } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+router.get("/reports", isAuthenticated, authorizedRoles("Admin"), fetchMonthlyOverview);
+router.get("/reports/:sellerId", isAuthenticated, authorizedRoles("Admin"), fetchSellerReport);
+router.post("/reports/send-all", isAuthenticated, authorizedRoles("Admin"), sendAllReports);
+router.post("/reports/:sellerId/send", isAuthenticated, authorizedRoles("Admin"), sendSellerReport);
 router.get("/finance", isAuthenticated, authorizedRoles("Admin"), fetchFinanceOperations);
 router.post("/finance/exchange-rates", isAuthenticated, authorizedRoles("Admin"), addExchangeRate);
 router.post("/finance/fees/import", isAuthenticated, authorizedRoles("Admin"), importProviderFees);

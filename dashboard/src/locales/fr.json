@@ -50,7 +50,9 @@
     "storeProfile": "Profil de la boutique",
     "logout": "Déconnexion",
     "collapse": "Réduire le menu",
-    "expand": "Agrandir le menu"
+    "expand": "Agrandir le menu",
+    "reports": "Rapports",
+    "myReports": "Mes rapports"
   },
   "header": {
     "adminAlt": "Admin"
@@ -260,5 +262,42 @@
   },
   "language": {
     "label": "Langue"
+  },
+  "reports": {
+    "title": "Rapports mensuels",
+    "subtitle": "Classement des boutiques, gains et rapports à envoyer en fin de mois.",
+    "loadFailed": "Impossible de charger le rapport.",
+    "sent": "Rapport envoyé dans l'espace du vendeur.",
+    "sentEmailed": "Rapport envoyé (espace vendeur + e-mail).",
+    "sentAll": "{{count}} rapport(s) envoyé(s).",
+    "sendFailed": "Envoi impossible.",
+    "totalSales": "Ventes totales",
+    "commission": "Commission Shelf153",
+    "owed": "À reverser aux boutiques",
+    "activeShops": "Boutiques actives",
+    "platformSales": "Ventes Shelf153 (en propre)",
+    "month": "Mois",
+    "sendAll": "Envoyer à toutes",
+    "ranking": "Classement",
+    "noShops": "Aucune boutique pour le moment.",
+    "shop": "Boutique",
+    "items": "Articles",
+    "orders": "Commandes",
+    "gross": "Ventes",
+    "commissionShort": "Commission",
+    "net": "Net dû",
+    "report": "Rapport",
+    "bestSeller": "Meilleure vente",
+    "sentOn": "Envoyé",
+    "resend": "Renvoyer",
+    "send": "Envoyer",
+    "confirmTitle": "Envoyer les rapports ?",
+    "confirmMessage": "Le rapport de {{month}} sera envoyé aux {{count}} boutique(s) ayant vendu ce mois-ci.",
+    "refunds": "Remboursements",
+    "topProducts": "Produits les plus vendus",
+    "myTitle": "Mes rapports mensuels",
+    "mySubtitle": "Chaque fin de mois, Shelf153 vous envoie le bilan de vos ventes et le montant qui vous revient.",
+    "noneYet": "Aucun rapport reçu pour l'instant. Votre premier bilan arrivera à la fin du mois.",
+    "receivedOn": "Reçu le"
   }
 }

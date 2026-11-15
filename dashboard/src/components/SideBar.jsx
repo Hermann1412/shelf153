@@ -14,12 +14,13 @@ import {
   Settings,
   WalletCards,
   Landmark,
+  FileBarChart,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { setOpenedComponent, toggleNavbar, setViewingStore } from "../store/slices/extraSlice";
 import { axiosInstance } from "../lib/axios";
-import { PLATFORM_STORE } from "../lib/storeScope";
+import { PLATFORM_STORE, selectActiveComponent } from "../lib/storeScope";
 import Logo from "./Logo";
 import { logout } from "../store/slices/authSlice";
 
@@ -27,9 +28,10 @@ const SideBar = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { openedComponent, isNavbarOpened, viewingStore } = useSelector(
+  const { isNavbarOpened, viewingStore } = useSelector(
     (state) => state.extra
   );
+  const activeComponent = useSelector(selectActiveComponent);
   const { user } = useSelector((state) => state.auth);
   const { conversations } = useSelector((state) => state.chat);
   const totalUnread = conversations.reduce(
@@ -44,16 +46,18 @@ const SideBar = () => {
       { label: "Products", icon: Package },
       { label: "Orders", icon: ListOrdered },
       { label: "Users", icon: Users },
+      { label: "Reports", icon: FileBarChart, display: t("sidebar.reports", "Rapports") },
       { label: "Payouts", icon: WalletCards },
       { label: "Finance", icon: Landmark },
       { label: "Chat", icon: MessageSquare },
       { label: "Settings", icon: Settings },
       { label: "Profile", icon: User },
     ],
+    // Sellers manage their catalog and read the monthly reports the main admin sends them;
+    // orders and customer details stay with the main admin.
     Seller: [
-      { label: "Dashboard", icon: LayoutDashboard },
       { label: "Products", icon: Package },
-      { label: "Orders", icon: ListOrdered },
+      { label: "Reports", icon: FileBarChart, display: t("sidebar.myReports", "Mes rapports") },
       { label: "Payouts", icon: WalletCards },
       { label: "StoreProfile", icon: Store, display: t("sidebar.storeProfile") },
       { label: "Profile", icon: User },
@@ -75,9 +79,14 @@ const SideBar = () => {
       .catch(() => {});
   }, [isAdmin]);
 
-  const storeItems = navItemsByRole.Seller
-    .filter((item) => !(viewingStore?.id === PLATFORM_STORE && item.label === "Payouts"))
-    .filter((item) => item.label !== "Profile");
+  // The admin's view of one store includes what sellers no longer see: its sales and orders.
+  const storeItems = [
+    { label: "Dashboard", icon: LayoutDashboard },
+    { label: "Products", icon: Package },
+    { label: "Orders", icon: ListOrdered },
+    { label: "Payouts", icon: WalletCards },
+    { label: "StoreProfile", icon: Store, display: t("sidebar.storeProfile") },
+  ].filter((item) => !(viewingStore?.id === PLATFORM_STORE && item.label === "Payouts"));
   const navItems = isAdmin && viewingStore ? storeItems : navItemsByRole[user?.role] || [];
 
   const handleStoreChange = (event) => {
@@ -174,10 +183,10 @@ const SideBar = () => {
                   // On phones the sidebar is a drawer: close it once a section is picked.
                   if (isNavbarOpened) dispatch(toggleNavbar());
                 }}
-                aria-current={openedComponent === item.label ? "page" : undefined}
+                aria-current={activeComponent === item.label ? "page" : undefined}
                 title={isCollapsed ? item.display || t(`sidebar.${item.label.charAt(0).toLowerCase()}${item.label.slice(1)}`, item.label) : undefined}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  openedComponent === item.label
+                  activeComponent === item.label
                     ? "bg-green-50 text-green-600"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}

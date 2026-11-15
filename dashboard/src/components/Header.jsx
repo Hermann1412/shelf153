@@ -5,11 +5,13 @@ import avatar from "../assets/avatar.jpg";
 import { Menu } from "lucide-react";
 import { toggleNavbar, setViewingStore } from "../store/slices/extraSlice";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { selectActiveComponent } from "../lib/storeScope";
 
 const Header = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { openedComponent, viewingStore } = useSelector((state) => state.extra);
+  const { viewingStore } = useSelector((state) => state.extra);
+  const openedComponent = useSelector(selectActiveComponent);
   const { user } = useSelector((state) => state.auth);
   const viewingAsAdmin = user?.role === "Admin" && viewingStore;
 
@@ -46,7 +48,9 @@ const Header = () => {
             {viewingAsAdmin ? viewingStore.store_name : t("sidebar.dashboard")}
           </p>
           <h2 className="text-xl font-semibold text-gray-800">
-            {t(`sidebar.${openedComponent?.charAt(0).toLowerCase()}${openedComponent?.slice(1)}`, openedComponent)}
+            {openedComponent === "Reports"
+              ? t(user?.role === "Seller" ? "sidebar.myReports" : "sidebar.reports", user?.role === "Seller" ? "Mes rapports" : "Rapports")
+              : t(`sidebar.${openedComponent?.charAt(0).toLowerCase()}${openedComponent?.slice(1)}`, openedComponent)}
           </h2>
         </div>
       </div>

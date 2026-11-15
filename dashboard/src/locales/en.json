@@ -50,7 +50,9 @@
     "storeProfile": "Store Profile",
     "logout": "Logout",
     "collapse": "Collapse sidebar",
-    "expand": "Expand sidebar"
+    "expand": "Expand sidebar",
+    "reports": "Reports",
+    "myReports": "My reports"
   },
   "header": {
     "adminAlt": "Admin"
@@ -260,5 +262,42 @@
   },
   "language": {
     "label": "Language"
+  },
+  "reports": {
+    "title": "Monthly reports",
+    "subtitle": "Shop ranking, earnings and the reports to send at month end.",
+    "loadFailed": "Could not load the report.",
+    "sent": "Report sent to the seller's space.",
+    "sentEmailed": "Report sent (seller space + email).",
+    "sentAll": "{{count}} report(s) sent.",
+    "sendFailed": "Could not send.",
+    "totalSales": "Total sales",
+    "commission": "Shelf153 commission",
+    "owed": "Owed to shops",
+    "activeShops": "Active shops",
+    "platformSales": "Shelf153's own sales",
+    "month": "Month",
+    "sendAll": "Send to all",
+    "ranking": "Ranking",
+    "noShops": "No shops yet.",
+    "shop": "Shop",
+    "items": "Items",
+    "orders": "Orders",
+    "gross": "Sales",
+    "commissionShort": "Commission",
+    "net": "Net owed",
+    "report": "Report",
+    "bestSeller": "Best seller",
+    "sentOn": "Sent",
+    "resend": "Resend",
+    "send": "Send",
+    "confirmTitle": "Send the reports?",
+    "confirmMessage": "The {{month}} report will be sent to the {{count}} shop(s) that sold this month.",
+    "refunds": "Refunds",
+    "topProducts": "Best-selling products",
+    "myTitle": "My monthly reports",
+    "mySubtitle": "At the end of each month, Shelf153 sends you a summary of your sales and the amount you are owed.",
+    "noneYet": "No reports yet. Your first summary arrives at the end of the month.",
+    "receivedOn": "Received on"
   }
 }

@@ -20,16 +20,20 @@ const Payouts = lazy(() => import("./components/Payouts"));
 const Finance = lazy(() => import("./components/Finance"));
 const SellerProducts = lazy(() => import("./components/SellerProducts"));
 const SellerOrders = lazy(() => import("./components/SellerOrders"));
+const Reports = lazy(() => import("./components/Reports"));
+const SellerReports = lazy(() => import("./components/SellerReports"));
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 import { ToastContainer } from "react-toastify";
 import { getUser } from "./store/slices/authSlice";
+import { selectActiveComponent } from "./lib/storeScope";
 
 function AppContent() {
   const dispatch = useDispatch();
   const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
-  const { openedComponent, viewingStore } = useSelector((state) => state.extra);
+  const { viewingStore } = useSelector((state) => state.extra);
+  const openedComponent = useSelector(selectActiveComponent);
   // The main admin sees a store's seller space when one is open in the store switcher.
   const viewingAsAdmin = user?.role === "Admin" && Boolean(viewingStore);
 
@@ -41,7 +45,8 @@ function AppContent() {
     // A plain User has no store yet — send them straight to the apply form.
     if (user?.role === "User") return <StoreProfile />;
 
-    if (user?.role === "Seller" || viewingAsAdmin) {
+    // The main admin inside one store: that store's sales, orders, catalog and payouts.
+    if (viewingAsAdmin) {
       switch (openedComponent) {
         case "Products":
           return <SellerProducts />;
@@ -51,10 +56,24 @@ function AppContent() {
           return <StoreProfile />;
         case "Payouts":
           return <Payouts />;
+        default:
+          return <Dashboard />;
+      }
+    }
+
+    // A seller manages their catalog and reads the reports the main admin sends; orders stay with the admin.
+    if (user?.role === "Seller") {
+      switch (openedComponent) {
+        case "Reports":
+          return <SellerReports />;
+        case "StoreProfile":
+          return <StoreProfile />;
+        case "Payouts":
+          return <Payouts />;
         case "Profile":
           return <Profile />;
         default:
-          return <Dashboard />;
+          return <SellerProducts />;
       }
     }
 
@@ -67,6 +86,8 @@ function AppContent() {
         return <Orders />;
       case "Users":
         return <Users />;
+      case "Reports":
+        return <Reports />;
       case "Chat":
         return <Chat />;
       case "Settings":
