@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import helmet from "helmet";
 import { paymentLimiter } from "./middlewares/rateLimiters.js";
+import { corsOrigin, isAllowedOrigin } from "./utils/allowedOrigins.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 import authRouter from "./router/authRoutes.js";
 import productRouter from "./router/productRoutes.js";
@@ -40,7 +41,7 @@ if (process.env.TRUST_PROXY_HOPS) {
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL, process.env.DASHBOARD_URL],
+    origin: corsOrigin,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -69,8 +70,7 @@ app.use(
 app.use((req, res, next) => {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
   const origin = req.get("origin");
-  const allowedOrigins = [process.env.FRONTEND_URL, process.env.DASHBOARD_URL].filter(Boolean);
-  if (origin && !allowedOrigins.includes(origin)) {
+  if (origin && !isAllowedOrigin(origin)) {
     return res.status(403).json({ success: false, message: "Origin not allowed." });
   }
   next();

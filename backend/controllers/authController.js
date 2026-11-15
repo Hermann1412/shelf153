@@ -9,6 +9,7 @@ import { sendEmail } from "../utils/sendEmail.js";
 import crypto from "crypto";
 import { v2 as cloudinary } from "cloudinary";
 import { toPublicUser } from "../utils/publicUser.js";
+import { allowedOrigins, isAllowedOrigin } from "../utils/allowedOrigins.js";
 import { isValidPassword, PASSWORD_RULE_MESSAGE } from "../utils/passwordPolicy.js";
 import { assertImageFile } from "../utils/imageUpload.js";
 
@@ -82,8 +83,9 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     data: { reset_password_token: hashedToken, reset_password_expire: new Date(resetPasswordExpireTime) },
   });
 
-  const allowedOrigins = [process.env.FRONTEND_URL, process.env.DASHBOARD_URL].filter(Boolean);
-  const origin = allowedOrigins.includes(req.get("origin")) ? req.get("origin") : process.env.FRONTEND_URL;
+  // Send the reset link to the site the request came from (storefront or dashboard).
+  const requestOrigin = String(req.get("origin") || "").replace(/\/+$/, "");
+  const origin = isAllowedOrigin(requestOrigin) ? requestOrigin : allowedOrigins()[0];
   const resetPasswordUrl = `${origin}/password/reset/${resetToken}`;
   const message = generateEmailTemplate(resetPasswordUrl);
 

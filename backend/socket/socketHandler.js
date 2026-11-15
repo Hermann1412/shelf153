@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import prisma from "../database/db.js";
 import { isTokenRevoked } from "../utils/passwordPolicy.js";
+import { corsOrigin } from "../utils/allowedOrigins.js";
 
 const conversationDetails = async (id) => {
   const conversation = await prisma.conversation.findUnique({
@@ -26,7 +27,7 @@ const conversationDetails = async (id) => {
 
 export const initSocket = (httpServer) => {
   const io = new Server(httpServer, {
-    cors: { origin: [process.env.FRONTEND_URL, process.env.DASHBOARD_URL], credentials: true },
+    cors: { origin: corsOrigin, credentials: true },
   });
 
   io.use(async (socket, next) => {
