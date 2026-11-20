@@ -1,4 +1,4 @@
-import { Plus, Minus, Trash2, ArrowRight, ShoppingBag, Truck } from "lucide-react";
+import { Plus, Minus, Trash2, ArrowRight, Truck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -16,8 +16,9 @@ const Cart = () => {
     return (
       <div className="page">
         <div className="surface max-w-lg mx-auto px-6 py-14 text-center">
-          <span className="mx-auto w-14 h-14 rounded-full bg-secondary flex items-center justify-center">
-            <ShoppingBag className="w-6 h-6 text-muted-foreground" />
+          {/* Brand illustration as an invitation to fill the bag; the cream net needs the green panel. */}
+          <span className="mx-auto w-28 h-36 rounded-2xl bg-gradient-to-br from-green-800 via-green-700 to-emerald-600 flex items-center justify-center">
+            <img src="/brand-bag.webp" alt="" width="304" height="640" className="h-28 w-auto" />
           </span>
           <h1 className="mt-5 text-xl font-bold text-foreground">{t("cart.empty")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{t("cart.emptyMessage")}</p>

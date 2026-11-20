@@ -17,9 +17,15 @@ const About = () => {
         <p className="page-subtitle">{t("about.subtitle")}</p>
       </div>
 
-      <section className="mt-8 surface p-6 sm:p-8">
-        <h2 className="section-title">{t("about.storyTitle")}</h2>
-        <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted-foreground max-w-3xl">{t("about.storyText")}</p>
+      <section className="mt-8 surface overflow-hidden grid sm:grid-cols-[1fr_auto]">
+        <div className="p-6 sm:p-8 self-center">
+          <h2 className="section-title">{t("about.storyTitle")}</h2>
+          <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted-foreground max-w-3xl">{t("about.storyText")}</p>
+        </div>
+        {/* Brand illustration: the cream net needs the green panel behind it. */}
+        <div className="flex items-center justify-center bg-gradient-to-br from-green-800 via-green-700 to-emerald-600 px-10 py-8 sm:w-64">
+          <img src="/brand-bag.webp" alt="" width="304" height="640" loading="lazy" className="h-56 sm:h-64 w-auto" />
+        </div>
       </section>
 
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
