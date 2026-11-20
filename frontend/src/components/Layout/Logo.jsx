@@ -22,9 +22,9 @@ export const ShelfMark = ({ className = "" }) => (
   </svg>
 );
 
-// Brand mark: the shopping net bag on a dark tile (the net is cream, so it needs a dark background).
+// Brand mark: the shopping net bag on a green tile matching the sign-in panel (the cream net needs a colored background).
 export const BrandMark = ({ className = "" }) => (
-  <span className={`inline-flex shrink-0 items-center justify-center bg-[#13241a] ${className}`}>
+  <span className={`inline-flex shrink-0 items-center justify-center bg-gradient-to-br from-green-800 via-green-700 to-emerald-600 ${className}`}>
     <img src="/logo.png" alt="" className="h-[82%] w-auto" />
   </span>
 );

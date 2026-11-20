@@ -30,8 +30,8 @@ const Logo = ({ size = "md", showText = true, light = false, className = "" }) =
   const s = sizes[size];
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      {/* Brand mark: the shopping net bag on a dark tile (the net is cream, so it needs a dark background). */}
-      <span className={`${s.box} shrink-0 inline-flex items-center justify-center bg-[#13241a] ${light ? "ring-1 ring-white/30" : ""}`}>
+      {/* Brand mark: the shopping net bag on a green tile matching the sign-in panel (the cream net needs a colored background). */}
+      <span className={`${s.box} shrink-0 inline-flex items-center justify-center bg-gradient-to-br from-green-800 via-green-700 to-emerald-600 ${light ? "ring-1 ring-white/30" : ""}`}>
         <img src="/logo.png" alt="" className="h-[82%] w-auto" />
       </span>
       {showText && (
