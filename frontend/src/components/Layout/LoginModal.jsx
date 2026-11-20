@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Mail, Lock, User, Eye, EyeOff, ShieldCheck } from "lucide-react";
-import { TinkliMark } from "./Logo";
+import { BrandMark } from "./Logo";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -129,7 +129,7 @@ const LoginModal = () => {
           <span className="absolute -left-20 -bottom-24 w-72 h-72 rounded-full bg-white/5" aria-hidden="true" />
           <div className="relative flex flex-col items-center">
             <div className="flex items-center gap-4">
-              <TinkliMark className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl shadow-lg" />
+              <BrandMark className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl shadow-lg" />
               <p className="text-3xl sm:text-4xl font-extrabold tracking-tight">
                 Shelf<span className="text-green-200">153</span>
               </p>

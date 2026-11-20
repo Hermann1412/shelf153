@@ -30,8 +30,10 @@ const Logo = ({ size = "md", showText = true, light = false, className = "" }) =
   const s = sizes[size];
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      {/* Tinkli "T" mark next to the Shelf153 name. */}
-      <img src="/tinkli-logo.jpg" alt="" className={`${s.box} shrink-0 object-contain bg-white ${light ? "" : "ring-1 ring-gray-200"}`} />
+      {/* Brand mark: the shopping net bag on a dark tile (the net is cream, so it needs a dark background). */}
+      <span className={`${s.box} shrink-0 inline-flex items-center justify-center bg-[#13241a] ${light ? "ring-1 ring-white/30" : ""}`}>
+        <img src="/logo.png" alt="" className="h-[82%] w-auto" />
+      </span>
       {showText && (
         <span className={`${s.text} font-extrabold tracking-tight ${light ? "text-white" : "text-gray-900"}`}>
           Shelf<span className={light ? "text-green-200" : "text-green-700"}>153</span>

@@ -22,14 +22,16 @@ export const ShelfMark = ({ className = "" }) => (
   </svg>
 );
 
-// Tinkli "T" mark, shown next to the Shelf153 name.
-export const TinkliMark = ({ className = "" }) => (
-  <img src="/tinkli-logo.jpg" alt="" className={`object-contain bg-white ${className}`} />
+// Brand mark: the shopping net bag on a dark tile (the net is cream, so it needs a dark background).
+export const BrandMark = ({ className = "" }) => (
+  <span className={`inline-flex shrink-0 items-center justify-center bg-[#13241a] ${className}`}>
+    <img src="/logo.png" alt="" className="h-[82%] w-auto" />
+  </span>
 );
 
 const Logo = ({ className = "", textClassName = "text-2xl" }) => (
   <Link to="/" aria-label="Tinkli Shelf153" className={`flex items-center gap-2 shrink-0 ${className}`}>
-    <TinkliMark className="w-9 h-9 rounded-lg ring-1 ring-border" />
+    <BrandMark className="w-9 h-9 rounded-lg" />
     <span className={`${textClassName} font-extrabold tracking-tight text-foreground`}>
       Shelf<span className="text-primary">153</span>
     </span>
