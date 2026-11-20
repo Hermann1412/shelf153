@@ -67,7 +67,7 @@
     "newsletterText": "Jiandikishe kwenye jarida letu upate ofa maalum na taarifa mpya",
     "emailPlaceholder": "Weka barua pepe yako",
     "subscribe": "Jiandikishe",
-    "copyright": "© 2024 Shelf153. Haki zote zimehifadhiwa."
+    "copyright": "© {{year}} Tinkli. Haki zote zimehifadhiwa."
   },
   "home": {
     "categoryTitle": "Nunua kwa Kategoria",

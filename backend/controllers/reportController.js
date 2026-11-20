@@ -12,7 +12,7 @@ const reportEmail = (report) => {
   const t = report.totals;
   return `
   <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#111">
-    <h2 style="color:#1c7d44">Tinkli-Shelf153 · Rapport de ${escapeHtml(monthLabel(report.period))}</h2>
+    <h2 style="color:#1c7d44">Shelf153 · Rapport de ${escapeHtml(monthLabel(report.period))}</h2>
     <p>Bonjour ${escapeHtml(report.owner_name)},</p>
     <p>Voici le récapitulatif des ventes de <strong>${escapeHtml(report.store_name)}</strong>.</p>
     <table style="width:100%;border-collapse:collapse">
@@ -25,6 +25,7 @@ const reportEmail = (report) => {
     </table>
     ${rows ? `<h3 style="margin-top:24px">Produits les plus vendus</h3><table style="width:100%;border-collapse:collapse"><tr><th align="left">Produit</th><th align="right">Qté</th><th align="right">Ventes</th></tr>${rows}</table>` : ""}
     <p style="color:#666;font-size:13px;margin-top:24px">Ce rapport est aussi disponible dans votre espace vendeur.</p>
+    <p style="color:#999;font-size:12px">Shelf153 est un produit Tinkli.</p>
   </div>`;
 };
 

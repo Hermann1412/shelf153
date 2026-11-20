@@ -67,7 +67,7 @@
     "newsletterText": "Songa nkumbu aku mu Newsletter yeto mu baka mabaku ya kizabukulu ye nsangu ya mpa",
     "emailPlaceholder": "Tula email aku",
     "subscribe": "Songa Nkumbu",
-    "copyright": "© 2024 Shelf153. Baswa yonso i ya kebolo."
+    "copyright": "© {{year}} Tinkli. Baswa yonso i ya kebolo."
   },
   "home": {
     "categoryTitle": "Sumba Kiengila kwa Catégorie",

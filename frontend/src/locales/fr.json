@@ -68,8 +68,9 @@
     "newsletterText": "Abonnez-vous à notre newsletter pour des offres exclusives et les actualités",
     "emailPlaceholder": "Entrez votre email",
     "subscribe": "S'abonner",
-    "copyright": "© 2024 Shelf153. Tous droits réservés.",
-    "sell": "Vendre sur Shelf153"
+    "copyright": "© {{year}} Tinkli. Tous droits réservés.",
+    "sell": "Vendre sur Shelf153",
+    "byline": "Shelf153 est un produit Tinkli."
   },
   "home": {
     "categoryTitle": "Acheter par catégorie",

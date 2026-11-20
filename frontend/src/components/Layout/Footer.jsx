@@ -102,7 +102,10 @@ const Footer = () => {
         </div>
 
         <div className="mt-12 pt-6 border-t border-border flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">{t("footer.copyright")}</p>
+          <p className="text-xs text-muted-foreground text-center sm:text-left">
+            {t("footer.copyright", { year: new Date().getFullYear() })}
+            <span className="block sm:inline sm:ml-1">{t("footer.byline", "Shelf153 est un produit Tinkli.")}</span>
+          </p>
           <div className="flex items-center gap-2">
             {socialLinks.map((social) => (
               <a

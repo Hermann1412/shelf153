@@ -67,7 +67,7 @@
     "newsletterText": "Idikisha bua kupeta mikenji ya pa buanga ne malu mapya",
     "emailPlaceholder": "Teka email webe",
     "subscribe": "Idikisha",
-    "copyright": "© 2024 Shelf153. Bibuelu bionso bidi bikubidila."
+    "copyright": "© {{year}} Tinkli. Bibuelu bionso bidi bikubidila."
   },
   "home": {
     "categoryTitle": "Sumba Ku Mishindu",

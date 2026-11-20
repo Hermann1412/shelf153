@@ -67,7 +67,7 @@
     "newsletterText": "Sala abonnement na newsletter na biso mpo na kozwa ba offre ya bomengo mpe ba nsango ya sika",
     "emailPlaceholder": "Kotisa email na yo",
     "subscribe": "Abonnement",
-    "copyright": "© 2024 Shelf153. Makoki nyonso ebombami."
+    "copyright": "© {{year}} Tinkli. Makoki nyonso ebombami."
   },
   "home": {
     "categoryTitle": "Somba Kolanda Kategori",

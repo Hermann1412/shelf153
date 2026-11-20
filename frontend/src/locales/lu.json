@@ -67,7 +67,7 @@
     "newsletterText": "Wenza Abonnement bua kupeta miyuki ne malu mimpe a mikuabu",
     "emailPlaceholder": "Fila email webe",
     "subscribe": "Wenza Abonnement",
-    "copyright": "© 2024 Shelf153. Bimonso bionso bidi ne muanda."
+    "copyright": "© {{year}} Tinkli. Bimonso bionso bidi ne muanda."
   },
   "home": {
     "categoryTitle": "Sumba Ku Catégories",

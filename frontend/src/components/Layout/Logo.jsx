@@ -28,7 +28,7 @@ export const BrandMark = ({ className = "" }) => (
 );
 
 const Logo = ({ className = "", textClassName = "text-2xl" }) => (
-  <Link to="/" aria-label="Tinkli Shelf153" className={`flex items-center gap-2 shrink-0 ${className}`}>
+  <Link to="/" aria-label="Shelf153" className={`flex items-center gap-2 shrink-0 ${className}`}>
     <BrandMark className="w-9 h-9 rounded-lg" />
     <span className={`${textClassName} font-extrabold tracking-tight text-foreground`}>
       Shelf<span className="text-primary">153</span>

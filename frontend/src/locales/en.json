@@ -68,8 +68,9 @@
     "newsletterText": "Subscribe to our newsletter for exclusive offers and updates",
     "emailPlaceholder": "Enter your email",
     "subscribe": "Subscribe",
-    "copyright": "© 2024 Shelf153. All rights reserved.",
-    "sell": "Sell on Shelf153"
+    "copyright": "© {{year}} Tinkli. All rights reserved.",
+    "sell": "Sell on Shelf153",
+    "byline": "Shelf153 is a Tinkli product."
   },
   "home": {
     "categoryTitle": "Shop by Category",
